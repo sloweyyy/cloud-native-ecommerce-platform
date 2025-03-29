@@ -1,0 +1,63 @@
+/* Order Summary Header */
+.order-summary-header {
+    background-color: #17a2b8;
+    /* Tăng độ sáng của màu nền */
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Order Summary Body */
+.order-summary-body {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 0 0 5px 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* List Item in Order Summary */
+.order-summary-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #e0e0e0;
+    /* Màu đường viền nhẹ nhàng */
+}
+
+.order-summary-item:last-of-type {
+    border-bottom: none;
+    /* Loại bỏ đường viền dưới cùng của mục cuối */
+}
+
+.order-summary-item strong {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Order Total Styling */
+.order-total {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #28a745;
+    /* Màu xanh lá cho tổng tiền */
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .order-summary-header {
+        font-size: 1.2em;
+    }
+
+    .order-summary-body {
+        padding: 15px;
+    }
+
+    .order-summary-item {
+        font-size: 0.9em;
+    }
+
+    .order-total {
+        font-size: 1.2em;
+    }
+}

@@ -1,0 +1,30 @@
+<div class="navbar">
+  <div class="logo">
+    <h3 class="logo-text" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">NextTech
+    </h3>
+  </div>
+
+  <nav class="nav-items">
+    <a class="nav-item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+    <a class="nav-item" routerLink="/store" routerLinkActive="active">Store</a>
+  </nav>
+
+  <div class="cart">
+    <a routerLink="/basket" class="position-relative">
+      <i class="fa fa-shopping-cart custom-icon"></i>
+      <div *ngIf="(basketService.basketSource$ | async) as basket" class="cart-no">
+        {{getBasketCount(basket.items)}}
+      </div>
+    </a>
+    <section class="login-section">
+      <!-- Login Button -->
+      <button *ngIf="!isUserAuthenticated" class="btn login-btn" (click)="login()">
+        Login
+      </button>
+      <!-- Logout Button -->
+      <button *ngIf="isUserAuthenticated" class="btn logout-btn" (click)="logout()">
+        Logout
+      </button>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,178 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.sidebar {
+    h5 {
+        color: #252B42;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .custom-select {
+        width: 100%;
+        border-radius: 5px;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    .list-group {
+        margin-top: 10px;
+
+        .list-group-item {
+            cursor: pointer;
+            border: 1px solid #252B42;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: #252B42;
+                color: white;
+            }
+
+            &.active {
+                background-color: #252B42;
+                color: white;
+                font-weight: bold;
+            }
+        }
+
+        margin-bottom: 5px;
+    }
+}
+
+.content-area {
+    header {
+        margin-top: 35px;
+        margin-bottom: -15px;
+
+        span {
+            font-size: 1rem;
+            color: #252B42;
+        }
+
+        strong {
+            font-weight: bold;
+            color: #252B42;
+        }
+    }
+
+    .form-inline {
+        display: flex;
+        align-items: center;
+
+        input {
+            border-radius: 5px;
+            border: 1px solid #252B42;
+            padding: 5px;
+            width: 300px;
+        }
+
+        button {
+            margin-left: 10px;
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: 1px solid #252B42;
+            color: #252B42;
+            background: transparent;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: #252B42;
+                color: white;
+            }
+        }
+    }
+
+    .products {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 40px 0;
+
+        .product-item {
+            transition: transform 0.3s ease;
+
+            &:hover {
+                transform: scale(1.05);
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            }
+        }
+    }
+}
+
+// 5. Pagination styles
+.pagination-wrapper {
+    display: flex;
+    justify-content: right;
+    margin-top: 20px;
+
+    .pagination {
+        li {
+            border-radius: 5px;
+            margin: 0 5px;
+
+            a {
+                color: #252B42;
+                padding: 5px 10px;
+                text-decoration: none;
+                border: 1px solid #252B42;
+
+                &:hover {
+                    background-color: #252B42;
+                    ;
+                    color: white;
+                }
+            }
+
+            &.active a {
+                background-color: #252B42;
+                color: white;
+            }
+        }
+    }
+}
+
+.header-search-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+header span {
+    margin-right: auto; // Move "Showing" to the left
+}
+
+.form-inline {
+    display: flex;
+    gap: 10px; // Add space between input and buttons
+    align-items: center;
+}
+
+.form-inline input {
+    padding: 5px;
+    width: 250px; // Adjust width as needed
+}
+
+.form-inline button {
+    padding: 5px 15px;
+    cursor: pointer;
+}

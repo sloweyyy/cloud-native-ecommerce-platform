@@ -1,0 +1,170 @@
+/* General container styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Empty basket message */
+.empty-message {
+    font-size: 1.5em;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 50px;
+    font-weight: 400;
+}
+
+/* Table container */
+.table-container {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+}
+
+.table th {
+    font-size: 1.2em;
+    color: #212529;
+    text-align: left;
+    padding: 10px;
+}
+
+.table td {
+    font-size: 1.1em;
+    padding: 10px;
+}
+
+.table .item-image {
+    max-height: 50px;
+    border-radius: 5px;
+}
+
+.table .quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table .quantity-display {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0 15px;
+}
+
+.table .fa {
+    font-size: 2em;
+    transition: transform 0.3s ease;
+}
+
+.table .fa:hover {
+    transform: scale(1.1);
+}
+
+/* Remove button */
+.table .fa-trash {
+    font-size: 2em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.table .fa-trash:hover {
+    color: #dc3545;
+}
+
+/* Checkout Button */
+.checkout-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    margin-top: 40px;
+
+    &:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    .container {
+        padding: 15px;
+    }
+
+    .table th,
+    .table td {
+        font-size: 1em;
+    }
+
+    .table .item-image {
+        max-height: 40px;
+    }
+
+    .checkout-btn {
+        font-size: 1em;
+        padding: 10px 18px;
+    }
+}
+
+@media (max-width: 992px) {
+    .table-container {
+        padding: 10px;
+    }
+}
+
+/* Product Image and Name Container */
+.product-image-container {
+    display: flex;
+    flex-direction: column;
+    /* Xếp dọc các phần tử con (hình ảnh và tên sản phẩm) */
+    align-items: flex-start;
+    /* Căn giữa các phần tử theo chiều ngang */
+    justify-content: center;
+    text-align: center;
+    /* Căn giữa chữ */
+}
+
+.item-image {
+    max-height: 100px;
+    /* Giới hạn kích thước hình ảnh để phù hợp với thiết kế */
+    width: auto;
+    margin-bottom: 10px;
+    /* Khoảng cách giữa hình ảnh và tên sản phẩm */
+}
+
+.product-name-container h5 {
+    font-size: 1em;
+    font-weight: 600;
+    color: #252B42;
+}
+
+.product-name-container h5 a {
+    text-decoration: none;
+    color: #252B42;
+    transition: color 0.3s ease;
+}
+
+.product-name-container h5 a:hover {
+    color: #007bff;
+    /* Thêm hiệu ứng khi hover */
+}
+
+.basket-empty {
+    font-size: 1.2em;
+    color: #6c757d;
+    text-align: center;
+    font-weight: 400;
+    height: 30vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

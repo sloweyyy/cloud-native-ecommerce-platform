@@ -1,0 +1,129 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar .logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.navbar .logo .logo-text {
+  font-size: 1.8em;
+  color: #252B42;
+  font-weight: 600;
+  user-select: none;
+  text-decoration: none;
+}
+
+.navbar .logo .logo-text:hover {
+  color: #1D2C5D;
+}
+
+.nav-items {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #878787;
+  font-size: 1.1em;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #252B42;
+}
+
+.nav-item.active {
+  color: #252B42;
+  font-weight: 600;
+}
+
+.cart {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.cart i {
+  font-size: 1.4em !important;
+  color: #252B42;
+}
+
+.cart-no {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background-color: #252B42;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.6em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 14px;
+  height: 14px;
+}
+
+.login-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 16px;
+  font-size: 1em;
+  font-weight: 500;
+  border: 1px solid #e1e1e1;
+  background-color: transparent;
+  color: #252B42;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border-radius: 5px;
+}
+
+.login-btn:hover,
+.logout-btn:hover {
+  background-color: #252B42;
+  color: white;
+}
+
+.login-btn:focus,
+.logout-btn:focus {
+  outline: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .nav-items {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cart {
+    margin-top: 15px;
+  }
+}

@@ -1,0 +1,202 @@
+/* General container styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Product Title */
+.product-title {
+    font-size: 2.5em;
+    font-weight: 600;
+    color: #252B42;
+    margin-top: 15px;
+}
+
+.product-name {
+    font-size: 2em;
+    font-weight: 700;
+    color: #252B42;
+}
+
+/* Product Price */
+.product-price {
+    font-size: 2em;
+    font-weight: 600;
+    color: #252B42;
+    margin-top: 10px;
+}
+
+/* Quantity Selector */
+.quantity-btn {
+    font-size: 2.5em;
+    transition: transform 0.3s ease;
+}
+
+.quantity-display {
+    font-size: 1.5em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    /* Adds spacing between quantity buttons */
+}
+
+/* Add to Cart Button */
+.add-to-cart-btn {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 12px 30px;
+    font-size: 1.2em;
+    background-color: #252B42;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+        background-color: #1a1f2c;
+        color: white;
+        transform: scale(1.05);
+    }
+}
+
+/* Image styling */
+img {
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Description */
+.description-title {
+    font-size: 1.8em;
+    font-weight: 600;
+    color: #252B42;
+    margin-bottom: 10px;
+}
+
+.product-description {
+    font-size: 1.2em;
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 767px) {
+
+    .product-title,
+    .product-price {
+        font-size: 2em;
+    }
+
+    .quantity-display {
+        font-size: 1.2em;
+    }
+
+    .add-to-cart-btn {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+}
+
+/* Card Effect */
+.card {
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+
+    &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Spacing classes */
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+.ml-4 {
+    margin-left: 1.5rem;
+}
+
+/* Flexbox layout for quantity buttons */
+.d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .quantity-btn {
+        font-size: 2.5em;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        margin: 0 10px;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    .quantity-display {
+        font-size: 1.5em;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 15px;
+    }
+
+    .add-to-cart-btn {
+        padding: 12px 30px;
+        font-size: 1.2em;
+        background-color: #252B42;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+
+        &:hover {
+            background-color: #1a1f2c;
+            color: white;
+            transform: scale(1.05);
+        }
+    }
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 767px) {
+    .container {
+        padding: 15px;
+    }
+
+    .product-title,
+    .product-price {
+        font-size: 1.8em;
+    }
+
+    .quantity-display {
+        font-size: 1.4em;
+    }
+
+    .quantity-btn {
+        font-size: 2em;
+    }
+
+    .add-to-cart-btn {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+}
+
+.product-image {
+    width: 80%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
