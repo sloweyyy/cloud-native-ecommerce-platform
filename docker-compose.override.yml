@@ -18,8 +18,8 @@ services:
   discountdb:
     container_name: discountdb
     environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=Password@1
+      - POSTGRES_USER=slowey
+      - POSTGRES_PASSWORD=Tlvptlvp2006@
       - POSTGRES_DB=DiscountDb
     restart: always
     ports:
@@ -27,7 +27,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin"]
+      test: ["CMD-SHELL", "pg_isready -U slowey"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,7 +35,7 @@ services:
   orderdb:
     container_name: orderdb
     environment:
-      SA_PASSWORD: "SloWey1234567"
+      SA_PASSWORD: "Tlvptlvp2006@"
       ACCEPT_EULA: "Y"
     restart: always
     ports:
@@ -43,7 +43,7 @@ services:
     volumes:
       - orderdb-data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'SloWey1234567' -Q 'select 1'"]
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Tlvptlvp2006@' -Q 'select 1'"]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -58,8 +58,8 @@ services:
   pgadmin:
     container_name: pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@eCommerce.net
-      - PGADMIN_DEFAULT_PASSWORD=Password@1
+      - PGADMIN_DEFAULT_EMAIL=sloweycontact@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=Tlvptlvp2006@
     restart: always
     ports:
       - "5050:80"
@@ -110,11 +110,11 @@ services:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=Password@1;"
+      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=slowey;Password=Tlvptlvp2006@;"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200" 
     depends_on:
-       discountdb:
-         condition: service_healthy
+      discountdb:
+        condition: service_healthy
     ports:
       - "8002:8080"
 
@@ -122,14 +122,14 @@ services:
     container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SloWey1234567;TrustServerCertificate=True" 
+      - "ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=Tlvptlvp2006@;TrustServerCertificate=True" 
       - "EventBusSettings__HostAddress=amqp://guest:guest@rabbitmq:5672"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
-     - orderdb                    
-     - rabbitmq      
+      - orderdb                    
+      - rabbitmq      
     ports:
-     - "8003:8080"    
+      - "8003:8080"    
 
   ocelot.apigateway:
     environment:
