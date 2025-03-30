@@ -1,70 +1,198 @@
-.card {
-  display: flex;
-  flex-direction: column;
-  position: relative;
+.product-card {
+  background-color: white;
+  border-radius: 12px;
   overflow: hidden;
-  border-radius: 10px;
-  transition: all 0.5s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
   height: 100%;
-}
-
-.image {
-  position: relative;
-  overflow: hidden;
-  height: 250px;
-}
-
-.card-body {
-  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 20px;
-}
+  position: relative;
 
-.card .card-text {
-  font-size: 1.2em;
-  font-weight: 400;
-}
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 
-.card .card-currency {
-  font-size: 1.5em;
-  font-weight: 600;
-}
+    .product-actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-.btn {
-  width: 30%;
-  height: 40px;
-}
-
-.image :hover {
-  opacity: 1;
-
-  & button {
-    transform: none;
-    opacity: 1;
+    .product-image {
+      transform: scale(1.05);
+    }
   }
 }
 
-.hover-overlay {
+.product-image-container {
+  position: relative;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  overflow: hidden;
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0) 50%);
+    z-index: 1;
+  }
+}
+
+.product-image {
   position: absolute;
-  width: 100%;
-  height: 100%;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #3048a5;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.product-actions {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   opacity: 0;
-  transition: all 0.5s;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 2;
+}
 
-  & button {
-    z-index: 1000;
-    transition: all 0.5s;
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #252B42;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #3048a5;
+    color: white;
+    transform: scale(1.1);
+  }
+}
+
+.product-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.product-category {
+  color: #3048a5;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #252B42;
+  margin: 0 0 10px;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+  height: 2.6em;
+
+  &:hover {
+    color: #3048a5;
+  }
+}
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+
+  .stars {
+    color: #ffc107;
+    letter-spacing: -2px;
   }
 
-  & button:first-of-type {
-    transform: translateX(-20px);
+  .review-count {
+    font-size: 0.8rem;
+    color: #5c5c5c;
+    margin-left: 5px;
+  }
+}
+
+.product-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.product-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #252B42;
+}
+
+.cart-btn-mobile {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #3048a5;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #252B42;
+    transform: scale(1.1);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .product-name {
+    font-size: 1rem;
   }
 
-  & button:last-of-type {
-    transform: translateX(20px);
+  .product-price {
+    font-size: 1.1rem;
   }
 }

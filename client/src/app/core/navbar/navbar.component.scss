@@ -3,13 +3,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  transition: all 0.3s ease;
+
+  &.scrolled {
+    padding: 10px 30px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .navbar .logo {
@@ -20,19 +27,21 @@
 
 .navbar .logo .logo-text {
   font-size: 1.8em;
-  color: #252B42;
+  color: var(--secondary-color);
   font-weight: 600;
   user-select: none;
   text-decoration: none;
-}
+  transition: all 0.3s ease;
 
-.navbar .logo .logo-text:hover {
-  color: #1D2C5D;
+  &:hover {
+    color: var(--primary-color);
+    transform: scale(1.05);
+  }
 }
 
 .nav-items {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -43,16 +52,42 @@
   color: #878787;
   font-size: 1.1em;
   font-weight: 500;
-  transition: color 0.3s ease;
-}
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+  padding: 5px 0;
 
-.nav-item:hover {
-  color: #252B42;
+  &:hover {
+    color: var(--secondary-color);
+  }
+
+  span {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background-color: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+  }
+
+  &:hover span::after {
+    width: 100%;
+  }
 }
 
 .nav-item.active {
-  color: #252B42;
+  color: var(--secondary-color);
   font-weight: 600;
+
+  span::after {
+    width: 100%;
+  }
 }
 
 .cart {
@@ -62,24 +97,35 @@
   position: relative;
 }
 
-.cart i {
-  font-size: 1.4em !important;
-  color: #252B42;
+.basket-icon {
+  position: relative;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  i {
+    font-size: 1.4em !important;
+    color: var(--secondary-color);
+  }
 }
 
 .cart-no {
   position: absolute;
   top: -8px;
   right: -12px;
-  background-color: #252B42;
+  background-color: var(--primary-color);
   color: white;
   border-radius: 50%;
   font-size: 0.6em;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
+  transition: all 0.3s ease;
+  animation: pulse 1.5s infinite;
 }
 
 .login-section {
@@ -89,41 +135,87 @@
 }
 
 .btn {
-  padding: 6px 16px;
-  font-size: 1em;
+  padding: 8px 16px;
+  font-size: 0.95em;
   font-weight: 500;
-  border: 1px solid #e1e1e1;
+  border: none;
   background-color: transparent;
-  color: #252B42;
+  color: var(--secondary-color);
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  border-radius: 5px;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    font-size: 0.9em;
+  }
 }
 
-.login-btn:hover,
-.logout-btn:hover {
-  background-color: #252B42;
+.login-btn {
+  background-color: var(--primary-color);
   color: white;
+
+  &:hover {
+    background-color: darken(#3048a5, 10%);
+    box-shadow: 0 4px 12px rgba(48, 72, 165, 0.25);
+  }
 }
 
-.login-btn:focus,
-.logout-btn:focus {
-  outline: none;
+.logout-btn {
+  border: 1px solid #e1e1e1;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(48, 72, 165, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(48, 72, 165, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(48, 72, 165, 0);
+  }
+}
+
+.pulse {
+  animation: subtle-pulse 2s infinite;
+}
+
+@keyframes subtle-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px;
+    padding: 15px;
   }
 
   .nav-items {
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
+    width: 100%;
+    margin-top: 15px;
   }
 
   .cart {
     margin-top: 15px;
+    width: 100%;
+    justify-content: space-between;
   }
 }

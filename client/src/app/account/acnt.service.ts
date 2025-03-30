@@ -14,8 +14,6 @@ import { AuthenticationResult } from '@azure/msal-browser';
 })
 export class AcntService {
 
-  // We need to have something which won't emit initial value rather wait till it has something.
-  // Hence for that ReplaySubject. I have given to hold one user object and it will cache this as well
   public currentUserSource = new ReplaySubject<any>(1);
   currentUser$ = this.currentUserSource.asObservable();
   constructor(
@@ -23,7 +21,6 @@ export class AcntService {
     private router: Router,
     private msalService: MsalService
   ) {
-    // Set user state if already logged in
     const account = this.msalService.instance.getActiveAccount();
     if (account) {
       this.currentUserSource.next(account);
@@ -31,7 +28,6 @@ export class AcntService {
   }
 
   isAuthenticated(): boolean {
-   // return this.user != null && !this.user.expired;
    return this.msalService.instance.getActiveAccount() !== null;
   }
 
@@ -40,19 +36,18 @@ export class AcntService {
       scopes: ["openid", "profile", "https://sportscenter19.onmicrosoft.com/85ec0233-0ecb-4830-96f5-12d00bf87176"],
       state: state
     });
-    //this.currentUserSource.next(this.msalService.instance.getActiveAccount());
   }
-  
+
   logout() {
     this.msalService.logoutRedirect({
-      postLogoutRedirectUri: 'http://localhost:4200',  // Replace with your post-logout redirect URI
+      postLogoutRedirectUri: 'http://localhost:4200',
     });
-    this.currentUserSource.next(null);  // Emit null to clear the current user
+    this.currentUserSource.next(null);
   }
 
   setUserAfterRedirect(): void {
     const account = this.msalService.instance.getActiveAccount();
-    console.log('Active Account after Redirect:', account); // Debugging: Log the account info
+    console.log('Active Account after Redirect:', account);
     if (account) {
         this.currentUserSource.next(account);
     } else {
@@ -70,8 +65,7 @@ export class AcntService {
         return `${result.tokenType} ${result.accessToken}`;
       });
     }
-    // Return an empty string if no account is found
-    return Promise.resolve(''); 
+    return Promise.resolve('');
   }
 
 }

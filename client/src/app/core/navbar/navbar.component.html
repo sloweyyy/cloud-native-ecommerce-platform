@@ -1,29 +1,33 @@
 <div class="navbar">
-  <div class="logo">
+  <div class="logo slide-in-left">
     <h3 class="logo-text" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">NextTech
     </h3>
   </div>
 
-  <nav class="nav-items">
-    <a class="nav-item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-    <a class="nav-item" routerLink="/store" routerLinkActive="active">Store</a>
+  <nav class="nav-items fade-in">
+    <a class="nav-item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <span>Home</span>
+    </a>
+    <a class="nav-item" routerLink="/store" routerLinkActive="active">
+      <span>Store</span>
+    </a>
   </nav>
 
-  <div class="cart">
-    <a routerLink="/basket" class="position-relative">
-      <i class="fa fa-shopping-cart custom-icon"></i>
+  <div class="cart slide-in-right">
+    <a routerLink="/basket" class="basket-icon position-relative">
+      <i class="fa fa-shopping-cart"></i>
       <div *ngIf="(basketService.basketSource$ | async) as basket" class="cart-no">
         {{getBasketCount(basket.items)}}
       </div>
     </a>
     <section class="login-section">
       <!-- Login Button -->
-      <button *ngIf="!isUserAuthenticated" class="btn login-btn" (click)="login()">
-        Login
+      <button *ngIf="!isUserAuthenticated" class="btn login-btn pulse" (click)="login()">
+        <i class="fa fa-sign-in"></i> Login
       </button>
       <!-- Logout Button -->
       <button *ngIf="isUserAuthenticated" class="btn logout-btn" (click)="logout()">
-        Logout
+        <i class="fa fa-sign-out"></i> Logout
       </button>
     </section>
   </div>

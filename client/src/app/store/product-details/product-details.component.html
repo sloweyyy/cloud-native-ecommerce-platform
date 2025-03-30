@@ -1,30 +1,92 @@
-<div class="container mt-5">
-  <div class="row" *ngIf="product">
-    <!-- Image and Name Section -->
-    <div class="col-md-6">
-      <img src="{{product.imageFile}}" alt="{{product.name}}" class="product-image">
+<div class="product-page-wrapper">
+  <div class="product-details-container section-fade-in" *ngIf="product">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+      <a routerLink="/store" class="breadcrumb-link"><i class="fa fa-arrow-left"></i> Back to Store</a>
     </div>
 
-    <!-- Product Info Section -->
-    <div class="col-md-6">
-      <h3 class="product-name">{{ product.name }}</h3>
-      <p class="product-price">{{ product.price | currency: "VND" }}</p>
-
-      <!-- Quantity Selector -->
-      <div class="d-flex justify-content-start align-items-center">
-        <i (click)="decrementQuantity()" class="fa fa-minus-circle text-warning mr-3 quantity-btn"
-          style="cursor: pointer;"></i>
-        <span class="font-weight-bold quantity-display">{{ quantity }}</span>
-        <i (click)="incrementQuantity()" class="fa fa-plus-circle text-warning mx-3 quantity-btn"
-          style="cursor: pointer;"></i>
-        <button (click)="addItemToCart()" class="btn btn-lg btn-primary ml-4 add-to-cart-btn">Add to Cart</button>
+    <div class="product-main">
+      <!-- Left column - Product Image -->
+      <div class="product-image-container">
+        <div class="main-image-wrapper">
+          <img src="{{product.imageFile}}" alt="{{product.name}}" class="product-image">
+        </div>
       </div>
 
-      <!-- Product Description -->
-      <div class="mt-4">
-        <h4 class="description-title">Description</h4>
-        <p class="product-description">{{ product.description }}</p>
+      <!-- Right column - Product Info -->
+      <div class="product-info">
+        <div class="product-category">{{product.productType}}</div>
+        <h1 class="product-name">{{ product.name }}</h1>
+        <div class="product-brand">By <span>{{product.productBrand}}</span></div>
+
+        <div class="product-price">{{ product.price | currency: "VND" }}</div>
+
+        <div class="product-actions">
+          <div class="quantity-selector">
+            <button (click)="decrementQuantity()" class="quantity-btn" [disabled]="quantity <= 1">
+              <i class="fa fa-minus"></i>
+            </button>
+            <span class="quantity">{{ quantity }}</span>
+            <button (click)="incrementQuantity()" class="quantity-btn">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+
+          <button (click)="addItemToCart()" class="add-cart-btn">
+            <i class="fa fa-shopping-cart"></i> Add to Cart
+          </button>
+        </div>
+
+        <div class="product-description-container">
+          <h3>Description</h3>
+          <p class="product-description">{{ product.description }}</p>
+        </div>
+
+        <div class="product-features">
+          <div class="feature">
+            <i class="fa fa-truck"></i>
+            <div class="feature-text">
+              <h4>Free Shipping</h4>
+              <p>On orders over 5,000,000 VND</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fa fa-sync"></i>
+            <div class="feature-text">
+              <h4>30-Day Returns</h4>
+              <p>Money back guarantee</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fa fa-shield-alt"></i>
+            <div class="feature-text">
+              <h4>1 Year Warranty</h4>
+              <p>For all electronic items</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Related Products -->
+    <div class="related-products">
+      <h2>You May Also Like</h2>
+      <div class="related-products-grid">
+        <!-- This would ideally be populated with actual related products -->
+        <div class="related-product" *ngFor="let i of [1, 2, 3, 4]">
+          <div class="related-product-img"></div>
+          <div class="related-product-info">
+            <h4>Similar Product</h4>
+            <p>{{product.price * 0.9 | currency: "VND"}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="!product">
+    <div class="spinner"></div>
+    <p>Loading product details...</p>
   </div>
 </div>

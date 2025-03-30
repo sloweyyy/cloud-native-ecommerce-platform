@@ -1,41 +1,70 @@
-<div class="container">
-  <div class="row">
-    <!-- Sidebar -->
-    <section class="sidebar col-3">
-      <ng-container *ngIf="products">
-        <!-- Sort Options -->
-        <h5>Sort</h5>
-        <select class="custom-select" (change)="onSortSelected($any($event.target).value)">
-          <option *ngFor="let sort of sortOptions" [value]="sort.value">
-            {{ sort.name }}
-          </option>
-        </select>
+<div class="store-page-wrapper">
+  <div class="store-banner section-fade-in">
+    <div class="banner-content">
+      <h1>Our Products</h1>
+      <p>Discover the latest in tech innovation</p>
+    </div>
+  </div>
 
-        <!-- Brand Filters -->
-        <h5>Brands</h5>
-        <ul class="list-group">
-          <li *ngFor="let brand of brands" class="list-group-item" [class.active]="brand.id === storeParams.brandId"
-            [value]="brand.id" (click)="onBrandSelected(brand.id)">
-            {{ brand.name }}
-          </li>
-        </ul>
+  <div class="container section-fade-in">
+    <div class="row">
+      <!-- Sidebar -->
+      <section class="sidebar col-3">
+        <div class="filter-container">
+          <div class="filter-header">
+            <h4>Filters</h4>
+            <button class="reset-btn" (click)="onReset()">Reset All</button>
+          </div>
 
-        <!-- Type Filters -->
-        <h5>Types</h5>
-        <ul class="list-group">
-          <li *ngFor="let type of types" class="list-group-item" [class.active]="type.id === storeParams.typeId"
-            [value]="type.id" (click)="onTypeSelected(type.id)">
-            {{ type.name }}
-          </li>
-        </ul>
-      </ng-container>
-    </section>
+          <ng-container *ngIf="products">
+            <!-- Sort Options -->
+            <div class="filter-group">
+              <h5>Sort By</h5>
+              <select class="custom-select" (change)="onSortSelected($any($event.target).value)">
+                <option *ngFor="let sort of sortOptions" [value]="sort.value">
+                  {{ sort.name }}
+                </option>
+              </select>
+            </div>
 
-    <!-- Content Area -->
-    <section class="content-area col-9">
-      <div class="header-search-wrapper">
-        <!-- Header -->
-        <header class="d-flex justify-content-between">
+            <!-- Brand Filters -->
+            <div class="filter-group">
+              <h5>Brands</h5>
+              <ul class="list-group">
+                <li *ngFor="let brand of brands" class="list-group-item"
+                  [class.active]="brand.id === storeParams.brandId" [value]="brand.id"
+                  (click)="onBrandSelected(brand.id)">
+                  {{ brand.name }}
+                </li>
+              </ul>
+            </div>
+
+            <!-- Type Filters -->
+            <div class="filter-group">
+              <h5>Categories</h5>
+              <ul class="list-group">
+                <li *ngFor="let type of types" class="list-group-item" [class.active]="type.id === storeParams.typeId"
+                  [value]="type.id" (click)="onTypeSelected(type.id)">
+                  {{ type.name }}
+                </li>
+              </ul>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+
+      <!-- Content Area -->
+      <section class="content-area col-9">
+        <div class="search-container">
+          <div class="search-wrapper">
+            <input (keyup.enter)="onSearch()" #search placeholder="Search for products..." type="text"
+              class="search-input">
+            <button (click)="onSearch()" class="search-btn"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info">
           <span *ngIf="totalCount && totalCount > 0">
             Showing
             <strong>{{ (storeParams.pageNumber - 1) * storeParams.pageSize + 1 }} -
@@ -47,30 +76,31 @@
           <span *ngIf="totalCount === 0">
             There are <strong>0</strong> results for this filter
           </span>
-
-          <!-- Search Bar -->
-          <div class="form-inline">
-            <input (keyup.enter)="onSearch()" #search placeholder="Search" type="text">
-            <button (click)="onSearch()">Search</button>
-            <button (click)="onReset()">Reset</button>
-          </div>
-        </header>
-      </div>
-
-      <!-- Product List -->
-      <div class="products">
-        <div class="product-item" *ngFor="let item of products">
-          <app-product-items [product]="item"></app-product-items>
         </div>
-      </div>
-    </section>
-  </div>
 
-  <!-- Pagination -->
-  <div class="pagination-wrapper">
-    <pagination [boundaryLinks]="true" [totalItems]="totalCount" previousText="&lsaquo;"
-      (pageChanged)="onPageChanged($event)" [itemsPerPage]="storeParams.pageSize" [maxSize]="10" nextText="&rsaquo;"
-      firstText="&laquo;" lastText="&raquo;">
-    </pagination>
+        <!-- Product List -->
+        <div class="products">
+          <div class="product-item" *ngFor="let item of products">
+            <app-product-items [product]="item"></app-product-items>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="products.length === 0">
+          <img src="assets/images/empty-cart.png" alt="No products found">
+          <h3>No products found</h3>
+          <p>Try adjusting your search or filter to find what you're looking for.</p>
+          <button class="btn-primary" (click)="onReset()">Reset Filters</button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+          <pagination [boundaryLinks]="true" [totalItems]="totalCount" previousText="&lsaquo;"
+            (pageChanged)="onPageChanged($event)" [itemsPerPage]="storeParams.pageSize" [maxSize]="10"
+            nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;">
+          </pagination>
+        </div>
+      </section>
+    </div>
   </div>
 </div>

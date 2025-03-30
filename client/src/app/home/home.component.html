@@ -1,29 +1,93 @@
-<div class="carousel-container">
+<!-- Black Friday Promotion Banner -->
+<div class="black-friday-banner fade-in">
+  <div class="banner-container">
+    <div class="banner-slide active">
+      <div class="banner-content">
+        <h2 class="slide-in-left">Discover</h2>
+        <p class="slide-in-right">Amazing Black Friday Deals</p>
+      </div>
+      <img
+        src="https://images.unsplash.com/photo-1484704849700-f032a568e944?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        alt="Black Friday Headphones" class="banner-img">
+    </div>
+    <div class="banner-slide">
+      <div class="banner-content">
+        <h2 class="slide-in-left">Premium</h2>
+        <p class="slide-in-right">Quality Tech Products</p>
+      </div>
+      <img
+        src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        alt="Premium Laptop" class="banner-img">
+    </div>
+    <div class="banner-slide">
+      <div class="banner-content">
+        <h2 class="slide-in-left">Stay</h2>
+        <p class="slide-in-right">Connected with Smart Gear</p>
+      </div>
+      <img
+        src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        alt="Smart Watch" class="banner-img">
+    </div>
+    <div class="banner-slide">
+      <div class="banner-content">
+        <h2 class="slide-in-left">Power</h2>
+        <p class="slide-in-right">Up Your Tech Game</p>
+      </div>
+      <img
+        src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+        alt="Computer Setup" class="banner-img">
+    </div>
+  </div>
+  <div class="banner-indicators">
+    <span class="indicator active" (click)="setBannerSlide(0)"></span>
+    <span class="indicator" (click)="setBannerSlide(1)"></span>
+    <span class="indicator" (click)="setBannerSlide(2)"></span>
+    <span class="indicator" (click)="setBannerSlide(3)"></span>
+  </div>
+</div>
+
+<div class="carousel-container fade-in">
   <div #carousel class="carousel">
     <div class="carousel-slide">
       <img src="assets/images/banner1.jpg" alt="First Slide" class="carousel-img">
+      <div class="carousel-caption">
+        <h2 class="slide-in-left">Discover Innovation</h2>
+        <p class="slide-in-right">Explore cutting-edge tech solutions</p>
+      </div>
     </div>
     <div class="carousel-slide">
       <img src="assets/images/banner2.jpg" alt="Second Slide" class="carousel-img">
+      <div class="carousel-caption">
+        <h2 class="slide-in-left">Premium Quality</h2>
+        <p class="slide-in-right">Only the best tech gear for you</p>
+      </div>
     </div>
     <div class="carousel-slide">
       <img src="assets/images/banner3.jpg" alt="Third Slide" class="carousel-img">
+      <div class="carousel-caption">
+        <h2 class="slide-in-left">Stay Connected</h2>
+        <p class="slide-in-right">Next-gen gadgets for modern life</p>
+      </div>
     </div>
     <div class="carousel-slide">
       <img src="assets/images/banner4.jpg" alt="Fourth Slide" class="carousel-img">
+      <div class="carousel-caption">
+        <h2 class="slide-in-left">Power Your Productivity</h2>
+        <p class="slide-in-right">Tools designed for performance</p>
+      </div>
     </div>
   </div>
   <button class="carousel-btn prev" (click)="prevSlide()">❮</button>
   <button class="carousel-btn next" (click)="nextSlide()">❯</button>
 </div>
 
-<section class="welcome-section">
+<section class="welcome-section section-fade-in">
   <div class="d-flex justify-content-center pt-4">
     <h1>Welcome to NextTech</h1>
   </div>
 </section>
 
-<div class="container marketing">
+<div class="container marketing section-fade-in">
   <div class="grid-images-container">
     <!-- Main image on the left side -->
     <div class="main-image">
@@ -51,8 +115,8 @@
     </div>
   </div>
 </div>
-<!--  -->
-<div class="feature-product-container">
+
+<div class="feature-product-container section-fade-in">
   <div class="fd-image-container">
     <img src="assets/home/setup-1.jpg" alt="Advanced Tech Gadgets" class="fd-img">
     <img src="assets/home/setup-2.jpg" alt="High-Performance Accessories" class="fd-img">
@@ -73,7 +137,7 @@
   </div>
 </div>
 
-<div class="feature-product-container">
+<div class="feature-product-container section-fade-in">
   <div class="fd-text">
     <p class="text-header">Next-Gen Accessories</p>
     <p class="text-title">Redefine Your Workspace</p>
@@ -93,8 +157,8 @@
     <img src="assets/home/setup-4.jpg" alt="Ultimate Gaming Accessories" class="fd-img">
   </div>
 </div>
-<!--  -->
-<div class="featured-products">
+
+<div class="featured-products section-fade-in">
   <div class="section-title">Featured Products</div>
   <div class="section-subtitle">THE BEST TECH GEAR</div>
   <div class="section-description">Explore innovative gadgets to enhance your tech experience.</div>
@@ -123,7 +187,7 @@
   </div>
 </div>
 
-<section class="faq-section">
+<section class="faq-section section-fade-in">
   <div class="container">
     <div class="faq-header">
       <h2>Frequently Asked Questions</h2>

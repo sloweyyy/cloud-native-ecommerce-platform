@@ -1,14 +1,50 @@
-<div class="card h-100 shadow-sm d-flex flex-column justify-content-between" *ngIf="product">
-  <div class="image position-relative" style="cursor: pointer;">
-    <img src="{{ product.imageFile }}" alt="{{ product.name }}" class="img-fluid bg-light" />
-    <div class="d-flex align-items-center justify-content-center hover-overlay gap-4">
-      <button (click)="addItemToBasket()" type="button" class="btn btn-primary fa fa-shopping-cart mr-2"></button>
-      <button routerLink="/store/{{product.id}}" type="button" class="btn btn-primary">View</button>
+<div class="product-card" *ngIf="product">
+  <!-- Product Image -->
+  <div class="product-image-container" [routerLink]="['/store', product.id]">
+    <img [src]="product.imageFile" [alt]="product.name" class="product-image" />
+
+    <!-- Badges can be dynamically added here like "New" or "Sale" -->
+    <span class="product-badge">New</span>
+
+    <!-- Quick Action Buttons -->
+    <div class="product-actions">
+      <button (click)="addItemToBasket()" class="action-btn" title="Add to Cart">
+        <i class="fa fa-shopping-cart"></i>
+      </button>
+      <button class="action-btn" title="Add to Wishlist">
+        <i class="fa fa-heart"></i>
+      </button>
     </div>
   </div>
 
-  <div class="card-body">
-    <h6 class="card-text">{{ product.name }}</h6>
-    <span class="card-currency mb-2" style="font-size: 1.5em;">{{ product.price | currency: "VND" }}</span>
+  <!-- Product Info -->
+  <div class="product-info">
+    <!-- Product Category -->
+    <div class="product-category">{{ product.productType }}</div>
+
+    <!-- Product Name -->
+    <h3 class="product-name" [routerLink]="['/store', product.id]">{{ product.name }}</h3>
+
+    <!-- Product Rating -->
+    <div class="product-rating">
+      <span class="stars">
+        <i class="fa fa-star"></i>
+        <i class="fa fa-star"></i>
+        <i class="fa fa-star"></i>
+        <i class="fa fa-star"></i>
+        <i class="fa fa-star-half-o"></i>
+      </span>
+      <span class="review-count">(42)</span>
+    </div>
+
+    <!-- Product Price -->
+    <div class="product-price-row">
+      <span class="product-price">{{ product.price | currency: "VND" }}</span>
+
+      <!-- Add to Cart Button (visible on mobile) -->
+      <button (click)="addItemToBasket()" class="cart-btn-mobile">
+        <i class="fa fa-shopping-cart"></i>
+      </button>
+    </div>
   </div>
 </div>
