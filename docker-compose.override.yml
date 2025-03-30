@@ -8,13 +8,13 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-  
+
   basketdb:
     container_name: basketdb
     restart: always
     ports:
-      - "6379:6379" 
-   
+      - "6379:6379"
+
   discountdb:
     container_name: discountdb
     environment:
@@ -27,7 +27,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U slowey"]
+      test: [ "CMD-SHELL", "pg_isready -U slowey -d postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,7 +43,7 @@ services:
     volumes:
       - orderdb-data:/var/opt/mssql
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Tlvptlvp2006@' -Q 'select 1'"]
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Tlvptlvp2006@' -Q 'select 1'" ]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -54,7 +54,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-  
+
   pgadmin:
     container_name: pgadmin
     environment:
@@ -65,7 +65,6 @@ services:
       - "5050:80"
     volumes:
       - pgadmin_data:/root/.pgadmin
-
 
   portainer:
     container_name: portainer
@@ -85,8 +84,8 @@ services:
       - "DatabaseSettings__DatabaseName=CatalogDb"
       - "DatabaseSettings__CollectionName=Products"
       - "DatabaseSettings__BrandsCollection=Brands"
-      - "DatabaseSettings__TypesCollection=Types" 
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200" 
+      - "DatabaseSettings__TypesCollection=Types"
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
       - catalogdb
     ports:
@@ -97,7 +96,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings__ConnectionString=basketdb:6379"
-      - "GrpcSettings__DiscountUrl=http://discount.api:8080" 
+      - "GrpcSettings__DiscountUrl=http://discount.api:8080"
       - "EventBusSettings__HostAddress=amqp://guest:guest@rabbitmq:5672"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
@@ -110,8 +109,8 @@ services:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=slowey;Password=Tlvptlvp2006@;"
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200" 
+      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=slowey;Password=Tlvptlvp2006@;Pooling=true;"
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
       discountdb:
         condition: service_healthy
@@ -122,26 +121,25 @@ services:
     container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=Tlvptlvp2006@;TrustServerCertificate=True" 
+      - "ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=Tlvptlvp2006@;TrustServerCertificate=True"
       - "EventBusSettings__HostAddress=amqp://guest:guest@rabbitmq:5672"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
-      - orderdb                    
-      - rabbitmq      
+      - orderdb
+      - rabbitmq
     ports:
-      - "8003:8080"    
+      - "8003:8080"
 
   ocelot.apigateway:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development        
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - catalog.api
       - basket.api
       - discount.api
       - ordering.api
     ports:
-      - "8010:8080" 
-
+      - "8010:8080"
 
   elasticsearch:
     container_name: elasticsearch
@@ -161,6 +159,4 @@ services:
     depends_on:
       - elasticsearch
     ports:
-      - "5601:5601"  
- 
-
+      - "5601:5601"

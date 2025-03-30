@@ -39,11 +39,10 @@ public static class DbExtension
         while (retry > 0)
             try
             {
-                using var connection =
-                    new NpgsqlConnection(config.GetValue<string>("DatabaseSettings:ConnectionString"));
-
-                var builder = new NpgsqlConnectionStringBuilder(config.GetValue<string>("DatabaseSettings:ConnectionString"));
+                var connectionString = config.GetValue<string>("DatabaseSettings:ConnectionString");
+                var builder = new NpgsqlConnectionStringBuilder(connectionString);
                 var dbName = builder.Database;
+
                 builder.Database = "postgres";
 
                 using (var masterConnection = new NpgsqlConnection(builder.ConnectionString))
@@ -60,7 +59,10 @@ public static class DbExtension
                     }
                 }
 
+                builder.Database = dbName;
+                using var connection = new NpgsqlConnection(builder.ConnectionString);
                 connection.Open();
+
                 using var migrationCmd = new NpgsqlCommand
                 {
                     Connection = connection
@@ -80,14 +82,12 @@ public static class DbExtension
                 migrationCmd.CommandText =
                     "INSERT INTO Coupon(ProductName, Description, Amount) VALUES('ASUS ROG Zephyrus G14 Gaming Laptop', 'Laptop Discount', 700);";
                 migrationCmd.ExecuteNonQuery();
-                // Exit loop if successful
                 break;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 retry--;
                 if (retry == 0) throw;
-                //Wait for 2 seconds
                 Thread.Sleep(2000);
             }
     }
