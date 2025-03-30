@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnInit } from '@angular/core';
 import { AcntService } from './account/acnt.service';
 import { BasketService } from './basket/basket.service';
 import { MsalService } from '@azure/msal-angular';
@@ -10,11 +10,11 @@ import { Router } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'eShopping';
 
   constructor(
-    private basketService: BasketService, 
+    private basketService: BasketService,
     private acntService: AcntService,
     private msalService: MsalService,
     private router: Router
@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
         console.log('Navigating to:', targetRoute);
         this.router.navigate([targetRoute]);
         // Set the active account and update user state
-        this.msalService.instance.setActiveAccount(result.account); 
+        this.msalService.instance.setActiveAccount(result.account);
         this.acntService.setUserAfterRedirect(); // Update the user state
       } else {
         console.log('No account in result or no redirect result.');
@@ -46,6 +46,81 @@ export class AppComponent implements OnInit {
       this.basketService.getBasket(basket_username);
     }
   }
+
+  ngAfterViewInit(): void {
+    // Initialize section animations
+    this.checkSectionVisibility();
+
+    // Add AOS if needed later
+    if (typeof document !== 'undefined') {
+      this.loadExternalScript('https://unpkg.com/aos@2.3.4/dist/aos.js').then(() => {
+        (window as any).AOS?.init({
+          duration: 800,
+          easing: 'ease-in-out',
+          once: false
+        });
+      });
+    }
+  }
+
+  /**
+   * Listen to scroll events and trigger animations
+   */
+  @HostListener('window:scroll', ['$event'])
+  onScroll() {
+    this.checkSectionVisibility();
+    this.updateNavbarOnScroll();
+  }
+
+  /**
+   * Update navbar style on scroll
+   */
+  private updateNavbarOnScroll() {
+    if (typeof window !== 'undefined') {
+      const navbar = document.querySelector('.navbar') as HTMLElement;
+      if (navbar) {
+        if (window.scrollY > 80) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if section is visible and apply animation class
+   */
+  private checkSectionVisibility() {
+    if (typeof document !== 'undefined') {
+      const sections = document.querySelectorAll('.section-fade-in');
+      sections.forEach((section) => {
+        const sectionTop = section.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        if (sectionTop < windowHeight * 0.75) {
+          section.classList.add('active');
+        }
+      });
+    }
+  }
+
+  /**
+   * Load external script
+   */
+  private loadExternalScript(scriptUrl: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (typeof document !== 'undefined') {
+        const scriptElement = document.createElement('script');
+        scriptElement.src = scriptUrl;
+        scriptElement.onload = () => resolve();
+        scriptElement.onerror = (error) => reject(error);
+        document.body.appendChild(scriptElement);
+      } else {
+        resolve();
+      }
+    });
+  }
+
   private async initializeMsal(): Promise<void> {
     const pca = new PublicClientApplication({
       auth: {

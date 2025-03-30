@@ -1,77 +1,181 @@
-<ng-container *ngIf="(basketService.basketSource$ | async) as basket">
-  <div class="container">
-    <div class="row">
-      <div class="table-responsive table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="border-0 bg-light" scope="col">
-                <div class="p-2 px-3 text-uppercase">
-                  Product
-                </div>
-              </th>
-              <th class="border-0 bg-light" scope="col">
-                <div class="p-2 text-uppercase">
-                  Price
-                </div>
-              </th>
-              <th class="border-0 bg-light" scope="col">
-                <div class="p-2 text-uppercase">
-                  Quantity
-                </div>
-              </th>
-              <th class="border-0 bg-light" scope="col">
-                <div class="p-2 text-uppercase">
-                  Total
-                </div>
-              </th>
-              <th class="border-0 bg-light" scope="col">
-                <div class="p-2 text-uppercase">
-                  Remove
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of basket.items">
-              <th scope="row">
-                <div class="p-2 product-image-container">
-                  <img src="{{item.imageFile}}" alt="{{item.productName}}" class="item-image" />
-                  <div class="ml-3 d-inline-block align-middle product-name-container">
-                    <h5 class="mb-0">
-                      <a routerLink="/store/{{item.productId}}" class="text-dark">{{item.productName}}</a>
-                    </h5>
-                  </div>
-                </div>
-              </th>
-              <td class="align-middle"><strong>{{item.price | currency:'VND'}}</strong></td>
-              <td class="align-middle">
-                <div class="quantity-control">
-                  <i (click)="decrementItem(item)" class="fa fa-minus-circle text-warning mr-2"></i>
-                  <span class="quantity-display">{{item.quantity}}</span>
-                  <i (click)="incrementItem(item)" class="fa fa-plus-circle text-warning mx-2"></i>
-                </div>
-              </td>
-              <td class="align-middle">
-                <strong>{{item.price * item.quantity | currency: 'VND'}}</strong>
-              </td>
-              <td class="align-middle text-center">
-                <a class="text-danger">
-                  <i (click)="removeBasketItem(item)" class="fa fa-trash" aria-hidden="true"></i>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12 col-lg-6 offset-lg-6">
-        <app-order-summary></app-order-summary>
-        <a (click)="orderNow(basket)" class="btn btn-outline-primary py-2 btn-block checkout-btn">
-          Order Now
-        </a>
-      </div>
+<div class="checkout-page-wrapper">
+  <div class="checkout-banner section-fade-in">
+    <div class="banner-content">
+      <h1>Checkout</h1>
+      <p>Complete your purchase securely</p>
     </div>
   </div>
-</ng-container>
+
+  <div class="container section-fade-in">
+    <ng-container *ngIf="(basketService.basketSource$ | async) as basket">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb-container">
+        <a routerLink="/basket" class="breadcrumb-link"><i class="fa fa-arrow-left"></i> Back to Cart</a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="checkout-content">
+        <!-- Left Column - Order Items & Shipping -->
+        <div class="checkout-main">
+          <!-- Order Summary Section -->
+          <div class="checkout-section">
+            <h2 class="section-title">Order Summary</h2>
+            <div class="order-items">
+              <div class="order-item" *ngFor="let item of basket.items">
+                <div class="item-image">
+                  <img src="{{item.imageFile}}" alt="{{item.productName}}">
+                </div>
+                <div class="item-details">
+                  <h4 class="item-name">{{item.productName}}</h4>
+                  <div class="item-meta">
+                    <div class="item-type">{{item.productName.split(' ')[0]}}</div>
+                    <div class="item-quantity">Qty: {{item.quantity}}</div>
+                  </div>
+                </div>
+                <div class="item-actions">
+                  <div class="quantity-control">
+                    <button (click)="decrementItem(item)" class="quantity-btn" [disabled]="item.quantity <= 1">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                    <span class="quantity">{{item.quantity}}</span>
+                    <button (click)="incrementItem(item)" class="quantity-btn">
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <button (click)="removeBasketItem(item)" class="remove-btn">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+                <div class="item-price">{{item.price * item.quantity | currency: 'VND'}}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Information Section -->
+          <div class="checkout-section">
+            <h2 class="section-title">Shipping Information</h2>
+            <div class="shipping-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="fullName">Full Name</label>
+                  <input type="text" id="fullName" class="form-control" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input type="tel" id="phone" class="form-control" placeholder="Your phone number">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" class="form-control" placeholder="Street address">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">City</label>
+                  <input type="text" id="city" class="form-control" placeholder="City">
+                </div>
+                <div class="form-group">
+                  <label for="zipCode">ZIP Code</label>
+                  <input type="text" id="zipCode" class="form-control" placeholder="ZIP code">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="country">Country</label>
+                <select id="country" class="form-control">
+                  <option selected>Vietnam</option>
+                  <option>United States</option>
+                  <option>Japan</option>
+                  <option>South Korea</option>
+                  <option>Singapore</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="notes">Order Notes (Optional)</label>
+                <textarea id="notes" class="form-control" rows="3"
+                  placeholder="Special instructions for delivery"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method Section -->
+          <div class="checkout-section">
+            <h2 class="section-title">Payment Method</h2>
+            <div class="payment-methods">
+              <div class="payment-method selected">
+                <input type="radio" id="cashOnDelivery" name="paymentMethod" checked>
+                <label for="cashOnDelivery">
+                  <span class="radio-button"></span>
+                  <div class="method-icon"><i class="fa fa-money"></i></div>
+                  <div class="method-info">
+                    <h4>Cash on Delivery</h4>
+                    <p>Pay when you receive your order</p>
+                  </div>
+                </label>
+              </div>
+              <div class="payment-method">
+                <input type="radio" id="creditCard" name="paymentMethod">
+                <label for="creditCard">
+                  <span class="radio-button"></span>
+                  <div class="method-icon"><i class="fa fa-credit-card"></i></div>
+                  <div class="method-info">
+                    <h4>Credit/Debit Card</h4>
+                    <p>Pay securely with your card</p>
+                  </div>
+                </label>
+              </div>
+              <div class="payment-method">
+                <input type="radio" id="bankTransfer" name="paymentMethod">
+                <label for="bankTransfer">
+                  <span class="radio-button"></span>
+                  <div class="method-icon"><i class="fa fa-university"></i></div>
+                  <div class="method-info">
+                    <h4>Bank Transfer</h4>
+                    <p>Pay via direct bank transfer</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Order Total -->
+        <div class="checkout-sidebar">
+          <div class="order-total-box">
+            <h3 class="order-total-header">Order Total</h3>
+            <div class="order-total-body">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <span>{{ (basketService.basketTotal$ | async)?.total | currency: 'VND' }}</span>
+              </div>
+              <div class="total-row">
+                <span>Shipping</span>
+                <span>{{ 0 | currency: 'VND' }}</span>
+              </div>
+              <div class="total-row">
+                <span>Tax</span>
+                <span>{{ 0 | currency: 'VND' }}</span>
+              </div>
+              <div class="total-row grand-total">
+                <span>Total</span>
+                <span>{{ (basketService.basketTotal$ | async)?.total | currency: 'VND' }}</span>
+              </div>
+              <button (click)="orderNow(basket)" class="place-order-btn">
+                <i class="fa fa-check"></i> Place Order
+              </button>
+              <a routerLink="/basket" class="back-to-cart-btn">
+                <i class="fa fa-shopping-cart"></i> Edit Cart
+              </a>
+            </div>
+          </div>
+          <div class="secure-checkout">
+            <div class="secure-icon"><i class="fa fa-lock"></i></div>
+            <div class="secure-text">
+              <h4>Secure Checkout</h4>
+              <p>Your information is protected with SSL encryption</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

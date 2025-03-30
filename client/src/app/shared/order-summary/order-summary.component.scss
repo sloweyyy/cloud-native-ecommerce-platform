@@ -1,63 +1,90 @@
-/* Order Summary Header */
+.order-summary {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
 .order-summary-header {
-    background-color: #17a2b8;
-    /* Tăng độ sáng của màu nền */
+    background: linear-gradient(135deg, #252B42 0%, #3048a5 100%);
     color: white;
-    padding: 10px 20px;
-    text-align: center;
-    font-size: 1.2em;
-    text-transform: uppercase;
-    border-radius: 5px 5px 0 0;
-}
-
-/* Order Summary Body */
-.order-summary-body {
     padding: 20px;
-    background-color: #f8f9fa;
-    border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
 }
 
-/* List Item in Order Summary */
-.order-summary-item {
+.order-summary-body {
+    padding: 25px;
+}
+
+.summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid #e0e0e0;
-    /* Màu đường viền nhẹ nhàng */
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &.total {
+        padding-top: 20px;
+        margin-top: 10px;
+        border-top: 2px solid #e6e6e6;
+        border-bottom: none;
+
+        .item-label, .item-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #252B42;
+        }
+    }
 }
 
-.order-summary-item:last-of-type {
-    border-bottom: none;
-    /* Loại bỏ đường viền dưới cùng của mục cuối */
+.item-label {
+    font-size: 1.1rem;
+    color: #5c5c5c;
 }
 
-.order-summary-item strong {
+.item-value {
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: #252B42;
 }
 
-/* Order Total Styling */
-.order-total {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #28a745;
-    /* Màu xanh lá cho tổng tiền */
-}
-
-/* Responsive adjustments */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .order-summary-header {
-        font-size: 1.2em;
+        padding: 15px;
+
+        h3 {
+            font-size: 1.3rem;
+        }
     }
 
     .order-summary-body {
-        padding: 15px;
+        padding: 20px;
     }
 
-    .order-summary-item {
-        font-size: 0.9em;
+    .summary-item {
+        &.total {
+            .item-label, .item-value {
+                font-size: 1.2rem;
+            }
+        }
     }
 
-    .order-total {
-        font-size: 1.2em;
+    .item-label, .item-value {
+        font-size: 1rem;
     }
 }
