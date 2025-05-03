@@ -10,6 +10,6 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  ConnectionStrings__OrderingConnectionString: Server=orderdb;Database=OrderDb;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True
+  ConnectionStrings__OrderingConnectionString: Server=orderdb;Database=OrderDb;User Id=sa;Password=SqlPassword123;TrustServerCertificate=True
   ElasticConfiguration__Uri: http://elasticsearch:9200
   EventBusSettings__HostAddress: amqp://guest:guest@rabbitmq:5672
