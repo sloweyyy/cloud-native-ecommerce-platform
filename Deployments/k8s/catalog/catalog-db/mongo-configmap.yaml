@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: mongo-configmap
 data:
-  connection_string: mongodb://username:password@mongo-service:27017
+  connection_string: mongodb://${MONGO_USER}:${DB_PASSWORD}@mongo-service:27017
   DatabaseName: CatalogDb
   CollectionName: Products
   BrandsCollection: Brands

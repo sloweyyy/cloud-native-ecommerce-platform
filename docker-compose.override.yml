@@ -18,16 +18,16 @@ services:
   discountdb:
     container_name: discountdb
     environment:
-      - POSTGRES_USER=slowey
-      - POSTGRES_PASSWORD=Tlvptlvp2006@
-      - POSTGRES_DB=DiscountDb
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     restart: always
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U slowey -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,15 +35,15 @@ services:
   orderdb:
     container_name: orderdb
     environment:
-      SA_PASSWORD: "Tlvptlvp2006@"
-      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SQL_SA_PASSWORD}
+      ACCEPT_EULA: ${ACCEPT_EULA}
     restart: always
     ports:
       - "1433:1433"
     volumes:
       - orderdb-data:/var/opt/mssql
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'Tlvptlvp2006@' -Q 'select 1'" ]
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SQL_SA_PASSWORD}' -Q 'select 1' -C" ]
       interval: 10s
       timeout: 10s
       retries: 3
@@ -54,12 +54,15 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
 
   pgadmin:
     container_name: pgadmin
     environment:
-      - PGADMIN_DEFAULT_EMAIL=sloweycontact@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=Tlvptlvp2006@
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     restart: always
     ports:
       - "5050:80"
@@ -80,12 +83,12 @@ services:
     container_name: catalog.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "DatabaseSettings__ConnectionString=mongodb://catalogdb:27017"
-      - "DatabaseSettings__DatabaseName=CatalogDb"
-      - "DatabaseSettings__CollectionName=Products"
-      - "DatabaseSettings__BrandsCollection=Brands"
-      - "DatabaseSettings__TypesCollection=Types"
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      - DatabaseSettings__ConnectionString=${MONGODB_URL}
+      - DatabaseSettings__DatabaseName=${MONGO_DB}
+      - DatabaseSettings__CollectionName=Products
+      - DatabaseSettings__BrandsCollection=Brands
+      - DatabaseSettings__TypesCollection=Types
+      - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
       - catalogdb
     ports:
@@ -95,10 +98,10 @@ services:
     container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "CacheSettings__ConnectionString=basketdb:6379"
-      - "GrpcSettings__DiscountUrl=http://discount.api:8080"
-      - "EventBusSettings__HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      - CacheSettings__ConnectionString=${REDIS_URL}
+      - GrpcSettings__DiscountUrl=http://discount.api:8080
+      - EventBusSettings__HostAddress=${RABBITMQ_URL}
+      - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
       - basketdb
       - rabbitmq
@@ -109,8 +112,8 @@ services:
     container_name: discount.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=slowey;Password=Tlvptlvp2006@;Pooling=true;"
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      - DatabaseSettings__ConnectionString=${POSTGRES_URL}
+      - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
       discountdb:
         condition: service_healthy
@@ -121,9 +124,9 @@ services:
     container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=Tlvptlvp2006@;TrustServerCertificate=True"
-      - "EventBusSettings__HostAddress=amqp://guest:guest@rabbitmq:5672"
-      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      - ConnectionStrings__OrderingConnectionString=${SQLSERVER_URL}
+      - EventBusSettings__HostAddress=${RABBITMQ_URL}
+      - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
       - orderdb
       - rabbitmq
@@ -144,7 +147,7 @@ services:
   elasticsearch:
     container_name: elasticsearch
     environment:
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ES_JAVA_OPTS=${ES_JAVA_OPTS}
       - discovery.type=single-node
       - xpack.security.enabled=false
     ports:
@@ -155,7 +158,7 @@ services:
   kibana:
     container_name: kibana
     environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
     depends_on:
       - elasticsearch
     ports:

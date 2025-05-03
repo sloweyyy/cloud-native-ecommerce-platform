@@ -395,3 +395,4 @@ k8s/charts/config
 coverage-html/
 coverage.info 
 coverage.json
+.env

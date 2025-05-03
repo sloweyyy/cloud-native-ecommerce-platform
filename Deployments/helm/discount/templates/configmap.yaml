@@ -10,5 +10,5 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  DatabaseSettings__ConnectionString: Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=Password@1;
+  DatabaseSettings__ConnectionString: Server=discountdb;Port=5432;Database=DiscountDb;User Id=${POSTGRES_USER};Password=${DB_PASSWORD};
   ElasticConfiguration__Uri: http://elasticsearch:9200
