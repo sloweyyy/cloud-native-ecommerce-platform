@@ -85,8 +85,8 @@ affinity: {}
 env:
   values:
     - name: POSTGRES_PASSWORD
-      value: "Password@1"
+      value: "${POSTGRES_PASSWORD}"
     - name: POSTGRES_USER
-      value: "admin"
+      value: "${POSTGRES_USER}"
     - name: POSTGRES_DB
-      value: DiscountDb  
+      value: "${POSTGRES_DB}"  

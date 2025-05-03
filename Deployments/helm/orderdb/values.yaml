@@ -5,26 +5,25 @@
 replicaCount: 1
 
 image:
-  repository: mcr.microsoft.com/mssql/server
+  repository: mcr.microsoft.com/mssql/server:2022-latest
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2017-latest"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: "orderdb"
+fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: false
+  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations:
-  sidecar.istio.io/inject: "false"
+podAnnotations: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -85,6 +84,6 @@ affinity: {}
 env:
   values:
     - name: SA_PASSWORD
-      value: "Tlvptlvp2006"
+      value: "${SQL_SA_PASSWORD}"
     - name: ACCEPT_EULA
-      value: "Y"      
+      value: "${ACCEPT_EULA}"      

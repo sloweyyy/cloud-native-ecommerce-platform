@@ -1,14 +1,14 @@
-{{- $name := include "discount-grpc.fullname" . -}}
+{{- $name := include "discount.fullname" . -}}
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: "cfg-{{ $name }}"
   labels:
-    app: {{ template "discount-grpc.name" . }}
-    chart: {{ template "discount-grpc.chart" .}}
+    app: {{ template "discount.name" . }}
+    chart: {{ template "discount.chart" .}}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  DatabaseSettings__ConnectionString: Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=Password@1;
+  DatabaseSettings__ConnectionString: Server=discountdb;Port=5432;Database=DiscountDb;User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Pooling=true;
   ElasticConfiguration__Uri: http://elasticsearch:9200
