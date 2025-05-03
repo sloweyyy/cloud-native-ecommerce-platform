@@ -8,7 +8,7 @@ image:
   repository: postgres
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: latest
 
 imagePullSecrets: []
 nameOverride: ""
@@ -83,10 +83,9 @@ tolerations: []
 affinity: {}
 
 env:
-  values:
+  - name: POSTGRES_USER
+    value: "admin"
     - name: POSTGRES_PASSWORD
-      value: "${POSTGRES_PASSWORD}"
-    - name: POSTGRES_USER
-      value: "${POSTGRES_USER}"
+    value: "admin1234"
     - name: POSTGRES_DB
-      value: "${POSTGRES_DB}"  
+    value: "DiscountDb"  

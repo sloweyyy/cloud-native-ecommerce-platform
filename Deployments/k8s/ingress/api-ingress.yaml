@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    kubernetes.io/ingress.class: istio
+spec:
+  rules:
+  - host: api.local
+    http:
+      paths:
+      - path: /catalog
+        pathType: Prefix
+        backend:
+          service:
+            name: catalog
+            port:
+              number: 80
+      - path: /basket
+        pathType: Prefix
+        backend:
+          service:
+            name: basket
+            port:
+              number: 80
+      - path: /discount
+        pathType: Prefix
+        backend:
+          service:
+            name: discountapi
+            port:
+              number: 80
+      - path: /ordering
+        pathType: Prefix
+        backend:
+          service:
+            name: ordering
+            port:
+              number: 80
+      - path: /gateway
+        pathType: Prefix
+        backend:
+          service:
+            name: ocelotapigw
+            port:
+              number: 8010 

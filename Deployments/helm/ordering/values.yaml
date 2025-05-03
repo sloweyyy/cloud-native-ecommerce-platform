@@ -5,11 +5,11 @@
 replicaCount: 1
 
 image:
-  registry: eshopping.azurecr.io
-  repository: eshopping.azurecr.io/orderingapi
+  registry: mcr.microsoft.com
+  repository: eshop/ordering.api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1"
+  tag: "latest"
 
 imagePullSecrets:
   - name: acr-secret

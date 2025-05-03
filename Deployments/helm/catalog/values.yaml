@@ -6,11 +6,11 @@ replicaCount: 1
 pathBase: /Catalog
 
 image:
-  registry: eshopping.azurecr.io
-  repository: eshopping.azurecr.io/catalogapi
+  registry: mcr.microsoft.com
+  repository: eshop/catalog.api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1"
+  tag: "latest"
 
 imagePullSecrets:
   - name: acr-secret

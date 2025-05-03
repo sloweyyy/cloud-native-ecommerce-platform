@@ -5,11 +5,9 @@
 replicaCount: 1
 
 image:
-  registry: eshopping.azurecr.io
-  repository: eshopping.azurecr.io/ocelotapigw
+  repository: mcr.microsoft.com/dotnet/aspnet
+  tag: "6.0"
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1"
 
 imagePullSecrets:
   - name: acr-secret
