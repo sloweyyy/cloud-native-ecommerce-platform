@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: ocelotapigw
-          image: eshop/ocelot.apigw:latest
+          image: slowey/ocelot.apigw:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

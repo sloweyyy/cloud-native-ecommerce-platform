@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: catalog-api
-          image: eshop/catalog.api:latest
+          image: slowey/catalog.api:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

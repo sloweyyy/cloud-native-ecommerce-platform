@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: discount-api
-          image: eshop/discount.grpc:latest
+          image: slowey/discount.grpc:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

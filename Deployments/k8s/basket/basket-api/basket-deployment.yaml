@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: basket-api
-          image: eshop/basket.api:latest
+          image: slowey/basket.api:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
