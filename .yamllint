@@ -1,0 +1,13 @@
+---
+extends: default
+
+rules:
+  document-start:
+    level: warning
+  truthy:
+    level: warning
+  line-length:
+    max: 100
+    level: warning
+  trailing-spaces:
+    level: warning 

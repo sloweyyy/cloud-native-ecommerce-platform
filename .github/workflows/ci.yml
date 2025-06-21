@@ -1,3 +1,4 @@
+---
 name: Continuous Integration
 
 on:
@@ -78,7 +79,13 @@ jobs:
         run: dotnet build Ecommerce.sln --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test Ecommerce.sln --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: >-
+          dotnet test Ecommerce.sln
+          --no-build
+          --configuration Release
+          --verbosity normal
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
 
       - name: Create coverage directory
         run: mkdir -p coverage
@@ -102,8 +109,6 @@ jobs:
 
       - name: Add Coverage PR Comment
         if: github.event_name == 'pull_request'
-        permissions:
-          pull-requests: write
         uses: actions/github-script@v7
         with:
           script: |
@@ -192,17 +197,25 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: [code-quality, frontend-quality]
-    if: always() && (needs.code-quality.result == 'success' || needs.code-quality.result == 'skipped') && (needs.frontend-quality.result == 'success' || needs.frontend-quality.result == 'skipped')
+    if: >-
+      always() &&
+      (needs.code-quality.result == 'success' ||
+       needs.code-quality.result == 'skipped') &&
+      (needs.frontend-quality.result == 'success' ||
+       needs.frontend-quality.result == 'skipped')
     strategy:
       matrix:
         service:
-          [
-            { name: "catalog-api", path: "Services/Catalog/Catalog.API" },
-            { name: "basket-api", path: "Services/Basket/Basket.API" },
-            { name: "discount-api", path: "Services/Discount/Discount.API" },
-            { name: "ordering-api", path: "Services/Ordering/Ordering.API" },
-            { name: "ocelot-gateway", path: "ApiGateways/Ocelot.ApiGateway" },
-          ]
+          - name: "catalog-api"
+            path: "Services/Catalog/Catalog.API"
+          - name: "basket-api"
+            path: "Services/Basket/Basket.API"
+          - name: "discount-api"
+            path: "Services/Discount/Discount.API"
+          - name: "ordering-api"
+            path: "Services/Ordering/Ordering.API"
+          - name: "ocelot-gateway"
+            path: "ApiGateways/Ocelot.ApiGateway"
     steps:
       - uses: actions/checkout@v4
 
@@ -315,7 +328,8 @@ jobs:
           echo "Validating raw Kubernetes manifests..."
           for manifest in $(find Deployments/k8s -name "*.yaml" -type f); do
             echo "Validating $manifest"
-            kubectl apply --validate=true --dry-run=client -f "$manifest" || echo "Warning: $manifest could not be validated"
+            kubectl apply --validate=true --dry-run=client -f "$manifest" \
+              || echo "Warning: $manifest could not be validated"
           done
 
       - name: Check shell script permissions
@@ -358,16 +372,19 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const status = '${{ needs.code-quality.result }}' === 'success' && 
-                          '${{ needs.frontend-quality.result }}' === 'success' && 
-                          '${{ needs.docker-build.result }}' === 'success' && 
-                          '${{ needs.security-scan.result }}' === 'success' && 
-                          '${{ needs.helm-lint.result }}' === 'success' &&
-                          '${{ needs.k8s-validate.result }}' === 'success' ? '✅' : '❌';
+            const status =
+              '${{ needs.code-quality.result }}' === 'success' &&
+              '${{ needs.frontend-quality.result }}' === 'success' &&
+              '${{ needs.docker-build.result }}' === 'success' &&
+              '${{ needs.security-scan.result }}' === 'success' &&
+              '${{ needs.helm-lint.result }}' === 'success' &&
+              '${{ needs.k8s-validate.result }}' === 'success' ? '✅' : '❌';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `${status} CI Pipeline completed. Check the [Actions tab](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details.`
+              body: `${status} CI Pipeline completed. Check the [Actions tab]
+                (${context.payload.repository.html_url}/actions/runs/${context.runId})
+                for details.`
             });
