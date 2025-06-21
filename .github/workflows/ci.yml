@@ -11,15 +11,20 @@ env:
   DOTNET_VERSION: "8.0.x"
   NODE_VERSION: "18.x"
   DOCKER_BUILDKIT: 1
+  DOCKER_USERNAME: slowey
 
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
       k8s: ${{ steps.changes.outputs.k8s }}
+      k8s_raw: ${{ steps.changes.outputs.k8s_raw }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -38,7 +43,11 @@ jobs:
               - 'docker-compose*.yml'
               - '**/Dockerfile'
             k8s:
-              - 'Deployments/**'
+              - 'Deployments/helm/**'
+            k8s_raw:
+              - 'Deployments/k8s/**'
+              - 'deploy-raw-k8s.sh'
+              - 'uninstall-raw-k8s.sh'
 
   code-quality:
     runs-on: ubuntu-latest
@@ -93,15 +102,23 @@ jobs:
 
       - name: Add Coverage PR Comment
         if: github.event_name == 'pull_request'
-        run: |
-          if [ -f "code-coverage-results.md" ]; then
-            echo "Posting code coverage results to PR"
-            gh pr comment ${{ github.event.pull_request.number }} --body-file code-coverage-results.md
-          else
-            echo "No code coverage results file found - skipping PR comment"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        permissions:
+          pull-requests: write
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            if (fs.existsSync('code-coverage-results.md')) {
+              const body = fs.readFileSync('code-coverage-results.md', 'utf8');
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body
+              });
+            } else {
+              console.log("No code coverage results file found - skipping PR comment");
+            }
 
   security-scan:
     runs-on: ubuntu-latest
@@ -198,7 +215,7 @@ jobs:
           context: .
           file: ./${{ matrix.service.path }}/Dockerfile
           push: false
-          tags: ${{ matrix.service.name }}:ci-${{ github.run_number }}
+          tags: ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:ci-${{ github.run_number }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -283,13 +300,40 @@ jobs:
             fi
           done
 
-      - name: Validate Kubernetes manifests
+  k8s-validate:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.k8s_raw == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Validate raw Kubernetes manifests
         run: |
-          # Simple check for YAML syntax without requiring kubectl API server
-          for manifest in Deployments/k8s/**/*.yaml; do
-            if [ -f "$manifest" ]; then
-              echo "Checking $manifest"
-              grep -v "^#" "$manifest" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" && echo "✓ $manifest is valid YAML" || echo "✗ YAML validation failed for $manifest"
+          echo "Validating raw Kubernetes manifests..."
+          for manifest in $(find Deployments/k8s -name "*.yaml" -type f); do
+            echo "Validating $manifest"
+            kubectl apply --validate=true --dry-run=client -f "$manifest" || echo "Warning: $manifest could not be validated"
+          done
+
+      - name: Check shell script permissions
+        run: |
+          echo "Checking deployment scripts..."
+
+          # Check if deployment scripts are executable
+          for script in deploy-raw-k8s.sh uninstall-raw-k8s.sh; do
+            if [ -f "$script" ]; then
+              if [ -x "$script" ]; then
+                echo "✅ $script is executable"
+              else
+                echo "❌ $script is not executable"
+                chmod +x "$script"
+                echo "   Fixed permissions for $script"
+              fi
+            else
+              echo "⚠️ $script not found"
             fi
           done
 
@@ -299,7 +343,14 @@ jobs:
       issues: write
       pull-requests: write
     needs:
-      [code-quality, frontend-quality, docker-build, security-scan, helm-lint]
+      [
+        code-quality,
+        frontend-quality,
+        docker-build,
+        security-scan,
+        helm-lint,
+        k8s-validate,
+      ]
     if: always()
     steps:
       - name: Notify PR status
@@ -311,7 +362,8 @@ jobs:
                           '${{ needs.frontend-quality.result }}' === 'success' && 
                           '${{ needs.docker-build.result }}' === 'success' && 
                           '${{ needs.security-scan.result }}' === 'success' && 
-                          '${{ needs.helm-lint.result }}' === 'success' ? '✅' : '❌';
+                          '${{ needs.helm-lint.result }}' === 'success' &&
+                          '${{ needs.k8s-validate.result }}' === 'success' ? '✅' : '❌';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,

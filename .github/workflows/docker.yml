@@ -2,14 +2,16 @@ name: Docker Build & Publish
 
 on:
   push:
-    branches: [ main, develop ]
-    tags: [ 'v*' ]
+    branches: [main, develop]
+    tags: ["v*"]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   REGISTRY: ghcr.io
+  DOCKER_HUB: docker.io
   IMAGE_NAME: ${{ github.repository }}
+  DOCKER_USERNAME: slowey
 
 jobs:
   build-and-push:
@@ -43,7 +45,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Container Registry
+      - name: Log in to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
@@ -51,8 +53,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_HUB }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata for GitHub packages
+        id: meta-github
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service.name }}
@@ -64,16 +74,41 @@ jobs:
             type=sha,prefix=${{ github.ref_name }}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Build and push Docker image
+      - name: Extract metadata for Docker Hub
+        id: meta-dockerhub
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=${{ github.ref_name }}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push to GitHub registry
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service.context }}
           file: ${{ matrix.service.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-github.outputs.tags }}
+          labels: ${{ steps.meta-github.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push to Docker Hub
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: true
+          tags: ${{ steps.meta-dockerhub.outputs.tags }}
+          labels: ${{ steps.meta-dockerhub.outputs.labels }}
+          cache-from: type=gha
           platforms: linux/amd64,linux/arm64
 
   security-scan:
@@ -82,22 +117,23 @@ jobs:
     if: github.event_name != 'pull_request'
     strategy:
       matrix:
-        service: [
-          {name: "catalog-api"},
-          {name: "basket-api"},
-          {name: "discount-api"},
-          {name: "ordering-api"},
-          {name: "ocelot-gateway"}
-        ]
+        service:
+          [
+            { name: "catalog-api" },
+            { name: "basket-api" },
+            { name: "discount-api" },
+            { name: "ordering-api" },
+            { name: "ocelot-gateway" },
+          ]
     steps:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service.name }}:${{ github.sha }}
-          format: 'sarif'
-          output: 'trivy-results-${{ matrix.service.name }}.sarif'
+          format: "sarif"
+          output: "trivy-results-${{ matrix.service.name }}.sarif"
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: 'trivy-results-${{ matrix.service.name }}.sarif' 
+          sarif_file: "trivy-results-${{ matrix.service.name }}.sarif"
