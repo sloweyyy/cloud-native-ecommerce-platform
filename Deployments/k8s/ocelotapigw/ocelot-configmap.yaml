@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ocelot-configmap
+data:
+  GlobalConfiguration__BaseUrl: http://ocelotapigw
+  Routes__CatalogAPI__DownstreamScheme: http
+  Routes__CatalogAPI__DownstreamHostAndPorts__0__Host: catalog-api
+  Routes__CatalogAPI__DownstreamHostAndPorts__0__Port: 80
+  Routes__BasketAPI__DownstreamScheme: http
+  Routes__BasketAPI__DownstreamHostAndPorts__0__Host: basket-api
+  Routes__BasketAPI__DownstreamHostAndPorts__0__Port: 80
+  Routes__DiscountAPI__DownstreamScheme: http
+  Routes__DiscountAPI__DownstreamHostAndPorts__0__Host: discount-api
+  Routes__DiscountAPI__DownstreamHostAndPorts__0__Port: 80
+  Routes__OrderingAPI__DownstreamScheme: http
+  Routes__OrderingAPI__DownstreamHostAndPorts__0__Host: ordering-api
+  Routes__OrderingAPI__DownstreamHostAndPorts__0__Port: 80
+  ElasticConfiguration__Uri: http://elasticsearch:9200 

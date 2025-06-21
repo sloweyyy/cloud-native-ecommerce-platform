@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discountdb
+  labels:
+    app: discountdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discountdb
+  template:
+    metadata:
+      labels:
+        app: discountdb
+    spec:
+      containers:
+        - name: discountdb
+          image: postgres:13
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: DiscountDb
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: admin1234
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: discountdb-data
+      volumes:
+        - name: discountdb-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discountdb
+spec:
+  selector:
+    app: discountdb
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432 

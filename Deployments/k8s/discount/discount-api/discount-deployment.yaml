@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discount-api
+  labels:
+    app: discount-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discount-api
+  template:
+    metadata:
+      labels:
+        app: discount-api
+    spec:
+      containers:
+        - name: discount-api
+          image: eshop/discount.grpc:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+            - containerPort: 50001
+              name: grpc
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          envFrom:
+            - configMapRef:
+                name: discount-configmap
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discount-api
+spec:
+  selector:
+    app: discount-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discount-grpc
+spec:
+  selector:
+    app: discount-api
+  ports:
+    - protocol: TCP
+      port: 50001
+      targetPort: 50001
+      name: grpc 

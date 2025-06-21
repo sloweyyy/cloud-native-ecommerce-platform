@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ordering-configmap
+data:
+  ConnectionStrings__OrderingConnectionString: Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678;TrustServerCertificate=True;
+  EventBusSettings__HostAddress: amqp://guest:guest@rabbitmq:5672
+  ElasticConfiguration__Uri: http://elasticsearch:9200 

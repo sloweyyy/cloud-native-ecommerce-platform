@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-configmap
+data:
+  DatabaseSettings__ConnectionString: mongodb://admin:admin1234@mongo-service:27017
+  DatabaseSettings__DatabaseName: CatalogDb
+  DatabaseSettings__CollectionName: Products
+  DatabaseSettings__BrandsCollection: Brands
+  DatabaseSettings__TypesCollection: Types
+  ElasticConfiguration__Uri: http://elasticsearch:9200 

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: discount-configmap
+data:
+  DatabaseSettings__ConnectionString: Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;
+  ElasticConfiguration__Uri: http://elasticsearch:9200 

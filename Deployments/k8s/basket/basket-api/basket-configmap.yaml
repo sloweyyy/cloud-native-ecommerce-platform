@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: basket-configmap
+data:
+  CacheSettings__ConnectionString: basketdb:6379
+  GrpcSettings__DiscountUrl: http://discount-grpc:50001
+  EventBusSettings__HostAddress: amqp://guest:guest@rabbitmq:5672
+  ElasticConfiguration__Uri: http://elasticsearch:9200 

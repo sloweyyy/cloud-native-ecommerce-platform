@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderdb
+  labels:
+    app: orderdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orderdb
+  template:
+    metadata:
+      labels:
+        app: orderdb
+    spec:
+      containers:
+        - name: orderdb
+          image: mcr.microsoft.com/mssql/server:2019-latest
+          ports:
+            - containerPort: 1433
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              value: "SwN12345678"
+            - name: MSSQL_PID
+              value: "Express"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          volumeMounts:
+            - mountPath: /var/opt/mssql/data
+              name: orderdb-data
+      volumes:
+        - name: orderdb-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderdb
+spec:
+  selector:
+    app: orderdb
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433 

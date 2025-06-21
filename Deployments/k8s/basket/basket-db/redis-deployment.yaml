@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basketdb
+  labels:
+    app: basketdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: basketdb
+  template:
+    metadata:
+      labels:
+        app: basketdb
+    spec:
+      containers:
+        - name: basketdb
+          image: redis:alpine
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: basketdb
+spec:
+  selector:
+    app: basketdb
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379 
