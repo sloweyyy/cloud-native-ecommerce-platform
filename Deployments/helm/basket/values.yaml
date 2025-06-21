@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   registry: mcr.microsoft.com
-  repository: eshop/basket.api
+  repository: slowey/basket.api
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"

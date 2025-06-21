@@ -91,11 +91,11 @@ build_images() {
     
     # Tag images for Kubernetes
     log_info "Tagging images for Kubernetes..."
-    docker tag catalogapi:latest eshop/catalog.api:latest
-    docker tag basketapi:latest eshop/basket.api:latest
-    docker tag discountapi:latest eshop/discount.grpc:latest
-    docker tag orderingapi:latest eshop/ordering.api:latest
-    docker tag ocelotapigateway:latest eshop/ocelot.apigw:latest
+    docker tag catalogapi:latest slowey/catalog.api:latest
+    docker tag basketapi:latest slowey/basket.api:latest
+    docker tag discountapi:latest slowey/discount.grpc:latest
+    docker tag orderingapi:latest slowey/ordering.api:latest
+    docker tag ocelotapigateway:latest slowey/ocelot.apigw:latest
     
     log_success "All Docker images built and tagged successfully"
 }

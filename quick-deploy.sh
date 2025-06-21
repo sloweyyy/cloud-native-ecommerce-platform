@@ -18,9 +18,9 @@ docker build -t basketapi:latest -f Services/Basket/Basket.API/Dockerfile .
 docker build -t ocelotapigateway:latest -f ApiGateways/Ocelot.ApiGateway/Dockerfile .
 
 # Tag images
-docker tag catalogapi:latest eshop/catalog.api:latest
-docker tag basketapi:latest eshop/basket.api:latest
-docker tag ocelotapigateway:latest eshop/ocelot.apigw:latest
+docker tag catalogapi:latest slowey/catalog.api:latest
+docker tag basketapi:latest slowey/basket.api:latest
+docker tag ocelotapigateway:latest slowey/ocelot.apigw:latest
 
 # Deploy infrastructure
 cd Deployments/helm
