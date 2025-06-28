@@ -1,438 +1,322 @@
 # Cloud-Native E-commerce Platform
 
-## Overview
+[![.NET](https://img.shields.io/badge/.NET-8.0-blue.svg)](https://dotnet.microsoft.com/)
+[![Angular](https://img.shields.io/badge/Angular-18-red.svg)](https://angular.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-green.svg)](https://kubernetes.io/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A comprehensive e-commerce solution built using microservices architecture with .NET Core. This project demonstrates enterprise-level application development using modern architecture patterns, containerization, and cloud-native practices.
+> A comprehensive cloud-native e-commerce platform built with microservices architecture, demonstrating modern software engineering practices and cloud technologies.
 
-## Vision
+## Features
 
-A cloud-native microservices e-commerce system leveraging Kubernetes for container orchestration, Helm for deployment automation, and Elastic Stack for comprehensive monitoring, providing a scalable, resilient and easily manageable platform.
+- **Microservices Architecture** - Clean separation of concerns with independent deployable services
+- **Event-Driven Design** - Asynchronous communication using RabbitMQ message broker
+- **Cloud-Native** - Kubernetes deployment with Helm charts and Istio service mesh
+- **Observability** - Comprehensive monitoring with Elastic Stack and distributed tracing
+- **Security** - JWT authentication and authorization with Identity Server
+- **API Gateway** - Centralized routing and cross-cutting concerns with Ocelot
+- **Modern UI** - Responsive Angular frontend with Material Design
 
-## Goals
-
-- Create a fully containerized microservices architecture following Clean Architecture principles
-- Implement robust deployment pipelines with Kubernetes and Helm charts
-- Establish comprehensive monitoring and logging with Elastic Stack
-- Enable service-to-service communication through message brokers and API gateways
-- Ensure high availability, scalability, and fault tolerance through Kubernetes orchestration
-- Implement Istio service mesh for enhanced network communication and observability
-- Build a responsive and modern e-commerce interface using Angular
-
-## Architecture Diagrams
-
-### Dependencies Structure
-
-![Dependencies Structure](images/dependencies-structure.png)
-
-The solution follows a clean layered architecture pattern with microservices:
-
-### Services (Microservices)
-
-Each microservice follows the same layered architecture pattern:
-
-#### Basket Service
-
-- **Basket.API**: REST API endpoints for basket operations
-- **Basket.Application**: Application logic and business workflows
-- **Basket.Core**: Domain models and business logic
-- **Basket.Infrastructure**: External concerns, data access, and infrastructure
-
-#### Catalog Service
-
-- **Catalog.API**: REST API endpoints for product catalog
-- **Catalog.Application**: Application layer business logic
-- **Catalog.Core**: Core domain models and rules
-- **Catalog.Infrastructure**: Data persistence and external services
-
-#### Discount Service
-
-- **Discount.API**: REST API for discount management
-- **Discount.Application**: Discount processing logic
-- **Discount.Core**: Core discount rules and models
-- **Discount.Infrastructure**: Data access and external integrations
-
-#### Ordering Service
-
-- **Ordering.API**: Order management REST endpoints
-- **Ordering.Application**: Order processing workflows
-- **Ordering.Core**: Order domain models and rules
-- **Ordering.Infrastructure**: Order persistence and integration
+## Architecture Overview
 
 ### System Architecture
 
-![System Architecture](images/system-architecture.png)
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        Web[Web App<br/>Angular 18]
+        Mobile[Mobile App<br/>Future]
+    end
+    
+    subgraph "API Gateway"
+        Gateway[Ocelot Gateway<br/>:8010]
+    end
+    
+    subgraph "Identity & Security"
+        Auth[Identity Server 4<br/>JWT Authentication]
+    end
+    
+    subgraph "Microservices"
+        Catalog[Catalog Service<br/>:8000]
+        Basket[Basket Service<br/>:8001]
+        Discount[Discount Service<br/>:8002]  
+        Ordering[Ordering Service<br/>:8003]
+    end
+    
+    subgraph "Data Layer"
+        CatalogDB[(MongoDB<br/>Catalog DB)]
+        BasketDB[(Redis<br/>Session Store)]
+        DiscountDB[(PostgreSQL<br/>Discount DB)]
+        OrderDB[(SQL Server<br/>Order DB)]
+    end
+    
+    subgraph "Infrastructure"
+        MessageBus[RabbitMQ<br/>Event Bus]
+        Monitoring[Elastic Stack<br/>Observability]
+    end
+    
+    Web --> Gateway
+    Mobile --> Gateway
+    Gateway --> Auth
+    Gateway --> Catalog
+    Gateway --> Basket
+    Gateway --> Discount
+    Gateway --> Ordering
+    
+    Catalog --> CatalogDB
+    Basket --> BasketDB
+    Discount --> DiscountDB
+    Ordering --> OrderDB
+    
+    Basket --> MessageBus
+    Ordering --> MessageBus
+    Basket -.->|gRPC| Discount
+    
+    Catalog --> Monitoring
+    Basket --> Monitoring
+    Discount --> Monitoring
+    Ordering --> Monitoring
+```
 
-The system implements:
+### Clean Architecture Pattern
 
-#### Client Layer
+```mermaid
+graph TD
+    subgraph "Each Microservice follows Clean Architecture"
+        API[API Layer<br/>Controllers, Endpoints]
+        App[Application Layer<br/>Commands, Queries, Handlers]
+        Domain[Domain Layer<br/>Entities, Value Objects, Rules]
+        Infra[Infrastructure Layer<br/>Repositories, External Services]
+    end
+    
+    API --> App
+    App --> Domain
+    App --> Infra
+    Infra --> Domain
+    
+    classDef apiStyle fill:#e3f2fd
+    classDef appStyle fill:#f3e5f5  
+    classDef domainStyle fill:#e8f5e8
+    classDef infraStyle fill:#fff3e0
+    
+    class API apiStyle
+    class App appStyle
+    class Domain domainStyle
+    class Infra infraStyle
+```
 
-- Angular-based front-end application
-- Integration with Identity Server
-- Communication through Ocelot API Gateway
+## Quick Start
 
-#### API Gateway Layer
+### Prerequisites
 
-- Ocelot API Gateway for routing and aggregation
-- Single entry point for all client requests
+- [Docker](https://www.docker.com/) & Docker Compose
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js 18+](https://nodejs.org/) & npm
+- [Kubernetes](https://kubernetes.io/) (optional, for K8s deployment)
 
-#### Microservices Layer
+### Local Development
 
-Each service has its own:
+```bash
+# Clone the repository
+git clone https://github.com/sloweyyy/cloud-native-ecommerce-platform.git
+cd cloud-native-ecommerce-platform
 
-- REST API endpoints
-- Application logic
-- Domain models
-- Infrastructure concerns
-- Database:
-  - Catalog: MongoDB
-  - Basket: Redis
-  - Discount: PostgreSQL
-  - Ordering: SQL Server
+# Start all services with Docker Compose
+docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d 
 
-#### Message Bus
+# Or use the deployment script
+./deploy.sh
+```
 
-- RabbitMQ for asynchronous communication
-- Event-driven architecture between services
+### Access Applications
 
-## Technical Stack
+| Service | URL | Description |
+|---------|-----|-------------|
+| Web App | [http://localhost:4200](http://localhost:4200) | Angular Frontend |
+| API Gateway | [http://localhost:8010](http://localhost:8010) | Ocelot Gateway |
+| Kibana | [http://localhost:5601](http://localhost:5601) | Log Analytics |
+| RabbitMQ | [http://localhost:15672](http://localhost:15672) | Message Broker UI |
+| Prometheus | [http://localhost:9090](http://localhost:9090) | Metrics |
+| Grafana | [http://localhost:3000](http://localhost:3000) | Dashboards |
 
-### Backend
+## Tech Stack
 
-- .NET Core 8.0
-- Clean Architecture
-- CQRS Pattern
-- Entity Framework Core
-- Dapper
-- AutoMapper
+### Backend Services
 
-### Databases
+- **.NET 8** - Modern C# runtime and framework
+- **ASP.NET Core** - Web API framework
+- **MediatR** - CQRS and Mediator pattern implementation
+- **AutoMapper** - Object-to-object mapping
+- **FluentValidation** - Input validation
+- **Serilog** - Structured logging
 
-- MongoDB
-- Redis
-- PostgreSQL
-- MS SQL Server
+### Databases & Storage
 
-### Message Broker
+- **MongoDB** - Document database for catalog service
+- **Redis** - In-memory cache for basket service
+- **PostgreSQL** - Relational database for discount service
+- **SQL Server** - Enterprise database for ordering service
 
-- RabbitMQ
+### Message Broker & Communication
+
+- **RabbitMQ** - Asynchronous messaging
+- **gRPC** - High-performance RPC framework
+- **SignalR** - Real-time communication
 
 ### Frontend
 
-- Angular
-- TypeScript
-- Material UI/Tailwind CSS
+- **Angular 18** - Modern web framework
+- **TypeScript** - Type-safe JavaScript
+- **Angular Material** - UI component library
+- **RxJS** - Reactive programming
+- **NgRx** - State management (optional)
 
-### API Gateway
+### Infrastructure & DevOps
 
-- Ocelot
-- JWT Authentication
-- Rate Limiting
-- Load Balancing
+- **Docker** - Containerization
+- **Kubernetes** - Container orchestration
+- **Helm** - Kubernetes package manager
+- **Istio** - Service mesh
+- **Ocelot** - API Gateway
+- **Identity Server 4** - Authentication & authorization
 
-### Monitoring & Logging
+### Monitoring & Observability
 
-- Elasticsearch
-- Kibana
-- Common.Logging
-- Health Checks
+- **Elasticsearch** - Search and analytics engine
+- **Kibana** - Data visualization
+- **Prometheus** - Metrics collection
+- **Grafana** - Monitoring dashboards
+- **Jaeger** - Distributed tracing
 
-### Containerization & Orchestration
+## Business Flow
 
-- Docker
-- Docker Compose
-- Kubernetes
-- Helm Charts
-- Istio Service Mesh
+### E-commerce User Journey
 
-### Development Tools
+```mermaid
+journey
+    title Customer Shopping Journey
+    section Browse Products
+      Visit Website: 5: Customer
+      View Catalog: 4: Customer, Catalog Service
+      Search Products: 4: Customer, Catalog Service
+    section Add to Cart
+      Select Product: 5: Customer
+      Add to Basket: 4: Customer, Basket Service
+      Apply Discount: 3: Customer, Discount Service
+    section Checkout
+      Review Cart: 4: Customer, Basket Service
+      Place Order: 5: Customer, Ordering Service
+      Payment: 3: Customer, Payment Service
+    section Post-Purchase
+      Order Confirmation: 5: Customer, Ordering Service
+      Track Order: 4: Customer, Ordering Service
+```
 
-- Visual Studio 2022
-- VS Code
-- Git
-- GitHub Actions
+## Project Structure
 
-## Epics and Features
+```
+├── Services/                    # Microservices
+│   ├── Catalog/                # Product catalog service
+│   ├── Basket/                 # Shopping basket service  
+│   ├── Discount/               # Discount management service
+│   └── Ordering/               # Order processing service
+├── client/                     # Angular frontend
+├── ApiGateways/                # API gateway
+├── Infrastructure/             # Shared libraries
+├── Deployments/                # K8s & Helm charts
+└── PostmanCollection/          # API testing
+```
 
-### Epic 1: Product Management
+## Configuration
 
-- **Catalog Management** - CRUD operations for products with MongoDB
-- **Brand Management** - Organization and administration of product brands
-- **Product Type Management** - Categorization and typing of products
-- **Product Search and Filter** - Advanced discovery capabilities
+### Environment Variables
 
-### Epic 2: Shopping Experience
+```bash
+# Database Connections
+CATALOG_DB=mongodb://localhost:27017/catalog
+BASKET_DB=redis://localhost:6379
+DISCOUNT_DB=postgresql://localhost:5432/discount
+ORDERING_DB=sqlserver://localhost:1433/ordering
 
-- **Product Browsing** - Intuitive product discovery and display
-- **Shopping Cart** - Redis-backed persistent cart management
+# Message Broker
+RABBITMQ_URL=amqp://localhost:5672
 
-### Epic 3: Order Processing
+# Monitoring
+ELASTICSEARCH_URL=http://localhost:9200
+```
 
-- **Checkout Process** - Convert carts to orders using RabbitMQ event-driven architecture
-- **Order Management** - SQL Server-based order tracking and history
+## Testing
 
-### Epic 4: Discount Management
+```bash
+# Run unit tests
+dotnet test
 
-- **Discount Application** - Apply percentage or fixed discounts to products
+# Run integration tests
+dotnet test --filter Category=Integration
 
-### Epic 5: User Management and Authentication
+# API testing with Postman collections
+newman run PostmanCollection/
+```
 
-- **User Registration and Login** - Identity Server 4 integration
+## Monitoring & Observability
 
-### Epic 6: System Operations
+The platform includes comprehensive monitoring capabilities:
 
-- **Deployment Automation** - Kubernetes and Helm chart deployment
-- **System Monitoring** - Elastic Stack observability
-- **Scaling and Resilience** - Kubernetes auto-scaling and self-healing
-- **Service Mesh** - Istio-based traffic management and security
+- **Application Metrics** - Custom business metrics via Prometheus
+- **Infrastructure Monitoring** - Container and cluster metrics
+- **Distributed Tracing** - Request tracing across microservices
+- **Centralized Logging** - Structured logs aggregated in Elasticsearch
+- **Health Checks** - Service health monitoring and alerting
 
-## Release Timeline
+## Security
 
-### Infrastructure Foundation (March 2025)
+- **Authentication** - JWT tokens via Identity Server 4
+- **Authorization** - Role-based access control
+- **API Security** - Rate limiting and request validation
+- **Network Security** - Service mesh with mTLS
+- **Data Protection** - Encryption at rest and in transit
 
-- Complete containerization of core microservices (Catalog, Basket)
-- Set up basic Kubernetes cluster configuration
-- Implement Docker Compose for local development
-- Create initial CI/CD pipeline for automated builds
+## Deployment
 
-### Service Expansion (April 2025)
+For detailed deployment instructions, please refer to our comprehensive deployment guides:
 
-- Containerize Discount and Ordering services
-- Implement Helm charts for automated deployments
-- Configure RabbitMQ for message-based communication
-- Set up inter-service communication patterns
+- [Quick Start Guide](DEPLOYMENT-QUICKSTART.md) - Get up and running in minutes
+- [Complete Deployment Guide](DEPLOYMENT-GUIDE-COMPLETE.md) - Detailed step-by-step instructions
+- [Deployment Configuration Guide](Deployments/DEPLOYMENT-CONFIGURATION.md) - Current service configurations and port mappings
+- **Deployment Scripts**:
+  - `./deploy.sh` - Full deployment with monitoring
+  - `./quick-deploy.sh` - Minimal deployment for development
+  - `./start.sh` - Start existing deployment
+  - `./cleanup.sh` - Clean up all resources
 
-### Monitoring and Resilience (May 2025)
-
-- Set up Elastic Stack for logging
-- Implement distributed tracing across services
-- Configure Kubernetes horizontal pod autoscaling
-- Enhance API Gateway with advanced routing and caching
-
-### Service Mesh and Frontend (June 2025)
-
-- Deploy Istio service mesh
-- Implement advanced traffic management
-- Develop and deploy Angular frontend client
-- Conduct end-to-end testing and optimization
-
-## Key Outcomes
-
-### Product Management Outcomes
-
-- MongoDB product database schema for flexible attributes
-- Product CRUD API endpoints with image upload capability
-- Brand entity model with brand-to-product relationships
-- Category hierarchy model with navigation components
-- Search and filtering framework for price ranges and attributes
-
-### Shopping Experience Outcomes
-
-- Responsive product interface with availability indicators
-- Redis-backed cart persistence system
-- Cart management UI with quantity controls and total calculation
-- Cart expiration and recovery mechanism
-
-### Order Processing Outcomes
-
-- Cart-to-order conversion with RabbitMQ
-- Order confirmation email system
-- Order management dashboard for administrators
-
-### Discount Management Outcomes
-
-- Percentage and fixed-amount discount configuration
-- Discount scheduling and expiration system
-- Applied discount indicators in product and cart views
-
-### User Management Outcomes
-
-- Identity Server 4 integration with email verification
-- Secure login process with rate limiting
-
-### System Operations Outcomes
-
-- Helm charts for each microservice with environment-specific configuration
-- Elasticsearch cluster with centralized logging
-- Kubernetes horizontal pod autoscaling
-- Service mesh capabilities with Istio
-
-## 🚀 Deployment
-
-This platform supports **Kubernetes deployment with comprehensive monitoring and service mesh capabilities**.
-
-### **Quick Start**
+### Quick Commands
 
 ```bash
 # One-command deployment (15-20 minutes)
 ./deploy.sh
 
-# Or start services if already deployed (30 seconds)
+# Quick development setup (5 minutes)
+./quick-deploy.sh
+
+# Start existing deployment (30 seconds)
 ./start.sh
 
-# Complete cleanup when done
+# Complete cleanup
 ./cleanup.sh
 ```
 
-### **Deployment Guides**
+## Contributing
 
-- 📋 **[Quick Reference](DEPLOYMENT-QUICKSTART.md)** - Essential commands and URLs
-- 📚 **[Complete Guide](DEPLOYMENT-GUIDE-COMPLETE.md)** - Detailed step-by-step instructions
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 
-### **Access URLs (After Deployment)**
+- Setting up the development environment
+- Coding standards and guidelines
+- Testing requirements
+- Pull request process
+- Issue reporting guidelines
 
-- 🌐 **Frontend**: <http://localhost:4200>
-- 🔗 **API Gateway**: <http://localhost:8010>
-- 📈 **Prometheus**: <http://localhost:9090>
-- 📊 **Grafana**: <http://localhost:3000>
-- 🔍 **Jaeger**: <http://localhost:16686>
-- 🕸️ **Kiali**: <http://localhost:20001>
-- 🐰 **RabbitMQ**: <http://localhost:15672> (guest/guest)
-
-### **Prerequisites**
-
-- Docker, Kubernetes (minikube), Helm, kubectl
-- 8GB+ RAM, 4+ CPU cores, 50GB+ disk space
-
-## Project Structure
-
-```plaintext
-├── src/
-│   ├── ApiGateways/                    # API gateway layer
-│   │   └── Ocelot.ApiGateway/          # Ocelot API gateway implementation
-│   │        ├── Configurations/        # Gateway routing and configuration
-│   │        ├── Extensions/            # Extension methods for services
-│   │        └── Program.cs             # Gateway entry point
-│   │
-│   ├── Infrastructure/                 # Shared infrastructure components
-│   │   ├── EventBus.Messages/          # Shared event messages for RabbitMQ
-│   │   │    ├── Events/                # Event models for inter-service communication
-│   │   │    └── Common/                # Shared constants and configurations
-│   │   │
-│   │   └── Common.Logging/             # Centralized logging infrastructure
-│   │        ├── Extensions/            # Logging extension methods
-│   │        └── SeriLogger.cs          # Serilog implementation
-│   │
-│   ├── Services/                       # Microservices implementations
-│   │   ├── Basket/                     # Shopping cart service
-│   │   │   ├── Basket.API/             # REST API endpoints and controllers
-│   │   │   │    ├── Controllers/       # API controllers
-│   │   │   │    ├── GrpcServices/      # gRPC clients for service communication
-│   │   │   │    └── Program.cs         # Service entry point
-│   │   │   │
-│   │   │   ├── Basket.Application/     # Application business logic
-│   │   │   │    ├── Behaviors/         # Request behaviors (validation, logging)
-│   │   │   │    ├── Features/          # Application features (CQRS)
-│   │   │   │    └── Mappings/          # AutoMapper profiles
-│   │   │   │
-│   │   │   ├── Basket.Core/            # Domain models and business rules
-│   │   │   │    ├── Entities/          # Domain entities
-│   │   │   │    ├── Repositories/      # Repository interfaces
-│   │   │   │    └── Specifications/    # Domain specifications
-│   │   │   │
-│   │   │   └── Basket.Infrastructure/  # External dependencies and implementations
-│   │   │        ├── Data/              # Redis implementation
-│   │   │        ├── Repositories/      # Repository implementations
-│   │   │        └── Extensions/        # Service extension methods
-│   │   │
-│   │   ├── Catalog/                    # Product catalog service
-│   │   │   ├── Catalog.API/            # REST API endpoints and controllers
-│   │   │   ├── Catalog.Application/    # Application business logic
-│   │   │   ├── Catalog.Core/           # Domain models and rules
-│   │   │   └── Catalog.Infrastructure/ # MongoDB persistence
-│   │   │
-│   │   ├── Discount/                   # Discount management service
-│   │   │   ├── Discount.API/           # REST API endpoints
-│   │   │   │    ├── Controllers/       # API controllers
-│   │   │   │    ├── Extensions/        # Service extensions
-│   │   │   │    └── Program.cs         # Service entry point
-│   │   │   │
-│   │   │   ├── Discount.Application/   # Discount processing logic
-│   │   │   ├── Discount.Core/          # Core discount rules and models
-│   │   │   └── Discount.Infrastructure/# PostgreSQL implementations
-│   │   │
-│   │   └── Ordering/                   # Order processing service
-│   │       ├── Ordering.API/           # REST API endpoints
-│   │       │    ├── Controllers/       # API controllers
-│   │       │    ├── EventBusConsumer/  # RabbitMQ message consumers
-│   │       │    └── Program.cs         # Service entry point
-│   │       │
-│   │       ├── Ordering.Application/   # Order workflows (CQRS with MediatR)
-│   │       │    ├── Behaviors/         # Request behaviors
-│   │       │    ├── Contracts/         # Interfaces
-│   │       │    ├── Features/          # Commands and queries
-│   │       │    └── Mappings/          # AutoMapper profiles
-│   │       │
-│   │       ├── Ordering.Core/          # Domain models and rules
-│   │       │    ├── Entities/          # Domain entities
-│   │       │    └── ValueObjects/      # Domain value objects
-│   │       │
-│   │       └── Ordering.Infrastructure/# SQL Server persistence
-│   │            ├── Persistence/       # Database context
-│   │            ├── Repositories/      # Repository implementations
-│   │            └── Mail/              # Email service implementation
-│   │
-│   ├── client/                         # Angular frontend application
-│   │    ├── src/                       # Source code
-│   │    │    ├── app/                  # Angular components
-│   │    │    ├── assets/               # Static assets
-│   │    │    └── environments/         # Environment configurations
-│   │    │
-│   │    ├── package.json               # NPM dependencies
-│   │    └── angular.json               # Angular configuration
-│   │
-│   └── images/                         # Documentation images
-│        ├── dependencies-structure.png # Architecture diagram
-│        └── system-architecture.png    # System architecture diagram
-│
-├── docker-compose.yml                  # Base Docker Compose configuration
-├── docker-compose.override.yml         # Environment-specific overrides
-├── Deployments/                        # Kubernetes and Helm deployment files
-│    ├── helm-charts/                   # Helm charts for each service
-│    └── k8s/                           # Kubernetes manifests
-│
-├── PostmanCollection/                  # API testing collections
-├── README.md                           # Project documentation
-└── LICENSE                             # MIT license
-```
-
-The project follows a clean microservices architecture with the following organizational principles:
-
-1. **Service Isolation**: Each microservice (Basket, Catalog, Discount, Ordering) is isolated with its own data storage, business logic, and API.
-
-2. **Clean Architecture**: Every service is structured following Clean Architecture principles with distinct layers:
-   - **API Layer**: Controllers and external interfaces
-   - **Application Layer**: Business workflows and application logic
-   - **Core/Domain Layer**: Business entities and rules
-   - **Infrastructure Layer**: Technical implementations and external concerns
-
-3. **Shared Infrastructure**: Common components like event bus messages and logging are isolated in the Infrastructure folder to enable reuse.
-
-4. **Gateway Pattern**: All client requests go through the Ocelot API Gateway, which handles routing, aggregation, and cross-cutting concerns.
-
-5. **Containerization**: Each component is containerized using Docker, with configurations defined in docker-compose files.
-
-6. **Kubernetes Deployment**: Production deployment uses Kubernetes manifests and Helm charts in the Deployments directory.
-
-## Analytics and Performance Metrics
-
-### Deployment Metrics
-
-- Deployment time target: 15 minutes (from 3 hours baseline)
-- Deployment success rate target: 99.5% (from 85% baseline)
-
-### Monitoring Metrics
-
-- Mean time to detect (MTTD) issues target: 5 minutes (from 30 minutes baseline)
-- Mean time to resolve (MTTR) issues target: 1 hour (from 4 hours baseline)
-
-## Future Work
-
-| Feature | Purpose | Priority | Timeframe |
-|---------|---------|----------|-----------|
-| Advanced Service Mesh Capabilities | Implement advanced Istio features for circuit breaking, fault injection, and A/B testing | Medium | Q3 2025 |
-| Machine Learning-Based Autoscaling | Implement predictive scaling based on historical patterns | Low | Q4 2025 |
-| Multi-Cluster Federation | Support multi-region, multi-cluster operation | Medium | Q1 2026 |
-| GitOps Deployment Pipeline | Implement GitOps principles for automated deployment | High | Q2 2026 |
+Also review our [Code of Conduct](CODE_OF_CONDUCT.md) and [Security Policy](SECURITY.md).
 
 ## License
 

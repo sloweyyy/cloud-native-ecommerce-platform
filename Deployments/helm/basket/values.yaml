@@ -5,8 +5,8 @@
 replicaCount: 1
 
 image:
-  registry: mcr.microsoft.com
-  repository: slowey/basket.api
+  registry: ""
+  repository: basketapi
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -27,7 +27,7 @@ serviceAccount:
   name: ""
 
 podAnnotations:
-  sidecar.istio.io/inject: "false"
+  sidecar.istio.io/inject: "true"
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -71,6 +71,8 @@ env:
   values:
   - name: ASPNETCORE_ENVIRONMENT
     value: Development
+  - name: BypassDiscount__Enabled
+    value: "true"
   urls:
   # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
   configmap:

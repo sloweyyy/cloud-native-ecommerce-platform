@@ -1,0 +1,70 @@
+🚀 {{ include "pgadmin.fullname" . }} has been deployed!
+
+📋 Service Information:
+   Name: {{ include "pgadmin.fullname" . }}
+   Namespace: {{ .Release.Namespace }}
+   Type: {{ .Values.service.type }}
+
+🌐 Access pgAdmin:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  🔗 Ingress URL: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  
+  # Get the NodePort and access the service:
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "pgadmin.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "🔗 pgAdmin URL: http://$NODE_IP:$NODE_PORT"
+
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  
+  # Wait for LoadBalancer IP (may take a few minutes):
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "pgadmin.fullname" . }}
+  
+  # Once available, get the IP:
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "pgadmin.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo "🔗 pgAdmin URL: http://$SERVICE_IP:{{ .Values.service.port }}"
+
+{{- else if contains "ClusterIP" .Values.service.type }}
+  
+  # For local access, use port-forwarding:
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "pgadmin.fullname" . }} 5050:{{ .Values.service.port }}
+  
+  🔗 pgAdmin URL: http://localhost:5050
+{{- end }}
+
+🔑 Default Credentials:
+   Email: admin@example.com
+   Password: admin1234
+
+📊 pgAdmin Features:
+   • PostgreSQL Database Administration
+   • Query Editor with Syntax Highlighting
+   • Database Schema Browser
+   • Backup and Restore Tools
+   • User and Role Management
+   • Performance Monitoring
+
+🔧 Useful Commands:
+   # Check pod status:
+   kubectl get pods -l app.kubernetes.io/name={{ include "pgadmin.name" . }} -n {{ .Release.Namespace }}
+   
+   # View logs:
+   kubectl logs -l app.kubernetes.io/name={{ include "pgadmin.name" . }} -n {{ .Release.Namespace }}
+   
+   # Port forward for local access:
+   kubectl port-forward svc/{{ include "pgadmin.fullname" . }} 5050:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+🔗 Connect to PostgreSQL:
+   # To connect to the discount database:
+   Host: discountdb (or discountdb.default.svc.cluster.local)
+   Port: 5432
+   Database: DiscountDb
+   Username: admin
+   Password: admin1234
+
+⚠️  Security Note:
+   Change default credentials in production environments!

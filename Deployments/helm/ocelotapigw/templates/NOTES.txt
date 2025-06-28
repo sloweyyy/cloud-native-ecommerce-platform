@@ -1,22 +1,54 @@
-1. Get the application URL by running these commands:
+🚀 {{ include "ocelotapigw.fullname" . }} API Gateway has been deployed!
+
+📋 Service Information:
+   Name: {{ include "ocelotapigw.fullname" . }}
+   Namespace: {{ .Release.Namespace }}
+   Type: {{ .Values.service.type }}
+   Port: {{ .Values.service.port }}
+
+🌐 Access the API Gateway:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
   {{- range .paths }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  🔗 Ingress URL: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}
 {{- end }}
 {{- else if contains "NodePort" .Values.service.type }}
+
+  # Get the NodePort and access the service:
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "ocelotapigw.fullname" . }})
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
-  echo http://$NODE_IP:$NODE_PORT
+  echo "🔗 API Gateway URL: http://$NODE_IP:$NODE_PORT"
+
 {{- else if contains "LoadBalancer" .Values.service.type }}
-     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running 'kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "ocelotapigw.fullname" . }}'
+
+  # Wait for LoadBalancer IP (may take a few minutes):
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "ocelotapigw.fullname" . }}
+
+  # Once available, get the IP:
   export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "ocelotapigw.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo http://$SERVICE_IP:{{ .Values.service.port }}
+  echo "🔗 API Gateway URL: http://$SERVICE_IP:{{ .Values.service.port }}"
+
 {{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "ocelotapigw.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
-  echo "Visit http://127.0.0.1:8080 to use your application"
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+  # For local access, use port-forwarding:
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "ocelotapigw.fullname" . }} 8010:{{ .Values.service.port }}
+
+  🔗 API Gateway URL: http://localhost:8010
 {{- end }}
+
+📊 Available API Endpoints:
+   • Catalog API: /Catalog
+   • Basket API: /Basket
+   • Discount API: /Discount
+   • Ordering API: /Order
+
+🔧 Useful Commands:
+   # Check pod status:
+   kubectl get pods -l app.kubernetes.io/name={{ include "ocelotapigw.name" . }} -n {{ .Release.Namespace }}
+
+   # View logs:
+   kubectl logs -l app.kubernetes.io/name={{ include "ocelotapigw.name" . }} -n {{ .Release.Namespace }}
+
+   # Port forward for local access:
+   kubectl port-forward svc/{{ include "ocelotapigw.fullname" . }} 8010:{{ .Values.service.port }} -n {{ .Release.Namespace }}

@@ -98,7 +98,15 @@ builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
 // MassTransit-RabbitMQ Configuration
 builder.Services.AddMassTransit(config =>
 {
-    config.UsingRabbitMq((ct, cfg) => { cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]); });
+    config.UsingRabbitMq((ct, cfg) =>
+    {
+        // Use simple host configuration for MassTransit 7.3.1
+        cfg.Host("rabbitmq", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+    });
 });
 builder.Services.AddMassTransitHostedService();
 

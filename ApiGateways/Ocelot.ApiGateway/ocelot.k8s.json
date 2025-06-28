@@ -79,7 +79,7 @@
 			"DownstreamHostAndPorts": [
 				{
 					"Host": "basket",
-					"Port": "8080"
+					"Port": "80"
 				}
 			],
 			"UpstreamPathTemplate": "/Basket/GetBasket/{userName}",
@@ -91,7 +91,7 @@
 			"DownstreamHostAndPorts": [
 				{
 					"Host": "basket",
-					"Port": "8080"
+					"Port": "80"
 				}
 			],
 			"UpstreamPathTemplate": "/Basket/DeleteBasket/{userName}",
@@ -103,7 +103,7 @@
 			"DownstreamHostAndPorts": [
 				{
 					"Host": "basket",
-					"Port": "8080"
+					"Port": "80"
 				}
 			],
 			"UpstreamPathTemplate": "/Basket/CreateBasket",
@@ -115,7 +115,7 @@
 			"DownstreamHostAndPorts": [
 				{
 					"Host": "basket",
-					"Port": "8080"
+					"Port": "80"
 				}
 			],
 			"UpstreamPathTemplate": "/Basket/Checkout",
@@ -134,7 +134,7 @@
 			"DownstreamHostAndPorts": [
 				{
 					"Host": "basket",
-					"Port": "8080"
+					"Port": "80"
 				}
 			],
 			"UpstreamPathTemplate": "/Basket/CheckoutV2",

@@ -1,0 +1,50 @@
+replicaCount: 1
+
+image:
+  repository: portainer/portainer-ce
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: "portainer"
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 9000
+  targetPort: 9000
+
+ingress:
+  enabled: false
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+# Environment variables for Portainer configuration
+env:
+  - name: PORTAINER_SESSION_TIMEOUT
+    value: "24h"
+  - name: PORTAINER_LOGO
+    value: "https://portainer.io/images/logos/portainer.png"

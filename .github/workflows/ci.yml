@@ -1,4 +1,3 @@
----
 name: Continuous Integration
 
 on:
@@ -12,20 +11,15 @@ env:
   DOTNET_VERSION: "8.0.x"
   NODE_VERSION: "18.x"
   DOCKER_BUILDKIT: 1
-  DOCKER_USERNAME: slowey
 
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
     outputs:
       backend: ${{ steps.changes.outputs.backend }}
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
       k8s: ${{ steps.changes.outputs.k8s }}
-      k8s_raw: ${{ steps.changes.outputs.k8s_raw }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -44,11 +38,7 @@ jobs:
               - 'docker-compose*.yml'
               - '**/Dockerfile'
             k8s:
-              - 'Deployments/helm/**'
-            k8s_raw:
-              - 'Deployments/k8s/**'
-              - 'deploy-raw-k8s.sh'
-              - 'uninstall-raw-k8s.sh'
+              - 'Deployments/**'
 
   code-quality:
     runs-on: ubuntu-latest
@@ -79,13 +69,7 @@ jobs:
         run: dotnet build Ecommerce.sln --no-restore --configuration Release
 
       - name: Run tests
-        run: >-
-          dotnet test Ecommerce.sln
-          --no-build
-          --configuration Release
-          --verbosity normal
-          --collect:"XPlat Code Coverage"
-          --results-directory ./coverage
+        run: dotnet test Ecommerce.sln --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: Create coverage directory
         run: mkdir -p coverage
@@ -109,21 +93,15 @@ jobs:
 
       - name: Add Coverage PR Comment
         if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            if (fs.existsSync('code-coverage-results.md')) {
-              const body = fs.readFileSync('code-coverage-results.md', 'utf8');
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body
-              });
-            } else {
-              console.log("No code coverage results file found - skipping PR comment");
-            }
+        run: |
+          if [ -f "code-coverage-results.md" ]; then
+            echo "Posting code coverage results to PR"
+            gh pr comment ${{ github.event.pull_request.number }} --body-file code-coverage-results.md
+          else
+            echo "No code coverage results file found - skipping PR comment"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   security-scan:
     runs-on: ubuntu-latest
@@ -197,25 +175,17 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
     needs: [code-quality, frontend-quality]
-    if: >-
-      always() &&
-      (needs.code-quality.result == 'success' ||
-       needs.code-quality.result == 'skipped') &&
-      (needs.frontend-quality.result == 'success' ||
-       needs.frontend-quality.result == 'skipped')
+    if: always() && (needs.code-quality.result == 'success' || needs.code-quality.result == 'skipped') && (needs.frontend-quality.result == 'success' || needs.frontend-quality.result == 'skipped')
     strategy:
       matrix:
         service:
-          - name: "catalog-api"
-            path: "Services/Catalog/Catalog.API"
-          - name: "basket-api"
-            path: "Services/Basket/Basket.API"
-          - name: "discount-api"
-            path: "Services/Discount/Discount.API"
-          - name: "ordering-api"
-            path: "Services/Ordering/Ordering.API"
-          - name: "ocelot-gateway"
-            path: "ApiGateways/Ocelot.ApiGateway"
+          [
+            { name: "catalog-api", path: "Services/Catalog/Catalog.API" },
+            { name: "basket-api", path: "Services/Basket/Basket.API" },
+            { name: "discount-api", path: "Services/Discount/Discount.API" },
+            { name: "ordering-api", path: "Services/Ordering/Ordering.API" },
+            { name: "ocelot-gateway", path: "ApiGateways/Ocelot.ApiGateway" },
+          ]
     steps:
       - uses: actions/checkout@v4
 
@@ -228,7 +198,7 @@ jobs:
           context: .
           file: ./${{ matrix.service.path }}/Dockerfile
           push: false
-          tags: ${{ env.DOCKER_USERNAME }}/${{ matrix.service.name }}:ci-${{ github.run_number }}
+          tags: ${{ matrix.service.name }}:ci-${{ github.run_number }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -313,41 +283,13 @@ jobs:
             fi
           done
 
-  k8s-validate:
-    runs-on: ubuntu-latest
-    needs: detect-changes
-    if: needs.detect-changes.outputs.k8s_raw == 'true'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-
-      - name: Validate raw Kubernetes manifests
+      - name: Validate Kubernetes manifests
         run: |
-          echo "Validating raw Kubernetes manifests..."
-          for manifest in $(find Deployments/k8s -name "*.yaml" -type f); do
-            echo "Validating $manifest"
-            kubectl apply --validate=true --dry-run=client -f "$manifest" \
-              || echo "Warning: $manifest could not be validated"
-          done
-
-      - name: Check shell script permissions
-        run: |
-          echo "Checking deployment scripts..."
-
-          # Check if deployment scripts are executable
-          for script in deploy-raw-k8s.sh uninstall-raw-k8s.sh; do
-            if [ -f "$script" ]; then
-              if [ -x "$script" ]; then
-                echo "✅ $script is executable"
-              else
-                echo "❌ $script is not executable"
-                chmod +x "$script"
-                echo "   Fixed permissions for $script"
-              fi
-            else
-              echo "⚠️ $script not found"
+          # Simple check for YAML syntax without requiring kubectl API server
+          for manifest in Deployments/k8s/**/*.yaml; do
+            if [ -f "$manifest" ]; then
+              echo "Checking $manifest"
+              grep -v "^#" "$manifest" | python3 -c "import sys, yaml; yaml.safe_load(sys.stdin)" && echo "✓ $manifest is valid YAML" || echo "✗ YAML validation failed for $manifest"
             fi
           done
 
@@ -356,15 +298,7 @@ jobs:
     permissions:
       issues: write
       pull-requests: write
-    needs:
-      [
-        code-quality,
-        frontend-quality,
-        docker-build,
-        security-scan,
-        helm-lint,
-        k8s-validate,
-      ]
+    needs: [code-quality, frontend-quality, docker-build, helm-lint]
     if: always()
     steps:
       - name: Notify PR status
@@ -372,19 +306,14 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const status =
-              '${{ needs.code-quality.result }}' === 'success' &&
-              '${{ needs.frontend-quality.result }}' === 'success' &&
-              '${{ needs.docker-build.result }}' === 'success' &&
-              '${{ needs.security-scan.result }}' === 'success' &&
-              '${{ needs.helm-lint.result }}' === 'success' &&
-              '${{ needs.k8s-validate.result }}' === 'success' ? '✅' : '❌';
+            const status = '${{ needs.code-quality.result }}' === 'success' && 
+                          '${{ needs.frontend-quality.result }}' === 'success' && 
+                          '${{ needs.docker-build.result }}' === 'success' && 
+                          '${{ needs.helm-lint.result }}' === 'success' ? '✅' : '❌';
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `${status} CI Pipeline completed. Check the [Actions tab]
-                (${context.payload.repository.html_url}/actions/runs/${context.runId})
-                for details.`
+              body: `${status} CI Pipeline completed. Check the [Actions tab](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details.`
             });

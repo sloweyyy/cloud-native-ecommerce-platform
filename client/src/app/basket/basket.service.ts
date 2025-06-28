@@ -59,14 +59,21 @@ export class BasketService {
         Authorization: token,
       }),
     };
+
+    // Create the checkout object that matches the V2 API expectations
+    const checkoutData = {
+      userName: basket.userName,
+      totalPrice: basket.totalPrice,
+    };
+
     return this.http
-      .post<IBasket>(
+      .post<any>(
         'http://localhost:8010/api/v2/Basket/Checkout',
-        basket,
+        checkoutData,
         httpOptions
       )
       .subscribe({
-        next: (basket) => {
+        next: (response) => {
           this.basketSource.next(null);
           this.router.navigateByUrl('/');
         },

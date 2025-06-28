@@ -399,3 +399,29 @@ coverage.json
 
 /.cursor
 /istio-1.26.2
+
+# Backup files
+*-backup-*.yaml
+*-backup-*.yml
+*-backup-*.json
+*-backup-*.xml
+*-backup-*.sql
+*-backup-*.txt
+*backup*.yaml
+*backup*.yml
+*backup*.json
+*backup*.xml
+*backup*.sql
+*backup*.txt
+*.backup
+*.bak
+*.bck
+*.orig
+*~backup~*
+backup/
+backups/
+*.dump
+*.tar.gz.backup
+*.zip.backup
+*.backup-*
+*.bak-*

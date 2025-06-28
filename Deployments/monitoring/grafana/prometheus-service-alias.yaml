@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: istio-system
+  labels:
+    app: prometheus-bridge
+spec:
+  type: ExternalName
+  externalName: prometheus-server.monitoring.svc.cluster.local
+  ports:
+  - port: 9090
+    targetPort: 80
+    protocol: TCP
+    name: http

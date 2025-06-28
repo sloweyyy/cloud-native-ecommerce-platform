@@ -73,8 +73,8 @@ services:
     container_name: portainer
     restart: always
     ports:
-      - "8080:8000"
-      - "9090:9000"
+      - "9080:8000"
+      - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -92,21 +92,21 @@ services:
     depends_on:
       - catalogdb
     ports:
-      - "8000:8080"
+      - "8000:80"
 
   basket.api:
     container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - CacheSettings__ConnectionString=${REDIS_URL}
-      - GrpcSettings__DiscountUrl=http://discount.api:8080
+      - GrpcSettings__DiscountUrl=http://discount.api:80
       - EventBusSettings__HostAddress=${RABBITMQ_URL}
       - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
       - basketdb
       - rabbitmq
     ports:
-      - "8001:8080"
+      - "8001:80"
 
   discount.api:
     container_name: discount.api
@@ -118,7 +118,7 @@ services:
       discountdb:
         condition: service_healthy
     ports:
-      - "8002:8080"
+      - "8002:80"
 
   ordering.api:
     container_name: ordering.api
@@ -131,7 +131,7 @@ services:
       - orderdb
       - rabbitmq
     ports:
-      - "8003:8080"
+      - "8003:80"
 
   ocelot.apigateway:
     environment:
@@ -142,7 +142,7 @@ services:
       - discount.api
       - ordering.api
     ports:
-      - "8010:8080"
+      - "8010:80"
 
   elasticsearch:
     container_name: elasticsearch

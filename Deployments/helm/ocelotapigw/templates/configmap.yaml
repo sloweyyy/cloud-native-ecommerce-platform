@@ -88,6 +88,18 @@ data:
           "UpstreamHttpMethod": [ "GET" ]
         },
         {
+          "DownstreamPathTemplate": "/api/v1/Basket/DeleteBasket/{userName}",
+          "DownstreamScheme": "http",
+          "DownstreamHostAndPorts": [
+            {
+              "Host": "basket",
+              "Port": "80"
+            }
+          ],
+          "UpstreamPathTemplate": "/Basket/DeleteBasket/{userName}",
+          "UpstreamHttpMethod": [ "DELETE" ]
+        },
+        {
           "DownstreamPathTemplate": "/api/v1/Basket/CreateBasket",
           "DownstreamScheme": "http",
           "DownstreamHostAndPorts": [

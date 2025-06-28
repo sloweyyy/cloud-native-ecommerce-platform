@@ -54,8 +54,8 @@ start_minikube() {
         return 0
     fi
     
-    # Start minikube with optimal configuration
-    minikube start --driver=docker --memory=7168 --cpus=4 --disk-size=50g
+    # Start minikube with increased configuration for better stability
+    minikube start --driver=docker --memory=10240 --cpus=6 --disk-size=80g
     
     # Enable required addons
     log_info "Enabling minikube addons..."
@@ -106,31 +106,41 @@ deploy_infrastructure() {
     
     cd Deployments/helm
     
-    # Install databases
+    # Install databases with increased timeout
     log_info "Installing databases..."
-    helm install eshopping-basketdb ./basketdb --namespace default --timeout 300s
-    helm install eshopping-catalogdb ./catalogdb --namespace default --timeout 300s
-    helm install eshopping-discountdb ./discountdb --namespace default --timeout 300s
-    helm install eshopping-orderdb ./orderdb --namespace default --timeout 300s
+    helm install eshopping-basketdb ./basketdb --namespace default --timeout 600s
+    helm install eshopping-catalogdb ./catalogdb --namespace default --timeout 600s
+    helm install eshopping-discountdb ./discountdb --namespace default --timeout 600s
+    helm install eshopping-orderdb ./orderdb --namespace default --timeout 600s
     
     # Install message broker
     log_info "Installing RabbitMQ..."
-    helm install eshopping-rabbitmq ./rabbitmq --namespace default --timeout 300s
+    helm install eshopping-rabbitmq ./rabbitmq --namespace default --timeout 600s
     
     # Install logging stack
     log_info "Installing logging stack..."
-    helm install eshopping-elasticsearch ./elasticsearch --namespace default --timeout 300s
-    helm install eshopping-kibana ./kibana --namespace default --timeout 300s
-    
+    helm install eshopping-elasticsearch ./elasticsearch --namespace default --timeout 600s
+    helm install eshopping-kibana ./kibana --namespace default --timeout 600s
+
+    # Install management tools
+    log_info "Installing management tools..."
+    helm install eshopping-portainer ./portainer --namespace default --timeout 600s
+    helm install eshopping-pgadmin ./pgadmin --namespace default --timeout 600s
+
+    # Wait for management tools to be ready
+    log_info "Waiting for management tools to be ready..."
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=portainer -n default --timeout=600s || log_warning "Portainer pod may not be ready yet"
+    kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=pgadmin -n default --timeout=600s || log_warning "pgAdmin pod may not be ready yet"
+
     cd ../..
-    
+
     log_success "Infrastructure services deployed"
 }
 
 # Function to wait for pods to be ready
 wait_for_pods() {
     log_info "Waiting for infrastructure pods to be ready..."
-    kubectl wait --for=condition=ready pod --all --timeout=600s -n default
+    kubectl wait --for=condition=ready pod --all --timeout=900s -n default
     log_success "All infrastructure pods are ready"
 }
 
@@ -140,12 +150,12 @@ deploy_apis() {
     
     cd Deployments/helm
     
-    # Install microservices
-    helm install eshopping-catalog ./catalog --namespace default --timeout 300s
-    helm install eshopping-basket ./basket --namespace default --timeout 300s
-    helm install eshopping-discount ./discount --namespace default --timeout 300s
-    helm install eshopping-ordering ./ordering --namespace default --timeout 300s
-    helm install eshopping-gateway ./ocelotapigw --namespace default --timeout 300s
+    # Install microservices with increased timeout
+    helm install eshopping-catalog ./catalog --namespace default --timeout 600s
+    helm install eshopping-basket ./basket --namespace default --timeout 600s
+    helm install eshopping-discount ./discount --namespace default --timeout 600s
+    helm install eshopping-ordering ./ordering --namespace default --timeout 600s
+    helm install eshopping-gateway ./ocelotapigw --namespace default --timeout 600s
     
     cd ../..
     
@@ -154,7 +164,8 @@ deploy_apis() {
 
 # Function to deploy monitoring stack
 deploy_monitoring() {
-    log_info "Deploying monitoring stack..."
+    
+    log_info "Deploying monitoring stack..." 
     
     # Create monitoring namespace
     kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
@@ -163,7 +174,7 @@ deploy_monitoring() {
     log_info "Installing Prometheus..."
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
     helm repo update
-    helm install prometheus prometheus-community/prometheus --namespace monitoring --timeout 300s
+    helm install prometheus prometheus-community/prometheus --namespace monitoring --timeout 600s
     
     # Install Istio and addons
     log_info "Installing Istio..."
@@ -175,10 +186,46 @@ deploy_monitoring() {
     
     # Install Istio addons
     log_info "Installing Istio addons..."
-    kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/grafana.yaml
-    kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/jaeger.yaml
-    kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.20/samples/addons/kiali.yaml
-    
+    kubectl apply -f ./istio-*/samples/addons/grafana.yaml
+    kubectl apply -f ./istio-*/samples/addons/jaeger.yaml
+    kubectl apply -f ./istio-*/samples/addons/kiali.yaml
+
+    # Wait for Grafana pod to be ready
+    log_info "Waiting for Grafana to be ready..."
+    kubectl wait --for=condition=ready pod -l app=grafana -n istio-system --timeout=600s || log_warning "Grafana pod may not be ready yet, but continuing deployment"
+
+    # Wait for Kiali pod to be ready
+    log_info "Waiting for Kiali to be ready..."
+    kubectl wait --for=condition=ready pod -l app=kiali -n istio-system --timeout=600s || log_warning "Kiali pod may not be ready yet, but continuing deployment"
+
+    # Fix Kiali-Prometheus connection
+    log_info "Applying Kiali-Prometheus connection fix..."
+    if [ -f "scripts/monitoring/fix-kiali-prometheus-connection.sh" ]; then
+        ./scripts/monitoring/fix-kiali-prometheus-connection.sh
+    else
+        log_warning "Kiali fix script not found, Kiali may have connectivity issues"
+    fi
+
+    # Enable Istio metrics collection
+    log_info "Enabling Istio metrics collection..."
+    if [ -f "scripts/monitoring/enable-istio-metrics.sh" ]; then
+        ./scripts/monitoring/enable-istio-metrics.sh
+    else
+        log_warning "Istio metrics script not found, Grafana dashboards may show no data"
+    fi
+
+    # Apply permanent Grafana fix
+    log_info "Applying Grafana configuration..."
+    if [ -f "scripts/setup-grafana.sh" ]; then
+        ./scripts/setup-grafana.sh
+    fi
+
+    # Setup Grafana-Prometheus connection
+    log_info "Setting up Grafana-Prometheus connection..."
+    if [ -f "scripts/monitoring/setup-grafana-prometheus-connection.sh" ]; then
+        ./scripts/monitoring/setup-grafana-prometheus-connection.sh > /dev/null 2>&1 || log_warning "Grafana setup script failed, but continuing..."
+    fi
+
     log_success "Monitoring stack deployed"
 }
 
@@ -325,7 +372,7 @@ cleanup() {
         echo "   1. Check minikube status: minikube status"
         echo "   2. Check pod logs: kubectl logs <pod-name> -n default"
         echo "   3. Reset minikube: minikube delete && minikube start"
-        echo "   4. Ensure enough resources: memory=7GB+, cpus=4+"
+        echo "   4. Ensure enough resources: memory=12GB+, cpus=6+"
     fi
 }
 

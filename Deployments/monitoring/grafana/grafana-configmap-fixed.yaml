@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/instance: grafana
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 9.5.5
+    helm.sh/chart: grafana-6.57.4
+data:
+  dashboardproviders.yaml: |
+    apiVersion: 1
+    providers:
+    - disableDeletion: false
+      folder: istio
+      name: istio
+      options:
+        path: /var/lib/grafana/dashboards/istio
+      orgId: 1
+      type: file
+    - disableDeletion: false
+      folder: istio
+      name: istio-services
+      options:
+        path: /var/lib/grafana/dashboards/istio-services
+      orgId: 1
+      type: file
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      editable: true
+      isDefault: true
+      jsonData:
+        timeInterval: 5s
+      name: Prometheus
+      orgId: 1
+      type: prometheus
+      url: http://prometheus-server.monitoring.svc.cluster.local:80
+    - access: proxy
+      editable: true
+      isDefault: false
+      jsonData:
+        timeInterval: 5s
+      name: Loki
+      orgId: 1
+      type: loki
+      url: http://loki:3100
+  grafana.ini: |
+    [analytics]
+    check_for_updates = true
+    [grafana_net]
+    url = https://grafana.net
+    [log]
+    mode = console
+    [paths]
+    data = /var/lib/grafana/
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+    [server]
+    domain = ''

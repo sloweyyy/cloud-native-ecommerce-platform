@@ -1,0 +1,67 @@
+🚀 {{ include "portainer.fullname" . }} has been deployed!
+
+📋 Service Information:
+   Name: {{ include "portainer.fullname" . }}
+   Namespace: {{ .Release.Namespace }}
+   Type: {{ .Values.service.type }}
+   Main UI Port: {{ .Values.service.port }}
+
+📊 Portainer Port Configuration:
+   • Port 9000: Main Portainer web UI and API (primary access)
+   • Port 8000: Edge Agent tunnel server (for remote agents)
+
+🌐 Access Portainer:
+{{- if .Values.ingress.enabled }}
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  🔗 Ingress URL: http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if contains "NodePort" .Values.service.type }}
+  
+  # Get the NodePort and access the service:
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "portainer.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "🔗 Portainer URL: http://$NODE_IP:$NODE_PORT"
+
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  
+  # Wait for LoadBalancer IP (may take a few minutes):
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "portainer.fullname" . }}
+  
+  # Once available, get the IP:
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "portainer.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo "🔗 Portainer URL: http://$SERVICE_IP:{{ .Values.service.port }}"
+
+{{- else if contains "ClusterIP" .Values.service.type }}
+  
+  # For local access, use port-forwarding:
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "portainer.fullname" . }} 9000:{{ .Values.service.port }}
+
+  🔗 Portainer URL: http://localhost:9000
+{{- end }}
+
+📊 Portainer Features:
+   • Container Management
+   • Docker Swarm Support
+   • Kubernetes Management
+   • Volume Management
+   • Network Configuration
+   • User Access Control
+   • Edge Agent Support (via port 8000)
+
+🔧 Useful Commands:
+   # Check pod status:
+   kubectl get pods -l app.kubernetes.io/name={{ include "portainer.name" . }} -n {{ .Release.Namespace }}
+   
+   # View logs:
+   kubectl logs -l app.kubernetes.io/name={{ include "portainer.name" . }} -n {{ .Release.Namespace }}
+   
+   # Port forward for local access:
+   kubectl port-forward svc/{{ include "portainer.fullname" . }} 9000:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+⚠️  First-time Setup:
+   1. Navigate to the Portainer URL
+   2. Create an admin user account
+   3. Choose your environment (Docker/Kubernetes)
+   4. Start managing your containers!
