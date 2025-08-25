@@ -28,7 +28,7 @@ jobs:
       url: https://staging.ecommerce.example.com
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: Deploy to staging
         run: |
@@ -48,7 +48,7 @@ jobs:
       url: https://ecommerce.example.com
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       
       - name: Deploy to production
         run: |
