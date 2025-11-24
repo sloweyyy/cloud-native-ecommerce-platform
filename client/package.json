@@ -21,7 +21,7 @@
     "@angular/forms": "^18.2.13",
     "@angular/platform-browser": "^18.2.13",
     "@angular/platform-browser-dynamic": "^18.2.13",
-    "@angular/router": "^18.2.13",
+    "@angular/router": "^18.2.14",
     "@azure/msal-angular": "^3.0.23",
     "@azure/msal-browser": "^3.28.1",
     "@fortawesome/fontawesome-free": "^6.7.2",
