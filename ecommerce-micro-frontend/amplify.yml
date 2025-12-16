@@ -1,0 +1,36 @@
+version: 1
+applications:
+  - appRoot: ecommerce-micro-frontend
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # Install dependencies
+            - npm ci
+            # Build shared packages (app-injector and auth-provider)
+            - npm run build:packages
+        build:
+          commands:
+            # Build all micro-frontend apps for production
+            - npm run build:prod
+            # Copy all apps to a single output directory for deployment
+            - mkdir -p dist/deploy
+            - cp -r dist/host/* dist/deploy/
+            - mkdir -p dist/deploy/remotes
+            - cp -r dist/store dist/deploy/remotes/
+            - cp -r dist/checkout dist/deploy/remotes/
+            - cp -r dist/account dist/deploy/remotes/
+      artifacts:
+        # Output directory with all apps
+        baseDirectory: dist/deploy
+        files:
+          - '**/*'
+      cache:
+        paths:
+          # Cache node_modules for faster builds
+          - node_modules/**/*
+          # Cache Nx cache
+          - .nx/cache/**/*
+          # Cache package build outputs
+          - packages/*/node_modules/**/*
+          - packages/*/dist/**/*

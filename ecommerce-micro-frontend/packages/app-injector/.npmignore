@@ -1,0 +1,30 @@
+# Source files (we ship compiled dist)
+src/
+
+# Config files
+tsconfig.json
+tsup.config.ts
+.eslintrc*
+eslint.config.*
+jest.config.*
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+coverage/
+
+# Development files
+.gitignore
+.editorconfig
+.prettierrc*
+.vscode/
+.idea/
+
+# Misc
+*.log
+*.tgz
+node_modules/
+

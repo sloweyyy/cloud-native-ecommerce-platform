@@ -31,7 +31,7 @@ export class BasketService {
 
   getBasket(username: string) {
     return this.http
-      .get<IBasket>(this.baseUrl + '/Basket/GetBasket/slowey')
+      .get<IBasket>(`${this.baseUrl}/Basket/GetBasket/${username}`)
       .subscribe({
         //update the basketsource so that via observable these values will be available to the subscribers via component
         next: (basket) => {
@@ -167,8 +167,23 @@ export class BasketService {
   private createBasket(): Basket {
     //since we have created class
     const basket = new Basket();
-    localStorage.setItem('basket_username', 'slowey');
+    const resolvedUserName = this.resolveUserName();
+    basket.userName = resolvedUserName;
+    localStorage.setItem('basket_username', resolvedUserName);
     return basket;
+  }
+
+  private resolveUserName(): string {
+    const email = this.acntService.getCurrentUserEmail();
+    if (email) {
+      return email.toLowerCase();
+    }
+
+    const existing = localStorage.getItem('basket_username');
+    if (existing) return existing;
+
+    const guest = `guest-${Date.now()}`;
+    return guest;
   }
 
   private mapProductItemToBasketItem(

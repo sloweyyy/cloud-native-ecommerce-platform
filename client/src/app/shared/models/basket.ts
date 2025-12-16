@@ -15,7 +15,7 @@ export interface IBasket {
 }
 
 export class Basket implements IBasket {
-  userName: string = 'slowey';
+  userName: string = '';
   totalPrice: number = 0;
   items: IBasketItem[] = [];
 }

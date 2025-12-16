@@ -81,4 +81,8 @@ export class StoreService {
   getTypes() {
     return this.http.get<IType[]>(this.baseUrl + 'Catalog/GetAllTypes');
   }
+
+  createProduct(payload: any): Observable<any> {
+    return this.http.post(this.baseUrl + 'Catalog/CreateProduct', payload);
+  }
 }

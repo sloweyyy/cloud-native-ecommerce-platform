@@ -44,6 +44,53 @@ check_prerequisites() {
     log_success "All required tools are available"
 }
 
+# Function to check and handle existing Helm releases
+check_existing_deployments() {
+    log_info "Checking for existing Helm deployments..."
+    
+    EXISTING_RELEASES=$(helm list -n default -q 2>/dev/null | grep -c "eshopping-" || echo "0")
+    
+    if [ "$EXISTING_RELEASES" -gt 0 ]; then
+        log_warning "Found $EXISTING_RELEASES existing Helm releases"
+        echo ""
+        echo "Options:"
+        echo "1) Upgrade existing releases (recommended for updates)"
+        echo "2) Delete all and reinstall (fresh deployment)"
+        echo "3) Skip deployment (keep existing)"
+        echo "4) Exit"
+        echo ""
+        read -p "Enter your choice (1-4): " choice
+        
+        case $choice in
+            1)
+                log_info "Will upgrade existing releases..."
+                DEPLOYMENT_MODE="upgrade"
+                ;;
+            2)
+                log_warning "Deleting all existing releases..."
+                helm list -n default -q | grep "eshopping-" | xargs -r helm uninstall -n default
+                log_success "Cleanup complete"
+                DEPLOYMENT_MODE="install"
+                ;;
+            3)
+                log_info "Skipping deployment, using existing infrastructure..."
+                DEPLOYMENT_MODE="skip"
+                ;;
+            4)
+                log_info "Exiting..."
+                exit 0
+                ;;
+            *)
+                log_error "Invalid choice"
+                exit 1
+                ;;
+        esac
+    else
+        log_info "No existing deployments found"
+        DEPLOYMENT_MODE="install"
+    fi
+}
+
 # Function to start minikube
 start_minikube() {
     log_info "Starting minikube..."
@@ -55,7 +102,7 @@ start_minikube() {
     fi
     
     # Start minikube with increased configuration for better stability
-    minikube start --driver=docker --memory=10240 --cpus=6 --disk-size=80g
+    minikube start --driver=docker --memory=10240 --cpus=8 --disk-size=80g
     
     # Enable required addons
     log_info "Enabling minikube addons..."
@@ -102,30 +149,40 @@ build_images() {
 
 # Function to deploy infrastructure services
 deploy_infrastructure() {
+    if [ "$DEPLOYMENT_MODE" = "skip" ]; then
+        log_info "Skipping infrastructure deployment (using existing)"
+        return 0
+    fi
+    
     log_info "Deploying infrastructure services..."
     
     cd Deployments/helm
     
+    HELM_CMD="install"
+    if [ "$DEPLOYMENT_MODE" = "upgrade" ]; then
+        HELM_CMD="upgrade --install"
+    fi
+    
     # Install databases with increased timeout
     log_info "Installing databases..."
-    helm install eshopping-basketdb ./basketdb --namespace default --timeout 600s
-    helm install eshopping-catalogdb ./catalogdb --namespace default --timeout 600s
-    helm install eshopping-discountdb ./discountdb --namespace default --timeout 600s
-    helm install eshopping-orderdb ./orderdb --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-basketdb ./basketdb --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-catalogdb ./catalogdb --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-discountdb ./discountdb --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-orderdb ./orderdb --namespace default --timeout 600s
     
     # Install message broker
     log_info "Installing RabbitMQ..."
-    helm install eshopping-rabbitmq ./rabbitmq --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-rabbitmq ./rabbitmq --namespace default --timeout 600s
     
     # Install logging stack
     log_info "Installing logging stack..."
-    helm install eshopping-elasticsearch ./elasticsearch --namespace default --timeout 600s
-    helm install eshopping-kibana ./kibana --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-elasticsearch ./elasticsearch --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-kibana ./kibana --namespace default --timeout 600s
 
     # Install management tools
     log_info "Installing management tools..."
-    helm install eshopping-portainer ./portainer --namespace default --timeout 600s
-    helm install eshopping-pgadmin ./pgadmin --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-portainer ./portainer --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-pgadmin ./pgadmin --namespace default --timeout 600s
 
     # Wait for management tools to be ready
     log_info "Waiting for management tools to be ready..."
@@ -146,16 +203,26 @@ wait_for_pods() {
 
 # Function to deploy API services
 deploy_apis() {
+    if [ "$DEPLOYMENT_MODE" = "skip" ]; then
+        log_info "Skipping API deployment (using existing)"
+        return 0
+    fi
+    
     log_info "Deploying API microservices..."
     
     cd Deployments/helm
     
+    HELM_CMD="install"
+    if [ "$DEPLOYMENT_MODE" = "upgrade" ]; then
+        HELM_CMD="upgrade --install"
+    fi
+    
     # Install microservices with increased timeout
-    helm install eshopping-catalog ./catalog --namespace default --timeout 600s
-    helm install eshopping-basket ./basket --namespace default --timeout 600s
-    helm install eshopping-discount ./discount --namespace default --timeout 600s
-    helm install eshopping-ordering ./ordering --namespace default --timeout 600s
-    helm install eshopping-gateway ./ocelotapigw --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-catalog ./catalog --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-basket ./basket --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-discount ./discount --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-ordering ./ordering --namespace default --timeout 600s
+    helm $HELM_CMD eshopping-gateway ./ocelotapigw --namespace default --timeout 600s
     
     cd ../..
     
@@ -174,7 +241,15 @@ deploy_monitoring() {
     log_info "Installing Prometheus..."
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
     helm repo update
-    helm install prometheus prometheus-community/prometheus --namespace monitoring --timeout 600s
+    
+    # Check if Prometheus exists and upgrade or install
+    if helm list -n monitoring -q | grep -q "^prometheus$"; then
+        log_info "Upgrading existing Prometheus installation..."
+        helm upgrade prometheus prometheus-community/prometheus --namespace monitoring --timeout 600s
+    else
+        log_info "Installing new Prometheus..."
+        helm install prometheus prometheus-community/prometheus --namespace monitoring --timeout 600s
+    fi
     
     # Install Istio and addons
     log_info "Installing Istio..."
@@ -182,13 +257,16 @@ deploy_monitoring() {
         curl -L https://istio.io/downloadIstio | sh -
     fi
     
-    ./istio-*/bin/istioctl install --set values.defaultRevision=default -y
+    # Find the istio directory
+    ISTIO_DIR=$(find . -maxdepth 1 -name "istio-*" -type d | head -n 1)
+    
+    ${ISTIO_DIR}/bin/istioctl install --set values.defaultRevision=default -y
     
     # Install Istio addons
     log_info "Installing Istio addons..."
-    kubectl apply -f ./istio-*/samples/addons/grafana.yaml
-    kubectl apply -f ./istio-*/samples/addons/jaeger.yaml
-    kubectl apply -f ./istio-*/samples/addons/kiali.yaml
+    kubectl apply -f ${ISTIO_DIR}/samples/addons/grafana.yaml
+    kubectl apply -f ${ISTIO_DIR}/samples/addons/jaeger.yaml
+    kubectl apply -f ${ISTIO_DIR}/samples/addons/kiali.yaml
 
     # Wait for Grafana pod to be ready
     log_info "Waiting for Grafana to be ready..."
@@ -279,6 +357,10 @@ setup_port_forwards() {
     kubectl port-forward svc/tracing 16686:80 -n istio-system > /dev/null 2>&1 &
     kubectl port-forward svc/kiali 20001:20001 -n istio-system > /dev/null 2>&1 &
     
+    # Logging & Metrics services
+    log_info "Starting Kibana port-forward..."
+    kubectl port-forward svc/kibana 5601:5601 -n default > /dev/null 2>&1 &
+    
     # RabbitMQ Management
     log_info "Starting RabbitMQ management port-forward..."
     kubectl port-forward svc/rabbitmq 15672:15672 -n default > /dev/null 2>&1 &
@@ -350,6 +432,10 @@ display_access_info() {
     echo "   Jaeger: http://localhost:16686"
     echo "   Kiali: http://localhost:20001"
     echo ""
+    echo "📈 LOGGING & METRICS:"
+    echo "   Kibana: http://localhost:5601"
+    echo "   RabbitMQ Metrics: Available in Kibana dashboards"
+    echo ""
     echo "🐰 RABBITMQ MANAGEMENT:"
     echo "   Management UI: http://localhost:15672"
     echo "   Credentials: guest/guest"
@@ -385,6 +471,7 @@ main() {
     echo ""
     
     check_prerequisites
+    check_existing_deployments
     start_minikube
     build_images
     deploy_infrastructure

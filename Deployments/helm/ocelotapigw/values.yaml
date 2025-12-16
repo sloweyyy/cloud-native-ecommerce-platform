@@ -9,8 +9,7 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
-imagePullSecrets:
-  - name: acr-secret
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: "ocelotapigw"
 
@@ -38,7 +37,7 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
+  type: LoadBalancer
   port: 80  
 
 ingress:

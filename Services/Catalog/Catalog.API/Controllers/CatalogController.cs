@@ -62,6 +62,15 @@ public class CatalogController : ApiController
         return Ok(result);
     }
 
+    [HttpPost]
+    [Route("CreateBrand")]
+    [ProducesResponseType(typeof(BrandResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<BrandResponse>> CreateBrand([FromBody] CreateBrandCommand brandCommand)
+    {
+        var result = await _mediator.Send<BrandResponse>(brandCommand);
+        return Ok(result);
+    }
+
     [HttpGet]
     [Route("GetAllTypes")]
     [ProducesResponseType(typeof(IList<TypesResponse>), (int)HttpStatusCode.OK)]
@@ -69,6 +78,15 @@ public class CatalogController : ApiController
     {
         var query = new GetAllTypesQuery();
         var result = await _mediator.Send(query);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Route("CreateType")]
+    [ProducesResponseType(typeof(TypesResponse), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<TypesResponse>> CreateType([FromBody] CreateTypeCommand typeCommand)
+    {
+        var result = await _mediator.Send<TypesResponse>(typeCommand);
         return Ok(result);
     }
 

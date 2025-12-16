@@ -1,0 +1,50 @@
+// Coupon Input Component Custom Styles
+.coupon-input {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.coupon-input-coupon-code {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    font-family: var(--font-family-code);
+  }
+
+  &:focus,
+  &.coupon-input-focused {
+    border-color: var(--coupon-success);
+    box-shadow: 0 0 0 2px rgba(0, 177, 79, 0.2);
+  }
+
+  &.coupon-input-status-error {
+    animation: shake 0.3s;
+  }
+
+  &.coupon-input-status-success {
+    animation: bounce 0.5s;
+    border-color: var(--coupon-success);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
