@@ -239,6 +239,9 @@ PublishScripts/
 **/packages/*
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
+# except ecommerce-micro-frontend packages (shared libraries)
+!ecommerce-micro-frontend/packages/
+!ecommerce-micro-frontend/packages/**
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
@@ -317,7 +320,10 @@ FakesAssemblies/
 node_modules/
 
 # Typescript v1 declaration files
-typings/
+# Note: Using **/typings/ to allow negation for ecommerce-micro-frontend
+**/typings/
+!ecommerce-micro-frontend/**/typings/
+!ecommerce-micro-frontend/**/typings/**
 
 # Visual Studio 6 build log
 *.plg
@@ -377,7 +383,6 @@ obj/
 
 ### Docker build ###
 docker-build/
-.docker*
 
 ### Vagrant ###
 .box
@@ -425,3 +430,9 @@ backups/
 *.zip.backup
 *.backup-*
 *.bak-*
+/istio-1.27.2
+/.claude
+/istio-1.28.1
+
+# Stakpak session files
+.stakpak/session*

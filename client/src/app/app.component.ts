@@ -36,9 +36,20 @@ export class AppComponent implements OnInit, AfterViewInit {
         // Set the active account and update user state
         this.msalService.instance.setActiveAccount(result.account);
         this.acntService.setUserAfterRedirect(); // Update the user state
+        const email = this.extractEmail(result.account);
+        if (email) {
+          localStorage.setItem('basket_username', email.toLowerCase());
+          this.basketService.getBasket(email.toLowerCase());
+        }
       } else {
         console.log('No account in result or no redirect result.');
         this.acntService.setUserAfterRedirect(); // Try to retrieve active account
+        const email = this.acntService.getCurrentUserEmail();
+        if (email) {
+          const normalized = email.toLowerCase();
+          localStorage.setItem('basket_username', normalized);
+          this.basketService.getBasket(normalized);
+        }
       }
     }).catch((error) => {
       console.error('Error handling redirect:', error);
@@ -47,6 +58,13 @@ export class AppComponent implements OnInit, AfterViewInit {
     const basket_username = localStorage.getItem('basket_username');
     if (basket_username) {
       this.basketService.getBasket(basket_username);
+    } else {
+      const email = this.acntService.getCurrentUserEmail();
+      if (email) {
+        const normalized = email.toLowerCase();
+        localStorage.setItem('basket_username', normalized);
+        this.basketService.getBasket(normalized);
+      }
     }
   }
 
@@ -127,10 +145,10 @@ export class AppComponent implements OnInit, AfterViewInit {
   private async initializeMsal(): Promise<void> {
     const pca = new PublicClientApplication({
       auth: {
-        clientId: '85ec0233-0ecb-4830-96f5-12d00bf87176',
-        authority: 'https://sportscenter19.b2clogin.com/sportscenter19.onmicrosoft.com/B2C_1_SignInSignUp/v2.0/',
+        clientId: 'd0dafab9-cae6-426d-a516-eab88853767c',
+        authority: 'https://nexttechuit.b2clogin.com/nexttechuit.onmicrosoft.com/B2C_1_SignInSignUp/v2.0/',
         redirectUri: 'http://localhost:4200',
-        knownAuthorities: ['sportscenter19.b2clogin.com'],
+        knownAuthorities: ['nexttechuit.b2clogin.com'],
       },
       cache: {
         cacheLocation: BrowserCacheLocation.LocalStorage,
@@ -139,5 +157,12 @@ export class AppComponent implements OnInit, AfterViewInit {
     });
     this.msalService.instance = pca;
     await pca.initialize();  // Ensure the instance is initialized before proceeding
+  }
+
+  private extractEmail(account: any): string | null {
+    if (!account) return null;
+    const claims: any = account.idTokenClaims;
+    const emailFromClaim = claims?.emails?.[0] || claims?.email;
+    return (emailFromClaim as string | undefined) ?? account.username ?? null;
   }
 }

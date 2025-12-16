@@ -55,7 +55,7 @@ chmod +x deploy.sh
 
 ```bash
 # Start minikube with sufficient resources
-minikube start --driver=docker --memory=7168 --cpus=4 --disk-size=50g
+minikube start --driver=docker --memory=10240 --cpus=8 --disk-size=50g
 
 # Enable required addons
 minikube addons enable ingress

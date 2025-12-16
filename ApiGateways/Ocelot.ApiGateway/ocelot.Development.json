@@ -27,6 +27,18 @@
       "UpstreamHttpMethod": [ "GET", "DELETE" ]
     },
     {
+      "DownstreamPathTemplate": "/api/v1/Catalog/CreateProduct",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host.docker.internal",
+          "Port": "8000"
+        }
+      ],
+      "UpstreamPathTemplate": "/Catalog/CreateProduct",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/Catalog/GetAllProducts",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -51,6 +63,18 @@
       "UpstreamHttpMethod": [ "GET", "DELETE" ]
     },
     {
+      "DownstreamPathTemplate": "/api/v1/Catalog/CreateBrand",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host.docker.internal",
+          "Port": "8000"
+        }
+      ],
+      "UpstreamPathTemplate": "/Catalog/CreateBrand",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/Catalog/GetAllTypes",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -61,6 +85,18 @@
       ],
       "UpstreamPathTemplate": "/Catalog/GetAllTypes",
       "UpstreamHttpMethod": [ "GET", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/Catalog/CreateType",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "host.docker.internal",
+          "Port": "8000"
+        }
+      ],
+      "UpstreamPathTemplate": "/Catalog/CreateType",
+      "UpstreamHttpMethod": [ "POST" ]
     },
     {
       "DownstreamPathTemplate": "/api/v1/Catalog/GetProductsByBrandName/{brand}",

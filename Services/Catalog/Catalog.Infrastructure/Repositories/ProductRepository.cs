@@ -97,12 +97,46 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
             .ToListAsync();
     }
 
+    async Task<ProductBrand> IBrandRepository.CreateBrand(ProductBrand brand)
+    {
+        if (await ((IBrandRepository)this).BrandExists(brand.Name))
+            throw new ArgumentException($"Brand '{brand.Name}' already exists");
+
+        await _context.Brands.InsertOneAsync(brand);
+        return brand;
+    }
+
+    async Task<bool> IBrandRepository.BrandExists(string name)
+    {
+        return await _context
+            .Brands
+            .Find(b => b.Name.ToLower() == name.ToLower())
+            .AnyAsync();
+    }
+
     async Task<IEnumerable<ProductType>> ITypesRepository.GetAllTypes()
     {
         return await _context
             .Types
             .Find(type => true)
             .ToListAsync();
+    }
+
+    async Task<ProductType> ITypesRepository.CreateType(ProductType type)
+    {
+        if (await ((ITypesRepository)this).TypeExists(type.Name))
+            throw new ArgumentException($"Type '{type.Name}' already exists");
+
+        await _context.Types.InsertOneAsync(type);
+        return type;
+    }
+
+    async Task<bool> ITypesRepository.TypeExists(string name)
+    {
+        return await _context
+            .Types
+            .Find(t => t.Name.ToLower() == name.ToLower())
+            .AnyAsync();
     }
 
     private async Task<IReadOnlyList<Product>> DataFilter(CatalogSpecParams catalogSpecParams,

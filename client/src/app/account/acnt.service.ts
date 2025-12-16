@@ -35,9 +35,9 @@ export class AcntService {
   }
 
   login(state?: string) {
-      this.msalService.loginRedirect({
-      scopes: ["openid", "profile", "https://sportscenter19.onmicrosoft.com/85ec0233-0ecb-4830-96f5-12d00bf87176"],
-      state: state
+    this.msalService.loginRedirect({
+      scopes: ['openid', 'profile'],
+      state: state,
     });
   }
 
@@ -57,6 +57,15 @@ export class AcntService {
         this.currentUserSource.next(null);
     }
 }
+
+  getCurrentUserEmail(): string | null {
+    const account = this.msalService.instance.getActiveAccount();
+    if (!account) return null;
+
+    const claims: any = account.idTokenClaims;
+    const emailFromClaim = claims?.emails?.[0] || claims?.email;
+    return (emailFromClaim as string | undefined) ?? account.username ?? null;
+  }
 
  get authorizationHeaderValue(): Promise<string> {
     const account = this.msalService.instance.getActiveAccount();

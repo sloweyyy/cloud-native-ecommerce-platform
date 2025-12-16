@@ -1,0 +1,10 @@
+# Amplify Redirects for Micro-Frontend Architecture
+# This file handles routing for the host app and remote micro-frontends
+
+# Serve remote micro-frontends from /remotes/ path
+/remotes/store/*  /remotes/store/:splat  200
+/remotes/checkout/*  /remotes/checkout/:splat  200
+/remotes/account/*  /remotes/account/:splat  200
+
+# SPA fallback - all other routes go to index.html for client-side routing
+/*  /index.html  200

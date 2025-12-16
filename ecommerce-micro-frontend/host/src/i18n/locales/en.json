@@ -1,0 +1,45 @@
+{
+  "homepage": {
+    "promotionalBanner": {
+      "title": "Discover",
+      "subtitle": "Amazing Deals"
+    },
+    "categoryGrid": {
+      "title": "Categories",
+      "viewAll": "View All"
+    },
+    "flashSale": {
+      "title": "Flash Sale",
+      "viewAll": "View All",
+      "endsIn": "Ends in",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "seconds": "Seconds"
+    },
+    "featuredProducts": {
+      "title": "Featured Products",
+      "subtitle": "THE BEST TECH GEAR",
+      "description": "Explore innovative gadgets to enhance your tech experience.",
+      "viewAll": "View All Products"
+    },
+    "featuredBrands": {
+      "title": "Featured Brands"
+    },
+    "trustBadges": {
+      "authentic": "100% Authentic",
+      "freeShipping": "Free Shipping",
+      "refund": "200% Refund if Fake",
+      "return": "30-Day Return",
+      "fastDelivery": "2h Fast Delivery"
+    }
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "vietnamese": "Vietnamese"
+  }
+}
+
+
+
+

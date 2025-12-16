@@ -1,0 +1,45 @@
+{
+  "homepage": {
+    "promotionalBanner": {
+      "title": "Khám phá",
+      "subtitle": "Ưu đãi tuyệt vời"
+    },
+    "categoryGrid": {
+      "title": "Danh mục",
+      "viewAll": "Xem tất cả"
+    },
+    "flashSale": {
+      "title": "Flash Sale",
+      "viewAll": "Xem tất cả",
+      "endsIn": "Kết thúc sau",
+      "hours": "Giờ",
+      "minutes": "Phút",
+      "seconds": "Giây"
+    },
+    "featuredProducts": {
+      "title": "Sản phẩm nổi bật",
+      "subtitle": "THIẾT BỊ CÔNG NGHỆ TỐT NHẤT",
+      "description": "Khám phá các thiết bị sáng tạo để nâng cao trải nghiệm công nghệ của bạn.",
+      "viewAll": "Xem tất cả sản phẩm"
+    },
+    "featuredBrands": {
+      "title": "Thương hiệu nổi bật"
+    },
+    "trustBadges": {
+      "authentic": "100% hàng thật",
+      "freeShipping": "Freeship mọi đơn",
+      "refund": "Hoàn 200% nếu hàng giả",
+      "return": "30 ngày đổi trả",
+      "fastDelivery": "Giao nhanh 2h"
+    }
+  },
+  "common": {
+    "language": "Ngôn ngữ",
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt"
+  }
+}
+
+
+
+
