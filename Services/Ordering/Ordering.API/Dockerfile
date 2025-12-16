@@ -27,4 +27,5 @@ RUN dotnet publish "./Ordering.API.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV ASPNETCORE_HTTP_PORTS=80
 ENTRYPOINT ["dotnet", "Ordering.API.dll"]

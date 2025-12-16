@@ -1,0 +1,155 @@
+/**
+ * Coupon Theme - Main Styles
+ * Imports all component-specific styles
+ */
+
+// Import component styles
+@import './Card/index.less';
+@import './Tag/index.less';
+@import './Modal/index.less';
+@import './Drawer/index.less';
+@import './Button/index.less';
+@import './Input/index.less';
+@import './Badge/index.less';
+@import './Typography/index.less';
+@import './List/index.less';
+@import './Space/index.less';
+
+// Global coupon styles
+:root {
+  // Brand colors
+  --coupon-success: #00b14f;
+  --coupon-success-soft: #b1eaba;
+  --coupon-success-bg: #d9fcde;
+  --coupon-success-border: #b1eaba;
+  --coupon-success-boldest: #005339;
+
+  --coupon-discount: #f09800;
+  --coupon-discount-soft: #ffd933;
+  --coupon-discount-bg: #fff9c0;
+
+  --coupon-info: #136fd8;
+  --coupon-info-soft: #b3ebff;
+  --coupon-info-bg: #ebfaff;
+
+  --coupon-error: #d42e1c;
+  --coupon-error-soft: #ffd2cc;
+  --coupon-error-bg: #fdf2f2;
+
+  --coupon-neutral: #707070;
+  --coupon-neutral-soft: #dbdbdb;
+  --coupon-neutral-bg: #f5f5f5;
+
+  --coupon-white: #ffffff;
+
+  // Outline/Border colors
+  --coupon-outline-soft: #e8e8e8;
+  --coupon-outline-default: #dbdbdb;
+
+  // Font families
+  --font-family-code: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+// Dark theme CSS variables
+[data-theme='dark'] {
+  --coupon-success: #00b14f;
+  --coupon-success-soft: #00804a;
+  --coupon-success-bg: rgba(0, 177, 79, 0.15);
+  --coupon-success-border: #00804a;
+  --coupon-success-boldest: #d9fcde;
+
+  --coupon-discount: #faab00;
+  --coupon-discount-soft: #a55f03;
+  --coupon-discount-bg: rgba(250, 171, 0, 0.15);
+
+  --coupon-info: #1495e6;
+  --coupon-info-soft: #0b54a8;
+  --coupon-info-bg: rgba(20, 149, 230, 0.15);
+
+  --coupon-error: #f55538;
+  --coupon-error-soft: #ac1e11;
+  --coupon-error-bg: rgba(245, 85, 56, 0.15);
+
+  --coupon-neutral: #8c8c8c;
+  --coupon-neutral-soft: #707070;
+  --coupon-neutral-bg: #353535;
+
+  --coupon-white: #1f1f1f;
+
+  --coupon-outline-soft: #3d3d3d;
+  --coupon-outline-default: #575757;
+}
+
+// Global animations
+@keyframes coupon-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes coupon-fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes coupon-slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes coupon-slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+// Utility classes
+.coupon-gradient-success {
+  background: var(--coupon-success);
+}
+
+.coupon-gradient-info {
+  background: var(--coupon-info);
+}
+
+.coupon-gradient-warning {
+  background: var(--coupon-discount);
+}
+
+.coupon-text-code {
+  font-family: var(--font-family-code);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.coupon-shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.coupon-shadow-medium {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.coupon-shadow-elevated {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.20);
+}
+

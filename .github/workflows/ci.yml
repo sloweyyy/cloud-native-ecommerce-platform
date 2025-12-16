@@ -33,7 +33,7 @@ jobs:
               - '*.sln'
               - '**/*.csproj'
             frontend:
-              - 'client/**'
+              - 'ecommerce-micro-frontend/**'
             docker:
               - 'docker-compose*.yml'
               - '**/Dockerfile'
@@ -147,30 +147,46 @@ jobs:
     if: needs.detect-changes.outputs.frontend == 'true'
     defaults:
       run:
-        working-directory: ./client
+        working-directory: ./ecommerce-micro-frontend
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: ecommerce-micro-frontend/package-lock.json
+
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: |
+            ecommerce-micro-frontend/.nx/cache
+            ecommerce-micro-frontend/node_modules/.cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('ecommerce-micro-frontend/package-lock.json') }}-${{ hashFiles('ecommerce-micro-frontend/**/project.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nx-${{ hashFiles('ecommerce-micro-frontend/package-lock.json') }}-
+            ${{ runner.os }}-nx-
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps || npm ci --legacy-peer-deps
+        run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Derive SHAs for affected commands
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Lint affected
+        run: npx nx affected --target=lint --base=$NX_BASE --head=$NX_HEAD
         continue-on-error: true
 
-      - name: Run tests
-        run: npm run test:ci
+      - name: Run tests affected
+        run: npx nx affected --target=test --base=$NX_BASE --head=$NX_HEAD --passWithNoTests
         continue-on-error: true
 
-      - name: Build
-        run: npm run build
+      - name: Build affected
+        run: npx nx affected --target=build --base=$NX_BASE --head=$NX_HEAD
 
   docker-build:
     runs-on: ubuntu-latest

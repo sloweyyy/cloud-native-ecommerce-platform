@@ -3,7 +3,7 @@
 public class CatalogSpecParams
 {
     private const int MaxPageSize = 70;
-    private int _pageSize = 10;
+    private int _pageSize = 12;
 
     public int PageIndex { get; set; } = 1;
 

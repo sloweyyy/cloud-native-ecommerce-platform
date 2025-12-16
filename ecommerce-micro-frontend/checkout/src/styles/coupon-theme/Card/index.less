@@ -1,0 +1,33 @@
+// Coupon Card Component Custom Styles
+.coupon-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  &.coupon-card-success {
+    border-color: var(--coupon-success-soft);
+    background: var(--coupon-success-bg);
+  }
+
+  &.coupon-card-premium {
+    background: rgba(0, 177, 79, 0.05);
+    border: 1px dashed var(--coupon-success-soft);
+  }
+}
+
+.coupon-card-hoverable {
+  &:hover:not(.coupon-card-disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+.coupon-card-disabled {
+  opacity: 0.5;
+  filter: grayscale(50%);
+  cursor: not-allowed;
+}
+

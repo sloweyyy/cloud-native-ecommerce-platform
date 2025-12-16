@@ -1,0 +1,48 @@
+<div class="add-product">
+  <h2>Add Product</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-grid">
+      <label>
+        Name
+        <input formControlName="name" type="text" placeholder="Product name" />
+      </label>
+      <label>
+        Summary
+        <input formControlName="summary" type="text" placeholder="Short summary" />
+      </label>
+      <label>
+        Description
+        <textarea formControlName="description" rows="3" placeholder="Full description"></textarea>
+      </label>
+      <label>
+        Image URL
+        <input formControlName="imageFile" type="text" placeholder="images/products/example.png" />
+      </label>
+      <label>
+        Price
+        <input formControlName="price" type="number" min="0" step="0.01" />
+      </label>
+      <label>
+        Brand
+        <select formControlName="brandId">
+          <option value="" disabled>Select brand</option>
+          <option *ngFor="let b of brands" [value]="b.id">{{ b.name }}</option>
+        </select>
+      </label>
+      <label>
+        Type
+        <select formControlName="typeId">
+          <option value="" disabled>Select type</option>
+          <option *ngFor="let t of types" [value]="t.id">{{ t.name }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Saving…' : 'Create Product' }}</button>
+      <span class="success" *ngIf="submitSuccess">Product created!</span>
+      <span class="error" *ngIf="submitError">{{ submitError }}</span>
+    </div>
+  </form>
+</div>

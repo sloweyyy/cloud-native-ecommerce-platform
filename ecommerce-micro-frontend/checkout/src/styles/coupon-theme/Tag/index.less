@@ -1,0 +1,40 @@
+// Coupon Tag Component Custom Styles
+.coupon-tag {
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.coupon-tag-gradient {
+    color: white;
+    border: none;
+
+    &.coupon-tag-success {
+      background: var(--coupon-success);
+    }
+
+    &.coupon-tag-info {
+      background: var(--coupon-info);
+    }
+
+    &.coupon-tag-warning {
+      background: var(--coupon-discount);
+    }
+  }
+
+  &.coupon-tag-closable {
+    .coupon-tag-close-icon {
+      transition: opacity 0.2s;
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+

@@ -1,13 +1,21 @@
-version: '3.4'
-
 services:
   catalogdb:
     container_name: catalogdb
     restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin1234
+      - MONGO_INITDB_DATABASE=CatalogDb
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "--host", "localhost", "--username", "admin", "--password", "admin1234", "--authenticationDatabase", "admin"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
 
   basketdb:
     container_name: basketdb
@@ -27,26 +35,29 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d postgres" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 30s
 
   orderdb:
     container_name: orderdb
     environment:
       SA_PASSWORD: ${SQL_SA_PASSWORD}
       ACCEPT_EULA: ${ACCEPT_EULA}
+      MSSQL_PID: Developer
     restart: always
     ports:
       - "1433:1433"
     volumes:
       - orderdb-data:/var/opt/mssql
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SQL_SA_PASSWORD}' -Q 'select 1' -C" ]
-      interval: 10s
+      test: ["CMD-SHELL", "grep -q 'SQL Server is now ready for client connections' /var/opt/mssql/log/errorlog || exit 1"]
+      interval: 15s
       timeout: 10s
-      retries: 3
+      retries: 15
+      start_period: 90s
 
   rabbitmq:
     container_name: rabbitmq
@@ -82,6 +93,7 @@ services:
   catalog.api:
     container_name: catalog.api
     environment:
+      - ASPNETCORE_HTTP_PORTS=80
       - ASPNETCORE_ENVIRONMENT=Development
       - DatabaseSettings__ConnectionString=${MONGODB_URL}
       - DatabaseSettings__DatabaseName=${MONGO_DB}
@@ -90,7 +102,10 @@ services:
       - DatabaseSettings__TypesCollection=Types
       - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
-      - catalogdb
+      catalogdb:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     ports:
       - "8000:80"
 
@@ -98,13 +113,18 @@ services:
     container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
       - CacheSettings__ConnectionString=${REDIS_URL}
-      - GrpcSettings__DiscountUrl=http://discount.api:80
+      - GrpcSettings__DiscountUrl=http://discount.api:8080
       - EventBusSettings__HostAddress=${RABBITMQ_URL}
       - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
-      - basketdb
-      - rabbitmq
+      basketdb:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
     ports:
       - "8001:80"
 
@@ -117,25 +137,33 @@ services:
     depends_on:
       discountdb:
         condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     ports:
-      - "8002:80"
+      - "8002:8080"
 
   ordering.api:
     container_name: ordering.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
       - ConnectionStrings__OrderingConnectionString=${SQLSERVER_URL}
       - EventBusSettings__HostAddress=${RABBITMQ_URL}
       - ElasticConfiguration__Uri=${ELASTICSEARCH_URL}
     depends_on:
-      - orderdb
-      - rabbitmq
+      orderdb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
     ports:
       - "8003:80"
 
   ocelot.apigateway:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
     depends_on:
       - catalog.api
       - basket.api
@@ -150,10 +178,18 @@ services:
       - ES_JAVA_OPTS=${ES_JAVA_OPTS}
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - xpack.monitoring.enabled=true
+      - xpack.watcher.enabled=false
     ports:
       - "9200:9200"
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   kibana:
     container_name: kibana
