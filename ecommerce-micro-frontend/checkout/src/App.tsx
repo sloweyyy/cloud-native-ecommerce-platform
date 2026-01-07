@@ -1,3 +1,4 @@
+// CI Test: Updated checkout App.tsx to trigger frontend-quality job
 import React, { useMemo, createContext, useContext } from 'react';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
