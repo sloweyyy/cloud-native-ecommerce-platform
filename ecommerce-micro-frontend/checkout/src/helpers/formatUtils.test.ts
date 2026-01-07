@@ -125,17 +125,17 @@ describe('formatUtils', () => {
 
   describe('formatRelativeTime', () => {
     it('should format recent past', () => {
-      // Use 23 hours ago instead of exactly 24 hours to avoid timing issues
-      // This ensures it's clearly within the "yesterday" range
-      const yesterday = new Date(Date.now() - 23 * 60 * 60 * 1000); // 23 hours ago
+      // Use 25 hours ago to ensure it uses 'day' unit (>= 24 hours)
+      // Intl.RelativeTimeFormat with numeric: 'auto' will format 1 day ago as "yesterday"
+      const yesterday = new Date(Date.now() - 25 * 60 * 60 * 1000); // 25 hours ago
       const result = formatRelativeTime(yesterday);
       expect(result).toContain('yesterday');
     });
 
     it('should format near future', () => {
-      // Use 23 hours from now instead of exactly 24 hours to avoid timing issues
-      // This ensures it's clearly within the "tomorrow" range
-      const tomorrow = new Date(Date.now() + 23 * 60 * 60 * 1000); // 23 hours from now
+      // Use 25 hours from now to ensure it uses 'day' unit (>= 24 hours)
+      // Intl.RelativeTimeFormat with numeric: 'auto' will format 1 day from now as "tomorrow"
+      const tomorrow = new Date(Date.now() + 25 * 60 * 60 * 1000); // 25 hours from now
       const result = formatRelativeTime(tomorrow);
       expect(result).toContain('tomorrow');
     });
