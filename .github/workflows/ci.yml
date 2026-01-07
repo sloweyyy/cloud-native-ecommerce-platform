@@ -179,19 +179,19 @@ jobs:
       - name: Build shared packages
         run: npm run build:packages
 
-      - name: Initialize Nx Cloud
+      - name: Set up Nx SHAs
         uses: nrwl/nx-set-shas@v4
 
       - name: Run lint
-        run: npx nx affected --target=lint --parallel=3 --base=${{ github.event.pull_request.base.sha || 'main' }}
+        run: npx nx affected --target=lint --parallel=3 --base=$NX_BASE --head=$NX_HEAD
         continue-on-error: true
 
       - name: Run tests
-        run: npx nx affected --target=test --parallel=3 --ci --code-coverage --base=${{ github.event.pull_request.base.sha || 'main' }} --passWithNoTests
+        run: npx nx affected --target=test --parallel=3 --ci --code-coverage --base=$NX_BASE --head=$NX_HEAD --passWithNoTests
         continue-on-error: true
 
       - name: Build affected apps
-        run: npx nx affected --target=build --parallel=3 --base=${{ github.event.pull_request.base.sha || 'main' }}
+        run: npx nx affected --target=build --parallel=3 --base=$NX_BASE --head=$NX_HEAD
 
   docker-build:
     runs-on: ubuntu-latest
