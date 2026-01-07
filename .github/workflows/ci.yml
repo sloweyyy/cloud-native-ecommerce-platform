@@ -145,13 +145,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
+    env:
+      NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
     defaults:
       run:
         working-directory: ./ecommerce-micro-frontend
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Required for NX affected commands
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -174,19 +176,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Derive SHAs for affected commands
+      - name: Build shared packages
+        run: npm run build:packages
+
+      - name: Initialize Nx Cloud
         uses: nrwl/nx-set-shas@v4
 
-      - name: Lint affected
-        run: npx nx affected --target=lint --base=$NX_BASE --head=$NX_HEAD
+      - name: Run lint
+        run: npx nx affected --target=lint --parallel=3 --base=${{ github.event.pull_request.base.sha || 'main' }}
         continue-on-error: true
 
-      - name: Run tests affected
-        run: npx nx affected --target=test --base=$NX_BASE --head=$NX_HEAD --passWithNoTests
+      - name: Run tests
+        run: npx nx affected --target=test --parallel=3 --ci --code-coverage --base=${{ github.event.pull_request.base.sha || 'main' }} --passWithNoTests
         continue-on-error: true
 
-      - name: Build affected
-        run: npx nx affected --target=build --base=$NX_BASE --head=$NX_HEAD
+      - name: Build affected apps
+        run: npx nx affected --target=build --parallel=3 --base=${{ github.event.pull_request.base.sha || 'main' }}
 
   docker-build:
     runs-on: ubuntu-latest
