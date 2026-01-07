@@ -8,29 +8,38 @@ import {
 } from './couponValidator';
 import { Coupon } from '../services/coupon/types';
 
-const createMockCoupon = (overrides: Partial<Coupon> = {}): Coupon => ({
-  id: 'test-coupon',
-  code: 'TEST2024',
-  discountType: 'percentage',
-  discountValue: 20,
-  description: 'Test coupon',
-  startDate: new Date('2024-01-01').toISOString(),
-  expiryDate: new Date('2025-12-31').toISOString(),
-  usageLimit: 100,
-  usedCount: 0,
-  minPurchaseAmount: 0,
-  isActive: true,
-  isPublic: true,
-  createdAt: new Date('2024-01-01').toISOString(),
-  updatedAt: new Date('2024-01-01').toISOString(),
-  ...overrides,
-});
+const createMockCoupon = (overrides: Partial<Coupon> = {}): Coupon => {
+  // Default to a future expiry date (1 year from now)
+  const defaultExpiryDate = new Date();
+  defaultExpiryDate.setFullYear(defaultExpiryDate.getFullYear() + 1);
+  
+  return {
+    id: 'test-coupon',
+    code: 'TEST2024',
+    discountType: 'percentage',
+    discountValue: 20,
+    description: 'Test coupon',
+    startDate: new Date('2024-01-01').toISOString(),
+    expiryDate: defaultExpiryDate.toISOString(),
+    usageLimit: 100,
+    usedCount: 0,
+    minPurchaseAmount: 0,
+    isActive: true,
+    isPublic: true,
+    createdAt: new Date('2024-01-01').toISOString(),
+    updatedAt: new Date('2024-01-01').toISOString(),
+    ...overrides,
+  };
+};
 
 describe('couponValidator', () => {
   describe('isExpired', () => {
     it('should return false for valid coupon with future expiry', () => {
+      // Use a date 1 year in the future to ensure it's always valid
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 1);
       const coupon = createMockCoupon({
-        expiryDate: new Date('2025-12-31').toISOString(),
+        expiryDate: futureDate.toISOString(),
       });
 
       const result = isExpired(coupon);
