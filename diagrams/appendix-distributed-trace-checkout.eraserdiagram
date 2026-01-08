@@ -1,0 +1,45 @@
+// Figure E.2: Distributed Trace Example - Checkout Flow
+// Shows Jaeger trace path through services
+
+// ==================== API GATEWAY ====================
+API Gateway [icon: aws-api-gateway, color: blue] {
+  POST /Basket/checkout [icon: send]
+  Duration: 5ms [icon: clock]
+}
+
+// ==================== BASKET SERVICE ====================
+Basket API [icon: shopping-cart, color: green] {
+  ProcessCheckout [icon: check-circle]
+  Duration: 45ms [icon: clock]
+}
+
+// ==================== DISCOUNT SERVICE ====================
+Discount API [icon: tag, color: purple] {
+  GetDiscount gRPC [icon: zap]
+  Duration: 12ms [icon: clock]
+}
+
+// ==================== MESSAGE BROKER ====================
+RabbitMQ [icon: message-square, color: orange] {
+  Publish Event [icon: upload]
+  BasketCheckoutEvent [icon: file-text]
+  Duration: 3ms [icon: clock]
+}
+
+// ==================== ORDERING SERVICE ====================
+Ordering API [icon: clipboard-list, color: red] {
+  ConsumeCheckoutEvent [icon: download]
+  Async Processing [icon: loader]
+  Separate Trace [icon: alert-triangle]
+}
+
+// ==================== TRACE FLOW ====================
+API Gateway > Basket API : route request
+Basket API > Discount API : gRPC call
+Basket API > RabbitMQ : publish event
+RabbitMQ > Ordering API : async consume
+
+// ==================== NOTES ====================
+// Total sync duration: ~65ms (Gateway + Basket + Discount + Publish)
+// Limitation: RabbitMQ breaks trace context
+// Ordering API appears as separate, disconnected trace

@@ -1,0 +1,436 @@
+{
+  "dashboard": {
+    "title": "K6 Load Testing Metrics",
+    "tags": ["k6", "load-testing", "performance"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 0,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "HTTP Request Duration (Average)",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "k6_http_req_duration_avg",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (ms)",
+            "format": "ms"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "lines": true,
+        "linewidth": 2,
+        "fill": 1,
+        "fillGradient": 0,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      },
+      {
+        "id": 2,
+        "title": "HTTP Request Duration (P95)",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "k6_http_req_duration_p95",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Duration (ms)",
+            "format": "ms"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "lines": true,
+        "linewidth": 2,
+        "fill": 1,
+        "fillGradient": 0,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      },
+      {
+        "id": 3,
+        "title": "Total HTTP Requests",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "k6_http_reqs_total",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Requests",
+            "format": "short"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "bars": true,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      },
+      {
+        "id": 4,
+        "title": "Failed HTTP Requests",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 8,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "k6_http_req_failed_total",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Failed Requests",
+            "format": "short"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "bars": true,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      },
+      {
+        "id": 5,
+        "title": "Virtual Users",
+        "type": "stat",
+        "gridPos": {
+          "x": 0,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "k6_vus",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": null,
+                  "color": "green"
+                },
+                {
+                  "value": 5,
+                  "color": "yellow"
+                },
+                {
+                  "value": 10,
+                  "color": "red"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "title": "Total Iterations",
+        "type": "stat",
+        "gridPos": {
+          "x": 6,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "k6_iterations_total",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": null,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 7,
+        "title": "Data Received (Bytes)",
+        "type": "stat",
+        "gridPos": {
+          "x": 12,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "k6_data_received_bytes",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": null,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Data Sent (Bytes)",
+        "type": "stat",
+        "gridPos": {
+          "x": 18,
+          "y": 16,
+          "w": 6,
+          "h": 4
+        },
+        "targets": [
+          {
+            "expr": "k6_data_sent_bytes",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "reduceOptions": {
+            "values": false,
+            "calcs": ["lastNotNull"],
+            "fields": ""
+          },
+          "textMode": "auto"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": null,
+                  "color": "green"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Request Rate (per second)",
+        "type": "graph",
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "rate(k6_http_reqs_total[1m])",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Requests/sec",
+            "format": "reqps"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "lines": true,
+        "linewidth": 2,
+        "fill": 1,
+        "fillGradient": 0,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        }
+      },
+      {
+        "id": 10,
+        "title": "Error Rate (%)",
+        "type": "graph",
+        "gridPos": {
+          "x": 12,
+          "y": 20,
+          "w": 12,
+          "h": 8
+        },
+        "targets": [
+          {
+            "expr": "(k6_http_req_failed_total / k6_http_reqs_total) * 100",
+            "legendFormat": "{{service}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Error Rate (%)",
+            "format": "percent"
+          }
+        ],
+        "xaxis": {
+          "mode": "time"
+        },
+        "lines": true,
+        "linewidth": 2,
+        "fill": 1,
+        "fillGradient": 0,
+        "legend": {
+          "show": true,
+          "values": true,
+          "current": true
+        },
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {
+                "params": [5],
+                "type": "gt"
+              },
+              "operator": {
+                "type": "and"
+              },
+              "query": {
+                "params": ["A", "5m", "now"]
+              },
+              "reducer": {
+                "params": [],
+                "type": "avg"
+              },
+              "type": "query"
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "60s",
+          "handler": 1,
+          "name": "High Error Rate Alert",
+          "noDataState": "no_data",
+          "notifications": []
+        }
+      }
+    ]
+  },
+  "overwrite": true
+}

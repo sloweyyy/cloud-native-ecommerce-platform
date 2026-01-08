@@ -443,3 +443,6 @@ backups/
 repomix-output.md
 /.agent
 /istio-1.28.1
+
+# K6 load testing binary (should be installed locally)
+/k6

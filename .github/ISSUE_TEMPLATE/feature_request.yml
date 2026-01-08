@@ -1,4 +1,96 @@
 name: 🚀 Feature Request
 description: Suggest a new feature or enhancement
 title: "[Feature]: "
-labels: ["enhancement", "triage"] 
+labels: ["enhancement", "triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! ✨
+        Please provide enough detail so we can scope and prioritize.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues/PRs for this request
+          required: true
+        - label: I have checked the documentation for related functionality
+          required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the feature or problem to solve
+      placeholder: What do you want to achieve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Why / Value
+      description: What value does this add? Who benefits?
+      placeholder: User story, pain point, business value...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution / Scope
+      description: Suggested approach, constraints, and what is in/out of scope
+      placeholder: High-level approach, APIs, UX, data, rollout, etc.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      description: Which area(s) does this impact?
+      multiple: true
+      options:
+        - Frontend (React Nx host)
+        - Frontend (Store MFE)
+        - Frontend (Checkout MFE)
+        - Frontend (Account MFE)
+        - Frontend (Admin MFE)
+        - Frontend (Angular legacy)
+        - API Gateway (Ocelot)
+        - Catalog Service
+        - Basket Service
+        - Discount Service (REST/gRPC)
+        - Ordering Service
+        - S3 / LocalStack assets
+        - Istio / Ingress / OIDC
+        - Kubernetes / Deployment scripts
+        - Monitoring (Prometheus/Grafana)
+        - Tracing / Mesh (Jaeger/Kiali)
+        - Load testing (k6)
+        - Documentation
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds
+      placeholder: Other approaches you evaluated
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context / Links
+      description: Design notes, diagrams, related issues, screenshots, etc.
+      placeholder: Add any extra details or references
+    validations:
+      required: false

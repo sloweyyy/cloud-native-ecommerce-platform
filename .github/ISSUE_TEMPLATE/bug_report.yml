@@ -32,15 +32,23 @@ body:
       label: Component
       description: Which component is affected?
       options:
+        - Frontend (React Nx host)
+        - Frontend (Store MFE)
+        - Frontend (Checkout MFE)
+        - Frontend (Account MFE)
+        - Frontend (Admin MFE)
+        - Frontend (Angular legacy)
+        - API Gateway (Ocelot)
         - Catalog Service
         - Basket Service
-        - Discount Service
+        - Discount Service (REST/gRPC)
         - Ordering Service
-        - API Gateway (Ocelot)
-        - Frontend (Angular)
-        - Database
-        - Kubernetes/Deployment
-        - Monitoring/Logging
+        - S3 / LocalStack assets
+        - Istio / Ingress / OIDC
+        - Kubernetes / Deployment scripts
+        - Monitoring (Prometheus/Grafana)
+        - Tracing / Mesh (Jaeger/Kiali)
+        - Load testing (k6)
         - Documentation
         - Other
     validations:
@@ -106,24 +114,30 @@ body:
       description: Information about your environment
       placeholder: |
         - OS: [e.g. Ubuntu 20.04, Windows 10, macOS 12]
-        - Docker Version: [e.g. 20.10.8]
-        - Kubernetes Version: [e.g. 1.21.0]
-        - Browser: [e.g. Chrome 91, Firefox 89] (if frontend issue)
-        - Platform Version: [e.g. v1.2.3]
+        - Docker Version: [e.g. 20.10.x]
+        - Kubernetes Version: [e.g. 1.27+]
+        - Istio Version (if applicable): [e.g. 1.20.x]
+        - Node.js Version (frontend): [e.g. 18.x]
+        - Browser: [e.g. Chrome 119, Firefox 118] (if frontend issue)
+        - Platform Version/Commit: [e.g. v0.3.0, commit SHA]
     validations:
       required: true
 
   - type: textarea
     id: logs
     attributes:
-      label: Logs and Error Messages
+      label: Logs, Traces, and Error Messages
       description: |
-        Paste any relevant logs, error messages, or screenshots
+        Paste any relevant logs, error messages, traces, or screenshots
         
-        **Tip**: You can attach images by clicking this area to highlight it and then dragging files in.
+        **Tips**:
+        - Port-forwards (prometheus/grafana/jaeger/kiali): note namespaces/commands used
+        - k6 load tests: include test file name and Grafana panel if relevant
+        - Mesh/Ingress: include Istio virtual service/gateway snippets if relevant
+        - You can attach images by clicking this area to highlight it and then dragging files in.
       placeholder: |
         ```
-        Paste logs here...
+        Paste logs/traces here...
         ```
     validations:
       required: false

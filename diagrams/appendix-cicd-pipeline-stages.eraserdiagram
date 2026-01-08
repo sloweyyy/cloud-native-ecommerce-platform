@@ -1,0 +1,63 @@
+// Figure D.1: CI/CD Pipeline Stages Overview
+// Complete pipeline from trigger to notification
+
+// ==================== TRIGGER ====================
+Trigger [icon: git-pull-request, color: gray] {
+  Push [icon: git-commit]
+  Pull Request [icon: git-merge]
+}
+
+// ==================== BUILD STAGE ====================
+Build [icon: package, color: blue] {
+  .NET Build [icon: dotnet]
+  Node Build [icon: nodejs]
+}
+
+// ==================== TEST STAGE ====================
+Test [icon: check-circle, color: green] {
+  Unit Tests [icon: test-tube]
+  Lint [icon: search]
+}
+
+// ==================== SCAN STAGE ====================
+Scan [icon: shield, color: yellow] {
+  Trivy [icon: lock]
+  CodeQL [icon: code]
+}
+
+// ==================== PUSH STAGE ====================
+Push [icon: upload-cloud, color: purple] {
+  ECR Push [icon: aws-ecr]
+  Image Tag [icon: tag]
+}
+
+// ==================== DEPLOY STAGE ====================
+Deploy [icon: rocket, color: orange] {
+  Helm Install [icon: kubernetes]
+  EKS Cluster [icon: aws-eks]
+}
+
+// ==================== VERIFY STAGE ====================
+Verify [icon: eye, color: cyan] {
+  Smoke Test [icon: activity]
+  Health Check [icon: heart]
+}
+
+// ==================== NOTIFY STAGE ====================
+Notify [icon: bell, color: pink] {
+  Slack [icon: slack]
+  Status [icon: check-square]
+}
+
+// ==================== PIPELINE FLOW ====================
+Trigger > Build : on event
+Build > Test : compile success
+Test > Scan : tests pass
+Scan > Push : no vulnerabilities
+Push > Deploy : images pushed
+Deploy > Verify : helm upgrade
+Verify > Notify : deployment complete
+
+// ==================== NOTES ====================
+// This diagram represents the end-to-end CI/CD pipeline
+// from code push to production deployment notification

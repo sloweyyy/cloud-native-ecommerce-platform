@@ -9,9 +9,9 @@ updates:
       time: "06:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "maintainers"
+      - "sloweyyy"
     assignees:
-      - "maintainers"
+      - "sloweyyy"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -28,19 +28,43 @@ updates:
     directory: "/client"
     schedule:
       interval: "weekly"
-      day: "monday" 
+      day: "monday"
       time: "06:00"
     open-pull-requests-limit: 10
     reviewers:
-      - "maintainers"
+      - "sloweyyy"
     assignees:
-      - "maintainers"
+      - "thvnhtai"
     commit-message:
       prefix: "chore"
       include: "scope"
     labels:
       - "dependencies"
       - "frontend"
+    ignore:
+      # Ignore major version updates for stability
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # npm packages for micro-frontend
+  - package-ecosystem: "npm"
+    directory: "/ecommerce-micro-frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "sloweyyy"
+    assignees:
+      - "thvnhtai"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "frontend"
+      - "micro-frontend"
     ignore:
       # Ignore major version updates for stability
       - dependency-name: "*"
@@ -55,9 +79,9 @@ updates:
       time: "06:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "maintainers"
+      - "sloweyyy"
     assignees:
-      - "maintainers"
+      - "sloweyyy"
     commit-message:
       prefix: "chore"
       include: "scope"
@@ -74,9 +98,9 @@ updates:
       time: "06:00"
     open-pull-requests-limit: 5
     reviewers:
-      - "maintainers"
+      - "sloweyyy"
     assignees:
-      - "maintainers"
+      - "sloweyyy"
     commit-message:
       prefix: "chore"
       include: "scope"

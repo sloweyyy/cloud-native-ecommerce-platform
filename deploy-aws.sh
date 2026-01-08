@@ -966,8 +966,7 @@ deploy_monitoring() {
 
     helm upgrade --install prometheus prometheus-community/prometheus \
         --namespace monitoring \
-        --set server.service.type=ClusterIP \
-        --set alertmanager.enabled=false \
+        -f Deployments/helm/prometheus/prometheus-values.yaml \
         --wait --timeout 600s
 
     # Install Grafana with Helm (separate from Istio)
@@ -981,6 +980,20 @@ deploy_monitoring() {
         --set service.type=ClusterIP \
         --set persistence.enabled=false \
         --wait --timeout 600s
+
+    # Install Prometheus PushGateway for k6 load testing metrics
+    log_info "Installing Prometheus PushGateway for k6 load testing..."
+    helm upgrade --install prometheus-pushgateway prometheus-community/prometheus-pushgateway \
+        --namespace monitoring \
+        --set service.type=ClusterIP \
+        --set service.port=9091 \
+        --wait --timeout 300s
+
+    log_info "Waiting for PushGateway to be ready..."
+    kubectl wait --for=condition=ready pod -l app=prometheus-pushgateway \
+        -n monitoring --timeout=300s || log_warning "PushGateway may need more time"
+
+    log_success "PushGateway deployed for k6 metrics collection"
 
     # Setup Grafana with comprehensive dashboards
     log_info "Configuring Grafana with production dashboards..."
@@ -1104,7 +1117,28 @@ data:
     }
 EOF
 
-    # 4. Copy Istio dashboards from istio-system if they exist
+    # 4. Create K6 Load Testing Dashboard ConfigMap
+    log_info "Creating K6 load testing dashboard ConfigMap..."
+
+    # Read and create K6 dashboard ConfigMap
+    kubectl apply -f - <<'K6_EOF'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  k6-dashboard.json: |-
+K6_EOF
+    cat Deployments/monitoring/grafana-dashboard-k6.json | sed 's/^/    /'
+    cat <<'K6_EOF'
+K6_EOF
+
+    log_success "K6 dashboard ConfigMap created"
+
+    # 5. Copy Istio dashboards from istio-system if they exist
     log_info "Waiting for Istio dashboards to be created..."
     sleep 10
 
@@ -1145,6 +1179,13 @@ EOF
       {"op": "add", "path": "/spec/template/spec/volumes/-", "value": {"name": "service-requests-dashboard", "configMap": {"name": "service-requests-dashboard"}}},
       {"op": "add", "path": "/spec/template/spec/containers/0/volumeMounts/-", "value": {"name": "service-requests-dashboard", "mountPath": "/var/lib/grafana/dashboards/service-requests-dashboard"}}
     ]' 2>/dev/null || log_warning "Service requests dashboard volume may already exist"
+
+    # Add K6 load testing dashboard
+    log_info "Mounting K6 dashboard in Grafana..."
+    kubectl patch deployment grafana -n monitoring --type='json' -p='[
+      {"op": "add", "path": "/spec/template/spec/volumes/-", "value": {"name": "k6-dashboard", "configMap": {"name": "k6-dashboard"}}},
+      {"op": "add", "path": "/spec/template/spec/containers/0/volumeMounts/-", "value": {"name": "k6-dashboard", "mountPath": "/var/lib/grafana/dashboards/k6"}}
+    ]' 2>/dev/null || log_warning "K6 dashboard volume may already exist"
 
     # Add Istio dashboards if they exist
     if kubectl get configmap istio-grafana-dashboards -n monitoring &>/dev/null; then
@@ -1230,7 +1271,22 @@ display_access_info() {
     echo "     kubectl port-forward -n monitoring svc/grafana 3000:80"
     echo "     Then open: http://localhost:3000"
     echo "     Login: admin / prom-operator"
-    echo "     Dashboards: Istio Service Mesh, Request Metrics, Pod Metrics"
+    echo "     Dashboards: Istio Service Mesh, Request Metrics, Pod Metrics, K6 Load Testing"
+    echo ""
+    echo "📊 K6 LOAD TESTING:"
+    echo "   PushGateway (for k6 metrics):"
+    echo "     kubectl port-forward -n monitoring svc/prometheus-pushgateway 9091:9091"
+    echo ""
+    echo "   Dashboard: Grafana → Dashboards → K6 Load Testing Metrics"
+    echo ""
+    echo "   To run k6 tests against deployed services:"
+    echo "   1. Port-forward PushGateway (command above)"
+    echo "   2. Port-forward target services:"
+    echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-catalog 8081:80"
+    echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-basket 8082:80"
+    echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-ordering 8083:80"
+    echo "   3. Run tests: ./tests/k6/push-metrics.sh"
+    echo "   4. View real-time metrics in Grafana k6 dashboard"
     echo ""
     echo "   Jaeger (Distributed Tracing - 100% sampling enabled):"
     echo "     kubectl port-forward -n istio-system svc/tracing 16686:80"

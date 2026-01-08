@@ -45,43 +45,21 @@ jobs:
         run: |
           npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/github
       
-      - name: Run semantic-release (dry-run)
+      - name: Run semantic-release
         id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # Manual release
-            current_version=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-            case "${{ github.event.inputs.release_type }}" in
-              "major")
-                new_version=$(echo $current_version | awk -F. '{print $1"."($2+1)".0"}' | sed 's/v//')
-                ;;
-              "minor")
-                new_version=$(echo $current_version | awk -F. '{print $1"."$2"."($3+1)}' | sed 's/v//')
-                ;;
-              "patch")
-                new_version=$(echo $current_version | awk -F. '{print $1"."$2"."($3+1)}' | sed 's/v//')
-                ;;
-              "prerelease")
-                new_version=$(echo $current_version | sed 's/v//')-beta.$(date +%s)
-                ;;
-            esac
+          npx semantic-release | tee semantic-output.txt
+
+          version=$(grep -Eo "(next release version is|Published release) [0-9]+\.[0-9]+\.[0-9]+([-a-zA-Z0-9\.]+)?" semantic-output.txt | tail -1 | awk '{print $NF}')
+
+          if [ -n "$version" ]; then
             echo "new_release_published=true" >> $GITHUB_OUTPUT
-            echo "new_release_version=v$new_version" >> $GITHUB_OUTPUT
-            echo "new_release_notes=Manual ${{ github.event.inputs.release_type }} release" >> $GITHUB_OUTPUT
+            echo "new_release_version=$version" >> $GITHUB_OUTPUT
+            echo "new_release_notes=Semantic Release published $version" >> $GITHUB_OUTPUT
           else
-            # Automatic semantic release
-            npx semantic-release --dry-run | tee semantic-output.txt
-            
-            if grep -q "The next release version is" semantic-output.txt; then
-              echo "new_release_published=true" >> $GITHUB_OUTPUT
-              version=$(grep "The next release version is" semantic-output.txt | awk '{print $NF}')
-              echo "new_release_version=$version" >> $GITHUB_OUTPUT
-              echo "new_release_notes=Automated semantic release" >> $GITHUB_OUTPUT
-            else
-              echo "new_release_published=false" >> $GITHUB_OUTPUT
-            fi
+            echo "new_release_published=false" >> $GITHUB_OUTPUT
           fi
 
   create-release:

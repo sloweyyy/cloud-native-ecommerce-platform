@@ -1,4 +1,6 @@
 server:
+  extraArgs:
+    web.enable-remote-write-receiver: ""
   persistentVolume:
     enabled: true
     size: 10Gi
@@ -70,3 +72,13 @@ serverFiles:
         - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
           action: keep
           regex: true
+
+      # PushGateway scraping for k6 load testing metrics
+      - job_name: 'pushgateway'
+        honor_labels: true
+        static_configs:
+          - targets: ['prometheus-pushgateway:9091']
+        metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: 'k6_.*'
+            action: keep
