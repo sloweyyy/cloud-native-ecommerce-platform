@@ -83,7 +83,7 @@
     "jest-util": "^30.0.2",
     "nx": "21.6.5",
     "prettier": "^2.6.2",
-    "react-refresh": "^0.10.0",
+    "react-refresh": "^0.18.0",
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
