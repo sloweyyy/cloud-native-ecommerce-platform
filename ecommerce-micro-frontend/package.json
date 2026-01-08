@@ -96,7 +96,7 @@
     "@azure/msal-react": "^2.1.1",
     "@ecommerce-platform/auth-provider": "^1.2.6",
     "@ecommerce-platform/shared-layout": "^1.0.1",
-    "@module-federation/enhanced": "^0.18.0",
+    "@module-federation/enhanced": "^0.22.0",
     "@tanstack/react-query": "^5.75.2",
     "@tanstack/react-query-devtools": "^5.75.2",
     "@tanstack/react-router": "^1.120.5",
