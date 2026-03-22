@@ -100,7 +100,7 @@
     "@tanstack/react-query": "^5.75.2",
     "@tanstack/react-query-devtools": "^5.75.2",
     "@tanstack/react-router": "^1.120.5",
-    "@tanstack/react-router-devtools": "^1.120.6",
+    "@tanstack/react-router-devtools": "^1.166.11",
     "@tanstack/zod-adapter": "^1.120.5",
     "antd": "^5.22.6",
     "axios": "^1.7.2",
