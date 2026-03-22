@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
-		<PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
+		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
 		<PackageReference Include="MediatR" Version="12.3.0" />
 	</ItemGroup>
 
