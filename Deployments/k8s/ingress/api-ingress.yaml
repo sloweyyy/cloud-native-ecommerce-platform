@@ -4,7 +4,6 @@ metadata:
   name: api-ingress
   namespace: ecommerce
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
@@ -12,34 +11,6 @@ spec:
     - host: localhost
       http:
         paths:
-          - path: /catalog
-            pathType: Prefix
-            backend:
-              service:
-                name: catalog-service
-                port:
-                  number: 80
-          - path: /basket
-            pathType: Prefix
-            backend:
-              service:
-                name: basket-service
-                port:
-                  number: 80
-          - path: /discount
-            pathType: Prefix
-            backend:
-              service:
-                name: discount-service
-                port:
-                  number: 80
-          - path: /ordering
-            pathType: Prefix
-            backend:
-              service:
-                name: ordering-service
-                port:
-                  number: 80
           - path: /
             pathType: Prefix
             backend:
