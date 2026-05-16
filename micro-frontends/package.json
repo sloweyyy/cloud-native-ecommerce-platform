@@ -81,7 +81,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "jest-environment-node": "^30.0.2",
     "jest-util": "^30.0.2",
-    "nx": "21.6.5",
+    "nx": "21.6.11",
     "prettier": "^2.6.2",
     "react-refresh": "^0.10.0",
     "ts-jest": "^29.4.0",
