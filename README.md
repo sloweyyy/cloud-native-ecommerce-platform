@@ -17,7 +17,7 @@
 - **☁️ Enterprise Cloud Infrastructure** - AWS EKS with auto-scaling, multi-AZ, CloudFormation IaC, and IRSA for secure AWS access
 - **🎯 Microservices Backend** - Clean Architecture with CQRS pattern, event-driven design, and gRPC communication
 - **📊 Full Observability** - Elastic Stack, Prometheus, Grafana, Jaeger distributed tracing, and Istio service mesh
-- **🔒 Security & Compliance** - JWT authentication, IRSA, Istio mTLS, Trivy/CodeQL scanning, and secrets management
+- **🔒 Security & Compliance** - IRSA, Istio mTLS, Trivy/CodeQL scanning, secrets management (app-layer JWT auth planned)
 - **🎨 Advanced Admin Dashboard** - Real-time analytics, activity tracking, product management, and audit logs
 - **⚡ Developer Experience** - Nx monorepo with caching, hot reload, type-safe APIs, and E2E testing (Playwright)
 
@@ -50,10 +50,6 @@ graph TB
 
     subgraph "API Gateway"
         Gateway["Ocelot Gateway<br/>Port 8010<br/>CORS, Auth, Routing"]
-    end
-
-    subgraph "Identity & Security"
-        AuthServer["Identity Server 4<br/>JWT Authentication<br/>Azure AD B2C"]
     end
 
     subgraph "Microservices"
@@ -97,7 +93,6 @@ graph TB
     Account --> Gateway
     Admin --> Gateway
 
-    Gateway --> AuthServer
     Gateway --> Catalog
     Gateway --> Basket
     Gateway --> Discount
@@ -218,7 +213,7 @@ graph TB
 ```mermaid
 graph TD
     API["API Layer<br/>Controllers, Endpoints"]
-    App["Application Layer<br/>Commands, Queries, Handlers<br/>MediatR, CQRS"]
+    App["Application Layer<br/>Commands, Queries, Handlers<br/>CQRS"]
     Domain["Domain Layer<br/>Entities, Value Objects<br/>Business Rules"]
     Infra["Infrastructure Layer<br/>Repositories, External Services<br/>Database, S3, gRPC"]
 
@@ -307,7 +302,6 @@ For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE
 | **Basket API** | [localhost:8001](http://localhost:8001) | [Swagger](http://localhost:8001/swagger) |
 | **Discount API** | [localhost:8002](http://localhost:8002) | [Swagger](http://localhost:8002/swagger) |
 | **Ordering API** | [localhost:8003](http://localhost:8003) | [Swagger](http://localhost:8003/swagger) |
-| **Identity Server** | [localhost:9009](http://localhost:9009) | - |
 
 ### Monitoring & Observability
 
@@ -344,10 +338,10 @@ For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE
 | **Runtime** | .NET | 10.0 | Framework |
 | **Framework** | ASP.NET Core | 10.0 | Web API |
 | **Architecture** | Clean Architecture | - | SOLID principles |
-| **Pattern** | CQRS + MediatR | 12.5 | Command/Query separation |
-| **ORM** | Entity Framework Core | 8.0 | Database abstraction |
-| **Mapping** | AutoMapper | 13.0 | DTO mapping |
-| **Validation** | FluentValidation | 11.9 | Input validation |
+| **Pattern** | CQRS + in-house Mediator | - | Command/Query separation (`Infrastructure/Common.Mediator`) |
+| **ORM** | Entity Framework Core | 10.0 | Database abstraction |
+| **Mapping** | Riok.Mapperly | 4.1 | Source-generated DTO mapping (no reflection) |
+| **Validation** | FluentValidation | 11.12 | Input validation |
 | **Communication** | gRPC + REST | - | Service communication |
 | **API Documentation** | Swagger/OpenAPI | 3.0 | Interactive docs |
 
@@ -519,7 +513,7 @@ The platform uses **Webpack Module Federation** with a shell-based orchestration
 Each microservice follows **Clean Architecture** with **CQRS Pattern**:
 
 ```text
-Controllers/Endpoints → MediatR Pipeline → Commands/Queries
+Controllers/Endpoints → Mediator Pipeline → Commands/Queries
                                               ↓
                                     Command Handlers / Query Handlers
                                               ↓
@@ -538,7 +532,7 @@ Controllers/Endpoints → MediatR Pipeline → Commands/Queries
 
 ### Security Architecture
 
-- **Authentication**: JWT tokens via Identity Server 4 + Azure AD B2C
+- **Authentication**: JWT planned (no auth middleware currently wired up)
 - **Authorization**: Role-based access control (RBAC)
 - **Service-to-Service**: Istio mTLS for encrypted communication
 - **Data Security**: Encryption at rest (S3, databases) and in transit (HTTPS/TLS)
@@ -622,7 +616,7 @@ dotnet test --filter Category=Integration  # Integration tests only
 
 ### Application Security
 
-- **JWT Authentication** with Identity Server 4
+- **JWT Authentication** (planned — not yet wired up)
 - **Role-Based Access Control** (RBAC)
 - **Input Validation** with FluentValidation
 - **SQL Injection Prevention** via parameterized queries & ORM
