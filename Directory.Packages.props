@@ -96,7 +96,7 @@
 
     <!-- OpenAPI. Swashbuckle 10.x retained pending Microsoft.AspNetCore.OpenApi
          migration (now the in-box option since .NET 9). -->
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
 </Project>
