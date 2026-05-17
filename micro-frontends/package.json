@@ -48,7 +48,7 @@
     "@nx/react": "^21.6.5",
     "@nx/web": "21.6.10",
     "@nx/webpack": "^21.6.5",
-    "@nx/workspace": "21.6.5",
+    "@nx/workspace": "21.6.11",
     "@playwright/test": "^1.56.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@svgr/webpack": "^8.0.1",
