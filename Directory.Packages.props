@@ -92,7 +92,7 @@
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageVersion Include="Serilog.Exceptions" Version="8.4.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="9.0.3" />
 
     <!-- OpenAPI. Swashbuckle 10.x retained pending Microsoft.AspNetCore.OpenApi
          migration (now the in-box option since .NET 9). -->
