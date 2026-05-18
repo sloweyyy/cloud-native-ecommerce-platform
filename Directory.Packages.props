@@ -28,7 +28,7 @@
     <PackageVersion Include="AWSSDK.S3" Version="3.7.511.4" />
 
     <!-- Mapping. Replaced AutoMapper with Mapperly (MIT, source-gen, no reflection). -->
-    <PackageVersion Include="Riok.Mapperly" Version="4.1.1" />
+    <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
 
     <!-- Data access. MongoDB.Driver 3.x fixes HIGH CVE in transitive Snappier
          1.0.0 (GHSA-pggp-6c3x-2xmx) and moderate CVE in transitive SharpCompress
