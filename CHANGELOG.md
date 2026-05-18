@@ -1,4 +1,85 @@
 # Changelog
+## [0.11.3] - 2026-05-18
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(security): force picomatch ^4.0.4 via npm overrides (supersedes #331) (#342) (f5e47e8)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: update README to reflect post-modernization reality (#328) (e66f62c)
+- docs: update README to reflect post-modernization reality (79ee297)
+- docs: update changelog for 0.11.2 (#327) (2b23669)
+- docs: update changelog for 0.11.2 [skip ci] (f31b672)
+
+### 🔐 Security
+- fix(security): force picomatch ^4.0.4 via npm overrides (supersedes #331) (#342) (f5e47e8)
+- chore(deps): Bump aquasecurity/trivy-action from 0.28.0 to 0.36.0 in /.github/workflows in the github_actions group across 1 directory (#313) (d3bfd8a)
+
+### 🏗️ Infrastructure
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 3 updates (#341) (4cd7c2e)
+- chore: Bump Dapper from 2.1.66 to 2.1.79 (#336) (16c6cdb)
+- chore(deps): Bump azure/setup-helm from 4 to 5 (#305) (69acd02)
+- chore(deps): Bump aquasecurity/trivy-action from 0.28.0 to 0.36.0 in /.github/workflows in the github_actions group across 1 directory (#313) (d3bfd8a)
+- ci: auto-merge dependabot patch and minor bumps (#329) (c192a8e)
+- ci: auto-merge dependabot patch and minor bumps (574ad73)
+- docs: update changelog for 0.11.2 [skip ci] (f31b672)
+
+### Other Changes
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 15 updates (#283) (c90faf4)
+- chore(deps): Bump the npm_and_yarn group across 3 directories with 1 update (#316) (3ba9393)
+- chore(deps): Bump actions/github-script from 7 to 9 (#333) (344fbe4)
+- chore(deps): Bump dependabot/fetch-metadata from 2 to 3 (#334) (0243c32)
+- chore: Bump the npm_and_yarn group across 3 directories with 1 update (6502b94)
+- chore: Bump Riok.Mapperly from 4.1.1 to 4.3.1 (#340) (9c8883f)
+- chore: Bump Npgsql from 10.0.0 to 10.0.2 (#339) (2f88dd0)
+- chore: Bump MassTransit from 8.1.3 to 8.5.9 (#337) (ebe711a)
+- chore: Bump AWSSDK.S3 from 3.7.511.4 to 3.7.511.7 (#335) (e7a390d)
+- chore(deps): Bump terraform-linters/setup-tflint from 4 to 6 (#311) (dcf4c1c)
+- chore(deps): Bump azure/setup-kubectl from 4 to 5 (#308) (a0e3b6d)
+- chore(deps): Bump hashicorp/setup-terraform from 3 to 4 (#306) (11831ea)
+- chore(deps): Bump aws-actions/configure-aws-credentials from 4 to 6 (#307) (9a33c32)
+- chore: Bump Serilog.Sinks.Elasticsearch from 9.0.0 to 9.0.3 (#279) (b996a67)
+- chore(deps-dev): Bump @nx/workspace from 21.6.5 to 21.6.11 in /micro-frontends (#301) (19a9ebe)
+- chore(deps-dev): Bump angular-eslint from 20.1.1 to 20.7.0 in /client (#286) (4f5e560)
+- chore: Bump Serilog.AspNetCore from 8.0.1 to 8.0.3 (#277) (53dac27)
+- chore: Bump Serilog.Sinks.Console from 6.0.0 to 6.1.1 (#278) (ba07839)
+- chore(deps): Bump @angular/core from 18.2.13 to 18.2.14 in /client (#287) (d805fc3)
+- chore(deps): Bump @angular/platform-browser from 18.2.13 to 18.2.14 in /client (#291) (9bbd917)
+- chore(deps): Bump react-router-dom from 6.30.2 to 6.30.3 in /micro-frontends (#295) (602d10b)
+- chore(deps): Bump zone.js from 0.14.10 to 0.16.2 in /client (#288) (b9300ed)
+- chore(deps-dev): Bump @swc/helpers from 0.5.18 to 0.5.21 in /micro-frontends (#296) (4f9996e)
+- chore(deps-dev): Bump react-refresh from 0.10.0 to 0.18.0 in /micro-frontends (#297) (08cf5b3)
+- chore(deps-dev): Bump @eslint/js from 9.39.2 to 9.39.4 in /micro-frontends (#298) (be6b075)
+- chore(deps-dev): Bump @nx/module-federation from 21.6.5 to 21.6.11 in /micro-frontends (#300) (f2d014f)
+- chore(deps): Bump zustand from 5.0.9 to 5.0.13 in /micro-frontends (#302) (bd33e7f)
+- chore(deps-dev): Bump nx from 21.6.5 to 21.6.11 in /micro-frontends (#303) (684766e)
+- chore(deps): Bump i18next from 25.7.3 to 25.10.10 in /micro-frontends (#309) (c7c9a37)
+- chore(deps-dev): Bump typescript-eslint from 8.34.1 to 8.59.3 in /client (#310) (8381f41)
+- chore(deps): Bump @angular/common from 18.2.13 to 18.2.14 in /client (#285) (3de8f68)
+- chore(deps-dev): Bump karma-jasmine-html-reporter from 2.1.0 to 2.2.0 in /client (#289) (5602518)
+- chore(deps-dev): Bump @angular/compiler-cli from 18.2.13 to 18.2.14 in /client (#290) (3cb834d)
+- Merge branch 'main' into chore/dependabot-auto-merge (13574cc)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.2...0.11.3
+
 ## [0.11.2] - 2026-05-16
 
 ## What's Changed
