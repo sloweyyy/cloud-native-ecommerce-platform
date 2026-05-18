@@ -33,7 +33,7 @@
     <!-- Data access. MongoDB.Driver 3.x fixes HIGH CVE in transitive Snappier
          1.0.0 (GHSA-pggp-6c3x-2xmx) and moderate CVE in transitive SharpCompress
          (GHSA-6c8g-7p36-r338). -->
-    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.8" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.8" />
