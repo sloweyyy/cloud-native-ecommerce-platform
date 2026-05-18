@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference, @typescript-eslint/no-empty-interface, @typescript-eslint/no-empty-object-type, no-var */
 /// <reference types="node" />
 /// <reference types="react" />
 /// <reference types="react-dom" />
@@ -15,8 +16,6 @@ declare namespace NodeJS {
     NX_LOG_LEVEL?: string;
     NX_ENABLE_API_LOGGING?: string;
   }
-
-  interface Timeout {}
 }
 
 declare var process: {
