@@ -1,10 +1,10 @@
-name: Dependabot auto-merge
+name: Auto-merge bot PRs
 
-# Auto-approves and enables auto-merge for dependabot PRs that bump
-# packages by patch or minor. Major bumps are surfaced for manual review
-# (dependabot.yml also already ignores semver-major for nuget/npm; this
-# workflow is the runtime safety net for docker / github-actions
-# ecosystems where major bumps still flow through).
+# Auto-approves and enables auto-merge for:
+#   1. dependabot[bot] patch/minor bumps (majors stay manual)
+#   2. github-actions[bot] changelog PRs (CHANGELOG.md-only changes)
+#
+# Major bumps from dependabot are commented and left for human review.
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  auto-merge:
+  dependabot:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -42,3 +42,38 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr comment "$PR_URL" --body "🛑 Major version bump — not auto-merged. Review the changelog before approving."
+
+  changelog:
+    # Auto-merge github-actions[bot] PRs that ONLY touch CHANGELOG.md
+    # (the automated release-changelog generation).
+    if: github.actor == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR only modifies CHANGELOG.md
+        id: scope
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          files=$(gh pr view "$PR_NUMBER" --repo ${{ github.repository }} --json files --jq '[.files[].path] | unique')
+          echo "files: $files"
+          if [ "$files" = '["CHANGELOG.md"]' ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "PR touches files other than CHANGELOG.md — skipping auto-merge."
+          fi
+
+      - name: Auto-approve changelog PR
+        if: steps.scope.outputs.ok == 'true'
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr review --approve "$PR_URL" --body "Auto-approved — CHANGELOG.md-only update from github-actions[bot]."
+
+      - name: Enable auto-merge (squash) for changelog PR
+        if: steps.scope.outputs.ok == 'true'
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "$PR_URL"
