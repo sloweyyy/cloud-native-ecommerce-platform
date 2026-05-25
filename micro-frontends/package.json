@@ -101,7 +101,7 @@
     "@tanstack/react-query-devtools": "^5.75.2",
     "@tanstack/react-router": "^1.168.2",
     "@tanstack/react-router-devtools": "^1.120.6",
-    "@tanstack/zod-adapter": "^1.166.9",
+    "@tanstack/zod-adapter": "^1.167.0",
     "antd": "^5.22.6",
     "axios": "^1.16.1",
     "dayjs": "^1.11.13",
