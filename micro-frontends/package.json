@@ -80,7 +80,7 @@
     "jest": "^30.0.2",
     "jest-environment-jsdom": "^30.3.0",
     "jest-environment-node": "^30.0.2",
-    "jest-util": "^30.0.2",
+    "jest-util": "^30.4.1",
     "nx": "21.6.11",
     "prettier": "^2.6.2",
     "react-refresh": "^0.18.0",
