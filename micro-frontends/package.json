@@ -54,7 +54,7 @@
     "@svgr/webpack": "^8.0.1",
     "@swc-node/register": "~1.11.1",
     "@swc/cli": "~0.8.1",
-    "@swc/core": "~1.15.21",
+    "@swc/core": "~1.15.40",
     "@swc/helpers": "~0.5.21",
     "@tanstack/router-cli": "^1.167.12",
     "@tanstack/router-plugin": "^1.168.11",
