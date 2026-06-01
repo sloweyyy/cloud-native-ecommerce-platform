@@ -37,7 +37,7 @@
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.29.0",
-    "@babel/preset-react": "^7.14.5",
+    "@babel/preset-react": "^7.29.7",
     "@eslint/js": "^9.39.4",
     "@nx/eslint": "21.6.11",
     "@nx/eslint-plugin": "21.6.5",
