@@ -40,7 +40,7 @@
     "@babel/preset-react": "^7.29.7",
     "@eslint/js": "^9.39.4",
     "@nx/eslint": "21.6.11",
-    "@nx/eslint-plugin": "21.6.5",
+    "@nx/eslint-plugin": "21.6.11",
     "@nx/jest": "21.6.11",
     "@nx/js": "21.6.5",
     "@nx/module-federation": "21.6.11",
