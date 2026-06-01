@@ -46,7 +46,7 @@
     "@nx/module-federation": "21.6.11",
     "@nx/playwright": "^22.7.5",
     "@nx/react": "^21.6.5",
-    "@nx/web": "21.6.10",
+    "@nx/web": "21.6.11",
     "@nx/webpack": "^22.7.5",
     "@nx/workspace": "21.6.11",
     "@playwright/test": "^1.60.0",
