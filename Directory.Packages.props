@@ -41,7 +41,7 @@
     <!-- Pin SharpCompress to override transitive 0.30.1 from older deps
          (GHSA-6c8g-7p36-r338, moderate). -->
     <PackageVersion Include="SharpCompress" Version="0.48.1" />
-    <PackageVersion Include="Npgsql" Version="10.0.2" />
+    <PackageVersion Include="Npgsql" Version="10.0.3" />
 
     <!-- Validation -->
     <PackageVersion Include="FluentValidation" Version="11.12.0" />
