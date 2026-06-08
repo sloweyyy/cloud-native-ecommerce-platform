@@ -42,7 +42,7 @@
     "@nx/eslint": "21.6.11",
     "@nx/eslint-plugin": "21.6.11",
     "@nx/jest": "21.6.11",
-    "@nx/js": "21.6.5",
+    "@nx/js": "21.6.11",
     "@nx/module-federation": "21.6.11",
     "@nx/playwright": "^22.7.5",
     "@nx/react": "^21.6.11",
