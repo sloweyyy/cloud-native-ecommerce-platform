@@ -56,7 +56,7 @@
     "@swc/cli": "~0.8.1",
     "@swc/core": "~1.15.40",
     "@swc/helpers": "~0.5.23",
-    "@tanstack/router-cli": "^1.167.12",
+    "@tanstack/router-cli": "^1.167.17",
     "@tanstack/router-plugin": "^1.168.18",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "^6.9.1",
