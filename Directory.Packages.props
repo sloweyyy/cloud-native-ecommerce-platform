@@ -24,7 +24,7 @@
     <PackageVersion Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
 
     <!-- AWS. AWSSDK 4.x is current; 3.7.x retained pending the 4.x migration PR. -->
-    <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400.1" />
+    <PackageVersion Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400.2" />
     <PackageVersion Include="AWSSDK.S3" Version="3.7.511.7" />
 
     <!-- Mapping. Replaced AutoMapper with Mapperly (MIT, source-gen, no reflection). -->
