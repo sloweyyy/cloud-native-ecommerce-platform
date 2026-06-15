@@ -84,7 +84,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.14.0-beta.1" />
 
     <!-- Resilience -->
-    <PackageVersion Include="Polly" Version="8.6.6" />
+    <PackageVersion Include="Polly" Version="8.7.0" />
 
     <!-- Logging. Serilog.AspNetCore 10.x retained pending a dedicated bump
          (configuration API differences). -->
