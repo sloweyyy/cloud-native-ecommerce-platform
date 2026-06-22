@@ -107,7 +107,7 @@
     "dayjs": "^1.11.21",
     "i18next": "^25.10.10",
     "lodash": "^4.18.1",
-    "papaparse": "^5.5.3",
+    "papaparse": "^5.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^16.6.6",
