@@ -99,7 +99,7 @@
     "@module-federation/enhanced": "^2.5.1",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/react-query-devtools": "^5.101.0",
-    "@tanstack/react-router": "^1.170.15",
+    "@tanstack/react-router": "^1.170.16",
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/zod-adapter": "^1.167.0",
     "antd": "^5.22.6",
