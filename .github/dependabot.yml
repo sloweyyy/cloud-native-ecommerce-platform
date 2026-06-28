@@ -48,19 +48,18 @@ updates:
       - "dependencies"
       - "frontend"
     groups:
-      # Keep the whole Nx toolchain on the same version. Bumping @nx/* packages
-      # individually previously left nx core and its plugins on different majors,
-      # producing an out-of-sync package-lock.json that broke `npm ci` in CI.
-      nx-monorepo:
-        patterns:
-          - "nx"
-          - "@nx/*"
-          - "@nrwl/*"
       minor-and-patch:
         update-types:
           - "minor"
           - "patch"
     ignore:
+      # nx must be upgraded as a coordinated set via `nx migrate`, not piecemeal.
+      # Individual @nx/* bumps leave nx core and its plugins on mismatched versions
+      # and generate a lockfile that `npm ci` rejects (missing nested @nx/*@NN
+      # transitive deps), which repeatedly broke the frontend CI (see #468 / #474).
+      - dependency-name: "nx"
+      - dependency-name: "@nx/*"
+      - dependency-name: "@nrwl/*"
       # Ignore major version updates for stability
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
@@ -85,19 +84,18 @@ updates:
       - "frontend"
       - "micro-frontend"
     groups:
-      # Keep the whole Nx toolchain on the same version. Bumping @nx/* packages
-      # individually previously left nx core and its plugins on different majors,
-      # producing an out-of-sync package-lock.json that broke `npm ci` in CI.
-      nx-monorepo:
-        patterns:
-          - "nx"
-          - "@nx/*"
-          - "@nrwl/*"
       minor-and-patch:
         update-types:
           - "minor"
           - "patch"
     ignore:
+      # nx must be upgraded as a coordinated set via `nx migrate`, not piecemeal.
+      # Individual @nx/* bumps leave nx core and its plugins on mismatched versions
+      # and generate a lockfile that `npm ci` rejects (missing nested @nx/*@NN
+      # transitive deps), which repeatedly broke the frontend CI (see #468 / #474).
+      - dependency-name: "nx"
+      - dependency-name: "@nx/*"
+      - dependency-name: "@nrwl/*"
       # Ignore major version updates for stability
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
