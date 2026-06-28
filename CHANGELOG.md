@@ -1,4 +1,157 @@
 # Changelog
+## [0.11.4] - 2026-06-28
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(ci): green the pipeline — lockfile sync, k6 install, drop redundant dep workflow, group Dependabot (#468) (d8cf043)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: update changelog for 0.11.3 (#343) (312268b)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- fix(ci): green the pipeline — lockfile sync, k6 install, drop redundant dep workflow, group Dependabot (#468) (d8cf043)
+- chore(deps-dev): Bump @angular-devkit/build-angular from 21.2.14 to 21.2.15 in /client (#440) (d2f17cd)
+- chore: Bump MassTransit and MassTransit.RabbitMQ (#418) (cd67e98)
+- ci: auto-merge github-actions[bot] changelog PRs too (#345) (9abac03)
+
+### Other Changes
+- chore: Bump Microsoft.Extensions.DependencyInjection from 10.0.8 to 10.0.9 (#461) (0c5db28)
+- chore(deps-dev): Bump typescript-eslint from 8.61.0 to 8.61.1 in /micro-frontends (#467) (9adfe80)
+- chore(deps-dev): Bump @playwright/test from 1.60.0 to 1.61.0 in /micro-frontends (#466) (390844e)
+- chore(deps): Bump @tanstack/react-router from 1.170.15 to 1.170.16 in /micro-frontends (#464) (ac9da2a)
+- chore: Bump Microsoft.Extensions.Hosting.Abstractions and Microsoft.Extensions.Logging.Abstractions (#463) (eb66750)
+- chore(deps): Bump papaparse from 5.5.3 to 5.5.4 in /micro-frontends (#462) (ea73d7d)
+- chore: Bump Microsoft.Extensions.Configuration.Binder from 10.0.8 to 10.0.9 (#460) (a9bef45)
+- chore(deps-dev): Bump @angular/cli from 21.2.15 to 21.2.16 in /client (#459) (b29f1be)
+- chore(deps-dev): Bump typescript-eslint from 8.61.0 to 8.61.1 in /client (#458) (742eab1)
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 2 updates (#456) (333d00e)
+- chore(deps): Bump esbuild from 0.27.7 to removed in /micro-frontends in the npm_and_yarn group across 1 directory (#446) (cf12c74)
+- chore(deps-dev): Bump the npm_and_yarn group across 1 directory with 3 updates (#455) (ca97b25)
+- chore(deps): Bump webpack-dev-server from 5.2.3 to 5.2.5 in /client in the npm_and_yarn group across 1 directory (#454) (73eabfa)
+- chore: Bump Microsoft.Extensions.DependencyInjection.Abstractions from 10.0.8 to 10.0.9 (#445) (9956315)
+- chore: Bump OpenTelemetry.Extensions.Hosting from 1.15.3 to 1.16.0 (#448) (504edcc)
+- chore(deps-dev): Bump typescript-eslint from 8.60.1 to 8.61.0 in /micro-frontends (#453) (e97db37)
+- chore(deps-dev): Bump @swc/core from 1.15.40 to 1.15.41 in /micro-frontends (#452) (ddb4b8b)
+- chore(deps-dev): Bump @types/node from 20.19.42 to 20.19.43 in /micro-frontends (#451) (db7c892)
+- chore(deps): Bump axios from 1.17.0 to 1.18.0 in /micro-frontends (#450) (b688c59)
+- chore: Bump Polly from 8.6.6 to 8.7.0 (#449) (6ef65b3)
+- chore: Bump OpenTelemetry.Exporter.OpenTelemetryProtocol from 1.15.3 to 1.16.0 (#447) (ad1568a)
+- chore(deps): Bump @angular/forms from 21.2.16 to 21.2.17 in /client (#442) (cf45989)
+- chore: Bump Microsoft.Extensions.Configuration.Abstractions from 10.0.8 to 10.0.9 (#444) (9c4dad4)
+- chore(deps-dev): Bump @angular/cli from 21.2.14 to 21.2.15 in /client (#438) (278b28b)
+- chore(deps-dev): Bump typescript-eslint from 8.60.1 to 8.61.0 in /client (#443) (d4a8bf7)
+- chore(deps): Bump @angular/platform-browser-dynamic from 21.2.16 to 21.2.17 in /client (#435) (dcf83d0)
+- chore(deps): Bump @angular/core from 21.2.16 to 21.2.17 in /client (#441) (5bc45d0)
+- chore(deps): Bump @angular/platform-browser from 21.2.16 to 21.2.17 in /client (#437) (c435ef5)
+- chore(deps-dev): Bump @angular/compiler-cli from 21.2.16 to 21.2.17 in /client (#436) (c68c859)
+- chore(deps): Bump @angular/router from 21.2.16 to 21.2.17 in /client (#434) (c43ec1b)
+- chore(deps): Bump @angular/common from 21.2.16 to 21.2.17 in /client (#433) (ff542a5)
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 3 updates (#432) (2284e8b)
+- chore(deps): Bump vitest from 3.2.6 to 4.1.8 in /micro-frontends in the npm_and_yarn group across 1 directory (#386) (c940154)
+- chore(deps-dev): Bump typescript-eslint from 8.57.1 to 8.60.1 in /micro-frontends (#430) (5dd34c9)
+- chore(deps): Bump @tanstack/react-query-devtools from 5.100.14 to 5.101.0 in /micro-frontends (#431) (f2d60c4)
+- chore(deps): Bump react-i18next from 16.6.1 to 16.6.6 in /micro-frontends (#429) (7994b08)
+- chore(deps-dev): Bump @nx/js from 21.6.5 to 21.6.11 in /micro-frontends (#428) (baefea7)
+- chore(deps-dev): Bump @tanstack/router-cli from 1.167.12 to 1.167.17 in /micro-frontends (#425) (9548582)
+- chore(deps): Bump axios from 1.16.1 to 1.17.0 in /micro-frontends (#426) (9254409)
+- chore(deps): Bump zustand from 5.0.13 to 5.0.14 in /micro-frontends (#427) (ea60b1d)
+- chore: Bump AWSSDK.S3 from 3.7.511.7 to 3.7.511.8 (#416) (33f4b51)
+- chore(deps): Bump @angular/forms from 21.2.15 to 21.2.16 in /client (#413) (23f5629)
+- chore(deps-dev): Bump @swc/helpers from 0.5.21 to 0.5.23 in /micro-frontends (#424) (c728363)
+- chore(deps): Bump dayjs from 1.11.19 to 1.11.21 in /micro-frontends (#423) (34522ad)
+- chore(deps-dev): Bump @tanstack/router-plugin from 1.168.11 to 1.168.18 in /micro-frontends (#422) (f37ce48)
+- chore(deps): Bump @tanstack/react-router from 1.170.8 to 1.170.15 in /micro-frontends (#421) (e7f9b8d)
+- chore(deps-dev): Bump @types/node from 20.19.41 to 20.19.42 in /micro-frontends (#420) (cff75ac)
+- chore(deps): Bump @tanstack/react-query from 5.100.14 to 5.101.0 in /micro-frontends (#419) (b957844)
+- chore(deps): Bump @angular/router from 21.2.15 to 21.2.16 in /client (#410) (eef2852)
+- chore: Bump AWSSDK.Extensions.NETCore.Setup from 3.7.400.1 to 3.7.400.2 (#415) (c63e7ce)
+- chore(deps): Bump @angular/core from 21.2.15 to 21.2.16 in /client (#414) (7d47bb6)
+- chore(deps): Bump @angular/platform-browser from 21.2.15 to 21.2.16 in /client (#409) (85a9ef3)
+- chore(deps-dev): Bump @angular/compiler-cli from 21.2.15 to 21.2.16 in /client (#405) (3ebfd64)
+- chore(deps-dev): Bump @angular-devkit/build-angular from 21.2.13 to 21.2.14 in /client (#408) (f04ba53)
+- chore(deps): Bump @angular/common from 21.2.15 to 21.2.16 in /client (#407) (e4c8d59)
+- chore(deps): Bump @angular/platform-browser-dynamic from 21.2.15 to 21.2.16 in /client (#406) (14db841)
+- chore(deps-dev): Bump @angular/cli from 21.2.13 to 21.2.14 in /client (#404) (66459a6)
+- chore(deps-dev): Bump hono from 4.12.19 to 4.12.23 in /client in the npm_and_yarn group across 1 directory (#403) (8604b70)
+- chore(deps): Bump react-router from 6.30.3 to 6.30.4 in /micro-frontends/packages/shared-layout in the npm_and_yarn group across 1 directory (#402) (4436d6b)
+- chore(deps-dev): Bump @babel/core from 7.29.0 to 7.29.7 in /micro-frontends (#399) (0666754)
+- chore(deps-dev): Bump @nx/eslint-plugin from 21.6.5 to 21.6.11 in /micro-frontends (#401) (02b9933)
+- chore(deps-dev): Bump @swc/core from 1.15.21 to 1.15.40 in /micro-frontends (#400) (a7bc411)
+- chore(deps): Bump @tanstack/react-router-devtools from 1.144.0 to 1.167.0 in /micro-frontends (#397) (a38381d)
+- chore(deps-dev): Bump @babel/preset-react from 7.28.5 to 7.29.7 in /micro-frontends (#398) (9096060)
+- chore(deps): Bump react-router-dom from 6.30.3 to 6.30.4 in /micro-frontends (#396) (374e8a0)
+- chore(deps-dev): Bump @tanstack/router-cli from 1.167.10 to 1.167.12 in /micro-frontends (#395) (81b3783)
+- chore(deps-dev): Bump @nx/react from 21.6.10 to 21.6.11 in /micro-frontends (#394) (319d465)
+- chore(deps-dev): Bump jest from 30.2.0 to 30.4.2 in /micro-frontends (#392) (68665e6)
+- chore(deps-dev): Bump @nx/jest from 21.6.10 to 21.6.11 in /micro-frontends (#393) (8be3c52)
+- chore(deps-dev): Bump @swc/cli from 0.6.0 to 0.8.1 in /micro-frontends (#391) (956fc89)
+- chore(deps-dev): Bump jest-environment-jsdom from 30.3.0 to 30.4.1 in /micro-frontends (#390) (a1c6057)
+- chore(deps-dev): Bump @nx/web from 21.6.10 to 21.6.11 in /micro-frontends (#389) (db6bbf1)
+- chore(deps-dev): Bump ts-jest from 29.4.6 to 29.4.11 in /micro-frontends (#388) (4269f6e)
+- chore(deps-dev): Bump babel-jest from 30.3.0 to 30.4.1 in /micro-frontends (#387) (57d6233)
+- chore(deps): Bump @angular/router from 21.2.14 to 21.2.15 in /client (#382) (7655625)
+- chore: Bump Npgsql from 10.0.2 to 10.0.3 (#385) (69df42e)
+- chore: Bump MongoDB.Driver from 3.8.1 to 3.9.0 (#384) (346f625)
+- chore(deps-dev): Bump @angular/cli from 21.2.12 to 21.2.13 in /client (#383) (d130982)
+- chore(deps): Bump @angular/common from 21.2.14 to 21.2.15 in /client (#379) (b25ecbc)
+- chore(deps): Bump @angular/core from 21.2.14 to 21.2.15 in /client (#377) (08467a3)
+- chore(deps-dev): Bump typescript-eslint from 8.59.4 to 8.60.1 in /client (#380) (f9bbe86)
+- chore(deps): Bump @angular/forms from 21.2.14 to 21.2.15 in /client (#378) (d23eb09)
+- chore(deps): Bump @angular/platform-browser-dynamic from 21.2.14 to 21.2.15 in /client (#374) (da0f061)
+- chore(deps-dev): Bump @angular/compiler-cli from 21.2.14 to 21.2.15 in /client (#376) (22249c6)
+- chore(deps-dev): Bump @angular-devkit/build-angular from 21.2.12 to 21.2.13 in /client (#375) (d16b3fe)
+- chore(deps): Bump @angular/compiler from 21.2.14 to 21.2.15 in /client (#373) (b18651c)
+- chore(deps): Bump @angular/platform-browser from 21.2.14 to 21.2.15 in /client (#372) (57abf9d)
+- chore(deps): Bump tmp from 0.2.5 to 0.2.7 in /client in the npm_and_yarn group across 1 directory (#371) (002422e)
+- chore(deps): Bump tmp from 0.2.5 to 0.2.7 in /micro-frontends in the npm_and_yarn group across 1 directory (#370) (3e7116b)
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 15 updates (#346) (c50f9d5)
+- chore: Bump MassTransit.RabbitMQ from 8.1.3 to 8.5.9 (#358) (83b6b3c)
+- chore(deps-dev): Bump jest-environment-node from 30.2.0 to 30.4.1 in /micro-frontends (#367) (93537fb)
+- chore(deps-dev): Bump @tanstack/router-cli from 1.145.2 to 1.167.10 in /micro-frontends (#368) (ac51089)
+- chore(deps-dev): Bump jest-util from 30.2.0 to 30.4.1 in /micro-frontends (#366) (c1b26bd)
+- chore(deps-dev): Bump @types/node from 20.19.27 to 20.19.41 in /micro-frontends (#365) (a5f1f7f)
+- chore(deps): Bump @tanstack/react-query-devtools from 5.91.2 to 5.100.14 in /micro-frontends (#364) (a14288e)
+- chore(deps-dev): Bump @playwright/test from 1.57.0 to 1.60.0 in /micro-frontends (#363) (2b15a95)
+- chore(deps-dev): Bump @tanstack/router-plugin from 1.167.3 to 1.168.11 in /micro-frontends (#362) (9dd0307)
+- chore(deps): Bump @tanstack/zod-adapter from 1.166.9 to 1.167.0 in /micro-frontends (#361) (35315bb)
+- chore(deps-dev): Bump @nx/playwright from 22.6.1 to 22.7.3 in /micro-frontends (#360) (7f47d88)
+- chore(deps-dev): Bump @nx/eslint from 21.6.10 to 21.6.11 in /micro-frontends (#359) (24cabae)
+- chore(deps-dev): Bump @angular/compiler-cli from 21.2.13 to 21.2.14 in /client (#357) (b739a5f)
+- chore(deps): Bump @angular/forms from 21.2.13 to 21.2.14 in /client (#355) (2cbdb1b)
+- chore(deps): Bump @angular/compiler from 21.2.13 to 21.2.14 in /client (#351) (ee735ca)
+- chore(deps): Bump @angular/platform-browser-dynamic from 21.2.13 to 21.2.14 in /client (#348) (121c052)
+- chore(deps-dev): Bump @angular/cli from 21.2.11 to 21.2.12 in /client (#356) (f4d2c47)
+- chore(deps): Bump @angular/core from 21.2.13 to 21.2.14 in /client (#354) (2857826)
+- chore(deps-dev): Bump @angular-devkit/build-angular from 21.2.11 to 21.2.12 in /client (#353) (69b7e18)
+- chore(deps-dev): Bump typescript-eslint from 8.59.3 to 8.59.4 in /client (#352) (ce4095f)
+- chore(deps): Bump @angular/platform-browser from 21.2.13 to 21.2.14 in /client (#350) (e08e089)
+- chore(deps): Bump @angular/common from 21.2.13 to 21.2.14 in /client (#349) (89442a6)
+- chore(deps): Bump @angular/router from 21.2.13 to 21.2.14 in /client (#347) (a288ff6)
+- chore(deps): Bump the npm_and_yarn group across 1 directory with 18 updates (#344) (6d688f7)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.3...0.11.4
+
 ## [0.11.3] - 2026-05-18
 
 ## What's Changed
