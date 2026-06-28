@@ -124,6 +124,20 @@ describe('formatUtils', () => {
   });
 
   describe('formatRelativeTime', () => {
+    // Freeze the clock so the timestamps built here and the `new Date()` inside
+    // formatRelativeTime resolve to the exact same instant. Otherwise the few
+    // milliseconds between the two calls push an exactly-one-day delta just past
+    // the boundary (Math.floor(-86400.001) -> -86401 -> "2 days ago"), which
+    // made these tests ~50/50 flaky depending on wall-clock timing.
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2024-06-15T12:00:00Z'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('should format recent past', () => {
       const yesterday = new Date(Date.now() - 86400000); // 1 day ago
       const result = formatRelativeTime(yesterday);
