@@ -18,6 +18,12 @@ updates:
     labels:
       - "dependencies"
       - "dotnet"
+    groups:
+      # Batch all non-major NuGet bumps into a single PR to cut review noise.
+      dotnet-minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       # Ignore major version updates for stability
       - dependency-name: "*"
@@ -41,6 +47,19 @@ updates:
     labels:
       - "dependencies"
       - "frontend"
+    groups:
+      # Keep the whole Nx toolchain on the same version. Bumping @nx/* packages
+      # individually previously left nx core and its plugins on different majors,
+      # producing an out-of-sync package-lock.json that broke `npm ci` in CI.
+      nx-monorepo:
+        patterns:
+          - "nx"
+          - "@nx/*"
+          - "@nrwl/*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       # Ignore major version updates for stability
       - dependency-name: "*"
@@ -65,6 +84,19 @@ updates:
       - "dependencies"
       - "frontend"
       - "micro-frontend"
+    groups:
+      # Keep the whole Nx toolchain on the same version. Bumping @nx/* packages
+      # individually previously left nx core and its plugins on different majors,
+      # producing an out-of-sync package-lock.json that broke `npm ci` in CI.
+      nx-monorepo:
+        patterns:
+          - "nx"
+          - "@nx/*"
+          - "@nrwl/*"
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
     ignore:
       # Ignore major version updates for stability
       - dependency-name: "*"
@@ -88,6 +120,10 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+    groups:
+      docker-images:
+        patterns:
+          - "*"
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -106,4 +142,8 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - "github-actions" 
+      - "github-actions"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
