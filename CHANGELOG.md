@@ -1,4 +1,44 @@
 # Changelog
+## [0.11.5] - 2026-06-28
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(ci): re-sync nx lockfile + stop Dependabot nx churn (supersedes #474) (#475) (1852970)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- No documentation updates
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- fix(ci): re-sync nx lockfile + stop Dependabot nx churn (supersedes #474) (#475) (1852970)
+
+### Other Changes
+- chore: Bump the dotnet-minor-and-patch group with 7 updates (#472) (f775019)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 15 updates (#471) (a18acc1)
+- chore(deps): Bump the minor-and-patch group in /client with 9 updates (#469) (a1d6fcc)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.4...0.11.5
+
 ## [0.11.3] - 2026-05-18
 
 ## What's Changed
