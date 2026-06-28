@@ -60,12 +60,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Install K6
-        run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D68
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6
+        # Use the official Grafana action instead of the apt/keyserver method:
+        # `gpg --recv-keys` from keyserver.ubuntu.com was intermittently failing
+        # with "keyserver receive failed: No data", breaking every scheduled run.
+        uses: grafana/setup-k6-action@v1
 
       - name: Build and start services
         run: |
@@ -79,11 +77,22 @@ jobs:
           # Start API Gateway
           cd ApiGateways/Ocelot.ApiGateway && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8010" & cd ../..
 
-          # Wait for services to start
-          echo "Waiting for services to start..."
-          for i in $(seq 1 30); do
-            curl -sf http://localhost:8010/health && break || sleep 2
+          # Wait for the gateway to accept connections. Ocelot exposes no /health
+          # route, so treat ANY HTTP response (even 404) as "process is listening".
+          echo "Waiting for API gateway to accept connections..."
+          gateway_up=false
+          for i in $(seq 1 45); do
+            if curl -s -o /dev/null "http://localhost:8010/"; then
+              gateway_up=true
+              echo "Gateway responding after attempt ${i}."
+              break
+            fi
+            sleep 2
           done
+          if [ "$gateway_up" != "true" ]; then
+            echo "::error::API gateway did not start within the timeout window"
+            exit 1
+          fi
 
       - name: Run K6 test
         env:
@@ -91,10 +100,20 @@ jobs:
           AWS_GATEWAY_URL: ${{ github.event.inputs.target_url || 'http://localhost:8010' }}
         run: |
           cd tests/k6
+          # Map the requested test type to the script that actually exists in
+          # tests/k6 (there is no generic "load-test.js").
+          case "$TEST_TYPE" in
+            smoke)  SCRIPT=gateway-smoke-test.js ;;
+            stress) SCRIPT=stress-test.js ;;
+            spike)  SCRIPT=spike-test.js ;;
+            soak)   SCRIPT=soak-test.js ;;
+            *)      SCRIPT=gateway-smoke-test.js ;;
+          esac
+          echo "Running k6 script '$SCRIPT' (test type: $TEST_TYPE)"
           k6 run \
             --out json=results.json \
             --tag testType=$TEST_TYPE \
-            load-test.js
+            "$SCRIPT"
 
       - name: Generate test summary
         if: always()
