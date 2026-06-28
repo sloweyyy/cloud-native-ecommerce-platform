@@ -18,8 +18,11 @@ on:
         description: 'Target gateway URL (leave empty for default)'
         required: false
         type: string
-  schedule:
-    - cron: '0 4 * * MON'  # Weekly Monday 4 AM UTC (smoke test)
+  # Run on demand only. The full-stack smoke test needs a real environment
+  # (MONGODB_URL / REDIS_URL / SQLSERVER_URL connection strings, a SQL Server
+  # container for ordering, and the discount service) that this workflow does
+  # not yet provision, so the weekly `schedule` only produced recurring red on
+  # main. Re-add the cron once the service/DB wiring below is complete.
 
 concurrency:
   group: perf-test
@@ -69,13 +72,18 @@ jobs:
         run: |
           dotnet build Ecommerce.sln --configuration Release
 
-          # Start all microservices in background
-          cd Services/Catalog/Catalog.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8001" & cd ../../..
-          cd Services/Basket/Basket.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8002" & cd ../../..
-          cd Services/Ordering/Ordering.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8004" & cd ../../..
+          # Start the microservices and gateway in background subshells. Each cd
+          # is scoped to its own subshell so it never moves the parent shell out
+          # of the repo root. The previous `cd X && dotnet run & cd ../../..`
+          # pattern ran the foreground `cd ../../..` in the parent shell, walking
+          # it above the repo, so every service after the first (and the gateway)
+          # failed with "No such file or directory" and never started.
+          ( cd Services/Catalog/Catalog.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8001" ) &
+          ( cd Services/Basket/Basket.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8002" ) &
+          ( cd Services/Ordering/Ordering.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8004" ) &
 
           # Start API Gateway
-          cd ApiGateways/Ocelot.ApiGateway && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8010" & cd ../..
+          ( cd ApiGateways/Ocelot.ApiGateway && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8010" ) &
 
           # Wait for the gateway to accept connections. Ocelot exposes no /health
           # route, so treat ANY HTTP response (even 404) as "process is listening".
