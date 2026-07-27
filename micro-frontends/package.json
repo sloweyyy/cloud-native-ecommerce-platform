@@ -49,7 +49,7 @@
     "@nx/web": "21.6.11",
     "@nx/webpack": "^22.7.5",
     "@nx/workspace": "21.6.11",
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "^1.62.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
     "@svgr/webpack": "^8.0.1",
     "@swc-node/register": "~1.12.1",
@@ -84,11 +84,11 @@
     "nx": "21.6.11",
     "prettier": "^2.6.2",
     "react-refresh": "^0.18.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "^29.4.12",
     "ts-node": "10.9.2",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.64.0"
+    "typescript-eslint": "^8.65.0"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
@@ -97,8 +97,8 @@
     "@ecommerce-platform/auth-provider": "^1.2.6",
     "@ecommerce-platform/shared-layout": "^1.0.1",
     "@module-federation/enhanced": "^2.8.0",
-    "@tanstack/react-query": "^5.101.2",
-    "@tanstack/react-query-devtools": "^5.101.2",
+    "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-query-devtools": "^5.101.4",
     "@tanstack/react-router": "^1.170.18",
     "@tanstack/react-router-devtools": "^1.167.0",
     "@tanstack/zod-adapter": "^1.167.0",
