@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <!-- API versioning -->
-    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.0.0" />
-    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.0" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.0.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.1" />
 
     <!-- Health checks -->
     <PackageVersion Include="AspNetCore.HealthChecks.MongoDb" Version="9.0.0" />
@@ -34,9 +34,9 @@
          1.0.0 (GHSA-pggp-6c3x-2xmx) and moderate CVE in transitive SharpCompress
          (GHSA-6c8g-7p36-r338). -->
     <PackageVersion Include="Dapper" Version="2.1.79" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10" />
     <PackageVersion Include="MongoDB.Driver" Version="3.10.0" />
     <!-- Pin SharpCompress to override transitive 0.30.1 from older deps
          (GHSA-6c8g-7p36-r338, moderate). -->
@@ -48,7 +48,7 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.12.0" />
 
     <!-- gRPC -->
-    <PackageVersion Include="Grpc.AspNetCore" Version="2.80.0" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.83.0" />
 
     <!-- Messaging. All services on 8.x stable line (free/OSS).
          MassTransit.AspNetCore is gone in 8.x — features absorbed into core. -->
