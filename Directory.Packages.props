@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <!-- API versioning -->
-    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.0.1" />
-    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.0.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc" Version="10.2.1" />
+    <PackageVersion Include="Asp.Versioning.Mvc.ApiExplorer" Version="10.2.1" />
 
     <!-- Health checks -->
     <PackageVersion Include="AspNetCore.HealthChecks.MongoDb" Version="9.0.0" />
