@@ -37,7 +37,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10" />
-    <PackageVersion Include="MongoDB.Driver" Version="3.10.0" />
+    <PackageVersion Include="MongoDB.Driver" Version="3.11.0" />
     <!-- Pin SharpCompress to override transitive 0.30.1 from older deps
          (GHSA-6c8g-7p36-r338, moderate). -->
     <PackageVersion Include="SharpCompress" Version="0.48.1" />
@@ -63,12 +63,12 @@
 
     <!-- ASP.NET Core / Microsoft.Extensions. Aligned with .NET 10 LTS. -->
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
 
     <!-- Tooling -->
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
