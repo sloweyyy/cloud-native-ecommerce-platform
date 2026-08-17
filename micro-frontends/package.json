@@ -56,12 +56,12 @@
     "@swc/cli": "~0.8.1",
     "@swc/core": "~1.15.47",
     "@swc/helpers": "~0.5.23",
-    "@tanstack/router-cli": "^1.167.24",
-    "@tanstack/router-plugin": "^1.168.26",
+    "@tanstack/router-cli": "^1.167.28",
+    "@tanstack/router-plugin": "^1.168.30",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "16.3.2",
-    "@testing-library/user-event": "^14.6.3",
+    "@testing-library/user-event": "^14.6.4",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.25",
     "@types/node": "^20.19.43",
@@ -88,7 +88,7 @@
     "ts-node": "10.9.2",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.66.0"
+    "typescript-eslint": "^8.67.0"
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
@@ -99,7 +99,7 @@
     "@module-federation/enhanced": "^2.8.2",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-devtools": "^5.101.4",
-    "@tanstack/react-router": "^1.170.21",
+    "@tanstack/react-router": "^1.170.27",
     "@tanstack/react-router-devtools": "^1.167.1",
     "@tanstack/zod-adapter": "^1.167.0",
     "antd": "^5.22.6",
@@ -107,14 +107,14 @@
     "dayjs": "^1.11.21",
     "i18next": "^25.10.10",
     "lodash": "^4.18.1",
-    "papaparse": "^5.5.4",
+    "papaparse": "^5.6.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-i18next": "^16.6.6",
     "react-router-dom": "^6.30.4",
     "xlsx": "^0.18.5",
     "zod": "^3.24.4",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   },
   "overrides": {
     "koa": "3.0.3",
