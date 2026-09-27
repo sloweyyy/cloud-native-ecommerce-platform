@@ -1,45 +1,82 @@
-﻿using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Polly;
+using Polly.Retry;
 
 namespace Ordering.API.Extensions;
 
 public static class DbExtension
 {
-    public static IHost MigrateDatabase<TContext>(this IHost host, Action<TContext, IServiceProvider> seeder)
+    /// <summary>
+    /// Applies pending EF Core migrations and runs <paramref name="seeder"/>, retrying transient
+    /// database failures (e.g. SQL Server still starting). Any non-transient failure, or a
+    /// transient one that persists after all retries, is logged as critical and rethrown so the
+    /// process exits instead of serving traffic against an unmigrated database.
+    /// </summary>
+    public static async Task<IHost> MigrateDatabaseAsync<TContext>(this IHost host,
+        Func<TContext, IServiceProvider, CancellationToken, Task> seeder,
+        CancellationToken cancellationToken = default)
         where TContext : DbContext
     {
-        using (var scope = host.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            var logger = services.GetRequiredService<ILogger<TContext>>();
-            var context = services.GetService<TContext>();
+        var logger = host.Services.GetRequiredService<ILogger<TContext>>();
+        var contextName = typeof(TContext).Name;
 
-            try
+        var pipeline = new ResiliencePipelineBuilder()
+            .AddRetry(new RetryStrategyOptions
             {
-                logger.LogInformation($"Started Db Migration: {typeof(TContext).Name}");
-                //retry strategy
-                var retry = Policy.Handle<SqlException>()
-                    .WaitAndRetry(
-                        5,
-                        retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
-                        (exception, span, count) => { logger.LogError($"Retrying because of {exception} {span}"); });
-                retry.Execute(() => CallSeeder(seeder, context, services));
-                logger.LogInformation($"Migration Completed: {typeof(TContext).Name}");
-            }
-            catch (Exception ex)
+                ShouldHandle = new PredicateBuilder().Handle<Exception>(IsTransient),
+                MaxRetryAttempts = 5,
+                BackoffType = DelayBackoffType.Exponential,
+                Delay = TimeSpan.FromSeconds(2),
+                MaxDelay = TimeSpan.FromSeconds(30),
+                UseJitter = true,
+                OnRetry = args =>
+                {
+                    logger.LogWarning(args.Outcome.Exception,
+                        "Migration of {DbContext} failed (attempt {Attempt}); retrying in {Delay}",
+                        contextName, args.AttemptNumber + 1, args.RetryDelay);
+                    return default;
+                }
+            })
+            .Build();
+
+        try
+        {
+            logger.LogInformation("Started Db Migration: {DbContext}", contextName);
+            await pipeline.ExecuteAsync(async token =>
             {
-                logger.LogError(ex, $"An Error occurred while migrating db: {typeof(TContext).Name}");
-            }
+                // Fresh scope per attempt so a failed attempt never reuses a broken DbContext.
+                await using var scope = host.Services.CreateAsyncScope();
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<TContext>();
+                await context.Database.MigrateAsync(token);
+                await seeder(context, services, token);
+            }, cancellationToken);
+            logger.LogInformation("Migration Completed: {DbContext}", contextName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogCritical(ex, "Database migration failed for {DbContext}; shutting down", contextName);
+            throw;
         }
 
         return host;
     }
 
-    private static void CallSeeder<TContext>(Action<TContext, IServiceProvider> seeder, TContext? context,
-        IServiceProvider services) where TContext : DbContext
+    /// <summary>
+    /// Connection/timeout style failures, including the ones EF's retrying execution strategy
+    /// wraps (<see cref="RetryLimitExceededException"/>, <see cref="DbUpdateException"/>).
+    /// Deterministic errors such as pending model changes are not retried.
+    /// </summary>
+    private static bool IsTransient(Exception exception)
     {
-        context.Database.Migrate();
-        seeder(context, services);
+        for (var ex = exception; ex is not null; ex = ex.InnerException)
+        {
+            if (ex is SqlException or TimeoutException or RetryLimitExceededException)
+                return true;
+        }
+
+        return false;
     }
 }

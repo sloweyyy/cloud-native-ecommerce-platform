@@ -93,12 +93,9 @@ builder.Services.AddMassTransit(config =>
 
 var app = builder.Build();
 
-//Apply db migration
-app.MigrateDatabase<OrderContext>((context, services) =>
-{
-    var logger = services.GetService<ILogger<OrderContextSeed>>();
-    OrderContextSeed.SeedAsync(context, logger).Wait();
-});
+//Apply db migration + seed; throws (and stops the process) if the database cannot be migrated
+await app.MigrateDatabaseAsync<OrderContext>((context, services, ct) =>
+    OrderContextSeed.SeedAsync(context, services.GetRequiredService<ILogger<OrderContextSeed>>(), ct));
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
