@@ -55,4 +55,4 @@ ignore: |
   */target/*
   */dist/*
   .git/*
-  deploy/k8s/gateway/ocelot-gateway.yaml
+  deploy/helm/*/templates/*

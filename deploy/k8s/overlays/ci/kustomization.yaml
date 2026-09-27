@@ -1,0 +1,31 @@
+# CI deployment test (.github/workflows/k8s-deployment-test.yml, kind cluster):
+# the platform plus its network policies, without the heavyweight logging
+# stack so it fits a standard GitHub-hosted runner. Images are built in the
+# workflow and side-loaded into kind with the tags declared in base.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/network-policies
+
+# The logging component is not deployed in CI; an empty URI disables the
+# Serilog Elasticsearch sink (src/BuildingBlocks/Common.Logging/Logging.cs).
+configMapGenerator:
+  - name: catalog-config
+    behavior: merge
+    literals: ["ElasticConfiguration__Uri="]
+  - name: basket-config
+    behavior: merge
+    literals: ["ElasticConfiguration__Uri="]
+  - name: discount-config
+    behavior: merge
+    literals: ["ElasticConfiguration__Uri="]
+  - name: ordering-config
+    behavior: merge
+    literals: ["ElasticConfiguration__Uri="]
+  - name: ocelotapigw-config
+    behavior: merge
+    literals: ["ElasticConfiguration__Uri="]

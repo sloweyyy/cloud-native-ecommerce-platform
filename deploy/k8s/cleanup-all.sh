@@ -1,75 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Remove everything deploy-all.sh created.
+#
+# Usage: ./cleanup-all.sh [--overlay local|ci] [--yes]
+#   --overlay <name>  overlay that was deployed (default: local; use the same
+#                     one you passed to deploy-all.sh)
+#   --yes             do not ask for confirmation (CI)
+#
+# WARNING: deleting the `ecommerce` namespace also deletes the StatefulSets'
+# PersistentVolumeClaims, i.e. ALL database data.
+set -euo pipefail
 
-# Clean up all Kubernetes resources for e-commerce platform
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+OVERLAY=local
+ASSUME_YES=false
 
-set -e
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --overlay) OVERLAY="$2"; shift 2 ;;
+    --yes|-y) ASSUME_YES=true; shift ;;
+    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; exit 2 ;;
+  esac
+done
 
-echo "======================================"
-echo "Cleaning up E-Commerce Platform"
-echo "======================================"
+command -v kubectl >/dev/null || { echo "kubectl not found on PATH" >&2; exit 1; }
 
-# Remove Ingress
-echo ""
-echo "1. Removing Ingress Resources..."
-kubectl delete -f ingress/ 2>/dev/null || echo "   No ingress resources found, skipping..."
+if [[ "${ASSUME_YES}" != "true" ]]; then
+  read -r -p "Delete the eShopping platform (namespaces ecommerce + monitoring, including all data)? [y/N] " reply
+  [[ "${reply}" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 0; }
+fi
 
-# Remove Management Tools
-echo ""
-echo "2. Removing Management Tools..."
-kubectl delete -f management/portainer/portainer.yaml 2>/dev/null || true
-kubectl delete -f management/portainer/portainer-rbac.yaml 2>/dev/null || true
-kubectl delete -f management/pgadmin/pgadmin.yaml 2>/dev/null || true
+echo "==> Removing Istio routing objects (if present)"
+kubectl delete --ignore-not-found \
+  -f "${REPO_ROOT}/deploy/istio/monitoring-virtualservices.yaml" \
+  -f "${REPO_ROOT}/deploy/istio/virtualservices.yaml" \
+  -f "${REPO_ROOT}/deploy/istio/gateway.yaml" 2>/dev/null || true  # CRDs absent when Istio is not installed
 
-# Remove Monitoring Stack
-echo ""
-echo "3. Removing Monitoring Stack..."
-kubectl delete -f monitoring/grafana/grafana.yaml 2>/dev/null || true
-kubectl delete -f monitoring/prometheus/prometheus.yaml 2>/dev/null || true
-kubectl delete -f monitoring/prometheus/prometheus-configmap.yaml 2>/dev/null || true
-kubectl delete -f monitoring/prometheus/prometheus-rbac.yaml 2>/dev/null || true
+echo "==> Removing addons"
+kubectl delete -k "${SCRIPT_DIR}/addons/management" --ignore-not-found
+kubectl delete -k "${SCRIPT_DIR}/addons/monitoring" --ignore-not-found
 
-# Remove API Gateway
-echo ""
-echo "4. Removing API Gateway..."
-kubectl delete -f gateway/ocelot-apigw.yaml 2>/dev/null || true
-kubectl delete -f gateway/ocelot-configmap.yaml 2>/dev/null || true
+echo "==> Removing overlays/${OVERLAY} (includes the ecommerce namespace)"
+kubectl delete -k "${SCRIPT_DIR}/overlays/${OVERLAY}" --ignore-not-found --wait=true
 
-# Remove Microservices
-echo ""
-echo "5. Removing Microservices..."
-kubectl delete -f ordering/ordering-api/ordering-api.yaml 2>/dev/null || true
-kubectl delete -f basket/basket-api/basket-api.yaml 2>/dev/null || true
-kubectl delete -f discount/discount-api/discount-api.yaml 2>/dev/null || true
-kubectl delete -f catalog/catalog-api/catalog-api.yaml 2>/dev/null || true
-
-# Remove Databases
-echo ""
-echo "6. Removing Databases..."
-kubectl delete -f ordering/ordering-db/ordering-db.yaml 2>/dev/null || true
-kubectl delete -f ordering/ordering-db/sqlserver-configmap.yaml 2>/dev/null || true
-kubectl delete -f ordering/ordering-db/sqlserver-secret.yaml 2>/dev/null || true
-kubectl delete -f discount/discount-db/discount-db.yaml 2>/dev/null || true
-kubectl delete -f discount/discount-db/postgres-configmap.yaml 2>/dev/null || true
-kubectl delete -f discount/discount-db/postgres-secret.yaml 2>/dev/null || true
-kubectl delete -f basket/basket-db/basket-db.yaml 2>/dev/null || true
-kubectl delete -f basket/basket-db/redis-configmap.yaml 2>/dev/null || true
-kubectl delete -f catalog/catalog-db/catalog-db.yaml 2>/dev/null || true
-kubectl delete -f catalog/catalog-db/mongo-secret.yaml 2>/dev/null || true
-kubectl delete -f catalog/catalog-db/mongo-configmap.yaml 2>/dev/null || true
-
-# Remove Infrastructure
-echo ""
-echo "7. Removing Infrastructure..."
-kubectl delete -f infrastructure/kibana/kibana.yaml 2>/dev/null || true
-kubectl delete -f infrastructure/elasticsearch/elasticsearch.yaml 2>/dev/null || true
-kubectl delete -f infrastructure/elasticsearch/elasticsearch-configmap.yaml 2>/dev/null || true
-kubectl delete -f infrastructure/rabbitmq/rabbitmq.yaml 2>/dev/null || true
-kubectl delete -f infrastructure/rabbitmq/rabbitmq-configmap.yaml 2>/dev/null || true
-
-echo ""
-echo "======================================"
-echo "Cleanup Complete!"
-echo "======================================"
-echo ""
-echo "Remaining resources:"
-kubectl get all
+echo "==> Done. Remaining objects labelled app.kubernetes.io/part-of=eshopping:"
+kubectl get all -A -l app.kubernetes.io/part-of=eshopping 2>/dev/null || true

@@ -1,14 +1,17 @@
-apiVersion: networking.istio.io/v1alpha3
+# Istio ingress gateway for the platform (namespace: ecommerce, created by
+# deploy/k8s). Apply after `kubectl apply -k deploy/k8s/overlays/local-istio`.
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: ecommerce-gateway
+  namespace: ecommerce
 spec:
   selector:
     istio: ingressgateway
   servers:
-  - port:
-      number: 80
-      name: http
-      protocol: HTTP
-    hosts:
-    - "*" 
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"

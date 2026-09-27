@@ -1,75 +1,48 @@
-apiVersion: networking.istio.io/v1alpha3
+# All public traffic enters through the Ocelot API gateway, which owns the
+# route table (ocelot.k8s.json: /Catalog/*, /Basket/*, /Discount/*, /Order/*,
+# ...). Routing straight to the backends would bypass the gateway's rate
+# limiting/caching and use paths the backends do not serve, so the mesh
+# ingress forwards everything to eshopping-ocelotapigw.
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: catalog
+  name: eshopping-api
+  namespace: ecommerce
 spec:
   hosts:
-  - "*"
+    - "*"
   gateways:
-  - ecommerce-gateway
+    - ecommerce/ecommerce-gateway
   http:
-  - match:
-    - uri:
-        prefix: /api/v1/Catalog
-    route:
-    - destination:
-        host: catalog
-        port:
-          number: 80
+    - route:
+        - destination:
+            host: eshopping-ocelotapigw.ecommerce.svc.cluster.local
+            port:
+              number: 80
+      timeout: 30s
+      retries:
+        attempts: 2
+        perTryTimeout: 10s
+        retryOn: gateway-error,connect-failure,refused-stream
 ---
-apiVersion: networking.istio.io/v1alpha3
+# In-mesh gRPC calls Basket -> Discount: HTTP/2 routing with retries on
+# transient gRPC failures. Port name "grpc"/appProtocol grpc on the Service
+# makes Istio treat the traffic as h2c.
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: basket
+  name: eshopping-discount-grpc
+  namespace: ecommerce
 spec:
   hosts:
-  - "*"
-  gateways:
-  - ecommerce-gateway
+    - eshopping-discount-discount-grpc.ecommerce.svc.cluster.local
   http:
-  - match:
-    - uri:
-        prefix: /api/v1/Basket
-    route:
-    - destination:
-        host: basket
-        port:
-          number: 80
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: ordering
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - ecommerce-gateway
-  http:
-  - match:
-    - uri:
-        prefix: /api/v1/Order
-    route:
-    - destination:
-        host: ordering
-        port:
-          number: 80
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: discount
-spec:
-  hosts:
-  - "*"
-  gateways:
-  - ecommerce-gateway
-  http:
-  - match:
-    - uri:
-        prefix: /api/v1/Discount
-    route:
-    - destination:
-        host: eshopping-discount-discount-grpc
-        port:
-          number: 8080 
+    - route:
+        - destination:
+            host: eshopping-discount-discount-grpc.ecommerce.svc.cluster.local
+            port:
+              number: 8080
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: unavailable,cancelled,resource-exhausted

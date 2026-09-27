@@ -1,0 +1,56 @@
+# PodDisruptionBudgets
+#
+# Every workload runs a single replica in this dev/CI stack, so the budgets use
+# `maxUnavailable: 1`: they never block `kubectl drain` / node upgrades (a
+# `minAvailable: 1` budget on a 1-replica workload would), yet still cap
+# voluntary disruption to one pod at a time once a workload is scaled out.
+# Selectors match the app.kubernetes.io/name labels on the pod templates.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eshopping-catalog
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalog
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eshopping-basket
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: basket
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eshopping-discount
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discount
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eshopping-ordering
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ordering
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: eshopping-ocelotapigw
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ocelotapigw

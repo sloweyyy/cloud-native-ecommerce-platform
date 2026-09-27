@@ -1,59 +1,75 @@
-apiVersion: networking.istio.io/v1alpha3
+# Observability UIs through the Istio ingress gateway, on dedicated hosts so
+# no path rewriting is needed (the UIs assume they are served from "/"):
+#   grafana.localhost     -> monitoring/grafana:3000       (deploy/k8s/addons/monitoring)
+#   prometheus.localhost  -> monitoring/prometheus:9090    (deploy/k8s/addons/monitoring)
+#   jaeger.localhost      -> istio-system/tracing:80       (Istio jaeger addon)
+#   kiali.localhost       -> istio-system/kiali:20001      (Istio kiali addon)
+# Uses the ecommerce/ecommerce-gateway Gateway from gateway.yaml, whose "*"
+# host list accepts these hosts.
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: grafana
-  namespace: istio-system
+  namespace: monitoring
 spec:
   hosts:
-  - "*"
+    - grafana.localhost
   gateways:
-  - dev/api-gateway
+    - ecommerce/ecommerce-gateway
   http:
-  - match:
-    - uri:
-        prefix: /grafana/
-    route:
-    - destination:
-        host: grafana
-        port:
-          number: 3000
+    - route:
+        - destination:
+            host: grafana.monitoring.svc.cluster.local
+            port:
+              number: 3000
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: prometheus
-  namespace: istio-system
+  namespace: monitoring
 spec:
   hosts:
-  - "*"
+    - prometheus.localhost
   gateways:
-  - dev/api-gateway
+    - ecommerce/ecommerce-gateway
   http:
-  - match:
-    - uri:
-        prefix: /prometheus/
-    route:
-    - destination:
-        host: prometheus-server.monitoring.svc.cluster.local
-        port:
-          number: 80
+    - route:
+        - destination:
+            host: prometheus.monitoring.svc.cluster.local
+            port:
+              number: 9090
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: jaeger
   namespace: istio-system
 spec:
   hosts:
-  - "*"
+    - jaeger.localhost
   gateways:
-  - dev/api-gateway
+    - ecommerce/ecommerce-gateway
   http:
-  - match:
-    - uri:
-        prefix: /jaeger/
-    route:
-    - destination:
-        host: tracing
-        port:
-          number: 16686 
+    - route:
+        - destination:
+            host: tracing.istio-system.svc.cluster.local
+            port:
+              number: 80
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  hosts:
+    - kiali.localhost
+  gateways:
+    - ecommerce/ecommerce-gateway
+  http:
+    - route:
+        - destination:
+            host: kiali.istio-system.svc.cluster.local
+            port:
+              number: 20001

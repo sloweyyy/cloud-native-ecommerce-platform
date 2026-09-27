@@ -1,0 +1,138 @@
+# Base: the complete, self-contained eShopping platform in ONE namespace.
+#
+# Resource names intentionally mirror the Helm release names used by
+# deploy/helm (eshopping-<chart>), so the gateway routing file
+# src/ApiGateways/Ocelot.ApiGateway/ocelot.k8s.json works unchanged for both
+# deployment paths.
+#
+# Render:  kubectl kustomize deploy/k8s/base
+# Apply:   kubectl apply -k deploy/k8s/overlays/local   (preferred)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ecommerce
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: eshopping
+    includeSelectors: false
+
+resources:
+  - namespace.yaml
+  - databases/catalogdb.yaml
+  - databases/basketdb.yaml
+  - databases/discountdb.yaml
+  - databases/orderdb.yaml
+  - messaging/rabbitmq.yaml
+  - storage/localstack.yaml
+  - services/catalog.yaml
+  - services/basket.yaml
+  - services/discount.yaml
+  - services/ordering.yaml
+  - gateway/ocelotapigw.yaml
+  - policies/pod-disruption-budgets.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/part-of: eshopping
+
+# Non-secret service configuration. Keys are the exact .NET configuration keys
+# (":" replaced by "__") read by each service - see src/Services/*/appsettings.json.
+configMapGenerator:
+  - name: catalog-config
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DatabaseSettings__DatabaseName=CatalogDb
+      - DatabaseSettings__CollectionName=Products
+      - DatabaseSettings__BrandsCollection=Brands
+      - DatabaseSettings__TypesCollection=Types
+      - ElasticConfiguration__Uri=http://eshopping-elasticsearch:9200
+      - Otlp__Endpoint=http://jaeger-collector.istio-system:4317
+      - AWS__S3__BucketName=ecommerce-product-images
+      - AWS__S3__Region=us-east-1
+      - AWS__S3__ImagePrefix=products/
+      - AWS__S3__ServiceUrl=http://eshopping-localstack:4566
+      - AWS_ENDPOINT_URL=http://eshopping-localstack:4566
+      - USE_LOCALSTACK=true
+  - name: basket-config
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CacheSettings__ConnectionString=eshopping-basketdb:6379
+      - GrpcSettings__DiscountUrl=http://eshopping-discount-discount-grpc:8080
+      - ElasticConfiguration__Uri=http://eshopping-elasticsearch:9200
+      - Otlp__Endpoint=http://jaeger-collector.istio-system:4317
+      - BypassDiscount__Enabled=false
+  - name: discount-config
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ElasticConfiguration__Uri=http://eshopping-elasticsearch:9200
+      - Otlp__Endpoint=http://jaeger-collector.istio-system:4317
+  - name: ordering-config
+    literals:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ElasticConfiguration__Uri=http://eshopping-elasticsearch:9200
+      - Otlp__Endpoint=http://jaeger-collector.istio-system:4317
+  - name: ocelotapigw-config
+    literals:
+      # Program.cs loads ocelot.{Environment}.json, so "k8s" selects ocelot.k8s.json.
+      - ASPNETCORE_ENVIRONMENT=k8s
+      - ElasticConfiguration__Uri=http://eshopping-elasticsearch:9200
+  - name: ocelotapigw-routes
+    files:
+      # Copy of src/ApiGateways/Ocelot.ApiGateway/ocelot.k8s.json.
+      # .github/scripts/validate-k8s-manifests.sh fails CI if the two drift.
+      - gateway/ocelot.k8s.json
+
+# DEV/CI-ONLY credentials. They exist so the stack boots on a laptop or in CI.
+# Never reuse them anywhere real: production runs through deploy/helm with
+# values-aws.yaml and managed AWS data stores (deploy/terraform).
+secretGenerator:
+  - name: catalogdb-credentials
+    literals:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin1234
+  - name: discountdb-credentials
+    literals:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin1234
+  - name: orderdb-credentials
+    literals:
+      - MSSQL_SA_PASSWORD=SqlPassword123
+  - name: rabbitmq-credentials
+    literals:
+      - RABBITMQ_DEFAULT_USER=eshop
+      - RABBITMQ_DEFAULT_PASS=eshop1234
+  - name: localstack-credentials
+    literals:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+  - name: catalog-secrets
+    literals:
+      - DatabaseSettings__ConnectionString=mongodb://admin:admin1234@eshopping-catalogdb:27017/CatalogDb?authSource=admin
+      - EventBusSettings__HostAddress=amqp://eshop:eshop1234@eshopping-rabbitmq:5672
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+  - name: basket-secrets
+    literals:
+      - EventBusSettings__HostAddress=amqp://eshop:eshop1234@eshopping-rabbitmq:5672
+  - name: discount-secrets
+    literals:
+      - DatabaseSettings__ConnectionString=Server=eshopping-discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;
+  - name: ordering-secrets
+    literals:
+      - ConnectionStrings__OrderingConnectionString=Server=eshopping-orderdb;Database=OrderDb;User Id=sa;Password=SqlPassword123;TrustServerCertificate=True;Encrypt=Optional
+      - EventBusSettings__HostAddress=amqp://eshop:eshop1234@eshopping-rabbitmq:5672
+
+# Local image names produced by `docker build` (see deploy/README.md).
+# Override per environment with the `images:` transformer in an overlay.
+images:
+  - name: eshop/catalog.api
+    newTag: latest
+  - name: eshop/basket.api
+    newTag: latest
+  - name: eshop/discount.grpc
+    newTag: latest
+  - name: eshop/ordering.api
+    newTag: latest
+  - name: eshop/ocelot.apigw
+    newTag: latest

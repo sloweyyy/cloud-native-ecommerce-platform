@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rabbitmq-configmap
-data:
-  rabbitmq-url: "amqp://guest:guest@rabbitmq-service:5672"

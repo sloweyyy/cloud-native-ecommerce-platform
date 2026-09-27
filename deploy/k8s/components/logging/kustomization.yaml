@@ -1,0 +1,10 @@
+# Optional centralized logging: Elasticsearch + Kibana.
+# The services' Serilog Elasticsearch sink targets
+# http://eshopping-elasticsearch:9200 (ElasticConfiguration__Uri); without this
+# component the sink simply drops log shipping and the services keep running.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - elasticsearch.yaml
+  - kibana.yaml

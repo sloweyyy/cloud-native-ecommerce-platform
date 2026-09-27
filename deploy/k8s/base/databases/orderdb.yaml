@@ -1,0 +1,105 @@
+# Ordering database - SQL Server (StatefulSet + PVC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshopping-orderdb
+  labels:
+    app.kubernetes.io/name: orderdb
+    app.kubernetes.io/instance: eshopping-orderdb
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: orderdb
+    app.kubernetes.io/instance: eshopping-orderdb
+  ports:
+    - name: tcp-mssql
+      port: 1433
+      targetPort: mssql
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eshopping-orderdb
+  labels:
+    app.kubernetes.io/name: orderdb
+    app.kubernetes.io/instance: eshopping-orderdb
+    app.kubernetes.io/component: database
+spec:
+  serviceName: eshopping-orderdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: orderdb
+      app.kubernetes.io/instance: eshopping-orderdb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: orderdb
+        app.kubernetes.io/instance: eshopping-orderdb
+        app.kubernetes.io/component: database
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      securityContext:
+        # The image runs as the non-root "mssql" user (uid 10001); fsGroup makes
+        # the PVC writable for it.
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mssql
+          image: mcr.microsoft.com/mssql/server:2022-latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mssql
+              containerPort: 1433
+              protocol: TCP
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: MSSQL_PID
+              value: Developer
+          envFrom:
+            - secretRef:
+                name: orderdb-credentials
+          resources:
+            requests:
+              cpu: 250m
+              memory: 2Gi
+            limits:
+              memory: 3Gi
+          startupProbe:
+            tcpSocket:
+              port: mssql
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - >-
+                  /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b -o /dev/null
+                  || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -Q "SELECT 1" -b -o /dev/null
+            periodSeconds: 10
+            timeoutSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: mssql
+            periodSeconds: 20
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /var/opt/mssql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 4Gi

@@ -1,0 +1,16 @@
+# Local developer cluster (kind, minikube, Docker Desktop):
+# full platform + centralized logging + network policies + ingress routes.
+#
+#   kubectl apply -k deploy/k8s/overlays/local
+#
+# Add the Istio component (../../components/istio) after installing Istio.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+components:
+  - ../../components/logging
+  - ../../components/network-policies
+  - ../../components/ingress
