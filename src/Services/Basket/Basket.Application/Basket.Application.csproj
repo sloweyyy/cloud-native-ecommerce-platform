@@ -12,6 +12,8 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentValidation" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
 		<PackageReference Include="Grpc.AspNetCore" />
 		<PackageReference Include="Riok.Mapperly">
 			<PrivateAssets>all</PrivateAssets>

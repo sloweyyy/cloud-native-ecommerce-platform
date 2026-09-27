@@ -6,6 +6,7 @@ using Basket.Application.Queries;
 using Basket.Application.Responses;
 using Basket.Core.Entities;
 using EventBus.Messages.Common;
+using FluentValidation;
 using MassTransit;
 using Common.Mediator;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +20,15 @@ public class BasketController : ApiController
     public readonly IMediator _mediator;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly ILogger<BasketController> _logger;
+    private readonly IValidator<BasketCheckout> _checkoutValidator;
 
-    public BasketController(IMediator mediator, IPublishEndpoint publishEndpoint, ILogger<BasketController> logger)
+    public BasketController(IMediator mediator, IPublishEndpoint publishEndpoint, ILogger<BasketController> logger,
+        IValidator<BasketCheckout> checkoutValidator)
     {
         _mediator = mediator;
         _publishEndpoint = publishEndpoint;
         _logger = logger;
+        _checkoutValidator = checkoutValidator;
     }
 
     [HttpGet]
@@ -61,6 +65,9 @@ public class BasketController : ApiController
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     public async Task<IActionResult> Checkout([FromBody] BasketCheckout basketCheckout)
     {
+        // Validate before anything is published or deleted (ValidationException -> 400).
+        await _checkoutValidator.ValidateAndThrowAsync(basketCheckout);
+
         //Get the existing basket with username
         var query = new GetBasketByUserNameQuery(basketCheckout.UserName);
         var basket = await _mediator.Send(query);

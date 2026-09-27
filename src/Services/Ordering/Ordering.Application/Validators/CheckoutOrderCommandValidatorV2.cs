@@ -9,14 +9,13 @@ public class CheckoutOrderCommandValidatorV2 : AbstractValidator<CheckoutOrderCo
     {
         RuleFor(o => o.UserName)
             .NotEmpty()
-            .WithMessage("{UserName} is required.")
-            .NotNull()
+            .WithMessage("{PropertyName} is required.")
             .MaximumLength(70)
-            .WithMessage("{UserName} must not exceed 70 characters.");
+            .WithMessage("{PropertyName} must not exceed 70 characters.");
         RuleFor(o => o.TotalPrice)
-            .NotEmpty()
-            .WithMessage("{TotalPrice} is required.")
-            .GreaterThan(-1)
-            .WithMessage("{TotalPrice} should not be -ve");
+            .NotNull()
+            .WithMessage("{PropertyName} is required.")
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("{PropertyName} must not be negative, but was {PropertyValue}.");
     }
 }

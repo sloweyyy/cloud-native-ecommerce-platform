@@ -8,6 +8,7 @@ using Basket.Infrastructure.Repositories;
 using Common.Api;
 using Common.Logging;
 using Discount.Grpc.Protos;
+using FluentValidation;
 using MassTransit;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -95,6 +96,9 @@ var assemblies = new Assembly[]
     typeof(CreateShoppingCartCommandHandler).Assembly
 };
 builder.Services.AddMediator(assemblies);
+
+// FluentValidation validators (checkout requests)
+builder.Services.AddValidatorsFromAssembly(typeof(CreateShoppingCartCommandHandler).Assembly);
 
 // Redis
 builder.Services.AddStackExchangeRedisCache(options =>

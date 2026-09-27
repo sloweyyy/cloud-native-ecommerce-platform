@@ -8,32 +8,26 @@ public class UpdateOrderCommandValidator : AbstractValidator<UpdateOrderCommand>
     public UpdateOrderCommandValidator()
     {
         RuleFor(o => o.Id)
-            .NotEmpty()
-            .NotNull()
-            .WithMessage("{Id} is required")
             .GreaterThan(0)
-            .WithMessage("{Id} cannot be -ve");
+            .WithMessage("{PropertyName} must be greater than 0, but was {PropertyValue}.");
         RuleFor(o => o.UserName)
             .NotEmpty()
-            .WithMessage("{UserName} is required.")
-            .NotNull()
+            .WithMessage("{PropertyName} is required.")
             .MaximumLength(70)
-            .WithMessage("{UserName} must not exceed 70 characters.");
+            .WithMessage("{PropertyName} must not exceed 70 characters.");
         RuleFor(o => o.TotalPrice)
-            .NotEmpty()
-            .WithMessage("{TotalPrice} is required.")
-            .GreaterThan(-1)
-            .WithMessage("{TotalPrice} should not be -ve");
+            .NotNull()
+            .WithMessage("{PropertyName} is required.")
+            .GreaterThanOrEqualTo(0)
+            .WithMessage("{PropertyName} must not be negative, but was {PropertyValue}.");
         RuleFor(o => o.EmailAddress)
             .NotEmpty()
-            .WithMessage("{EmailAddress} is required");
+            .WithMessage("{PropertyName} is required.");
         RuleFor(o => o.FirstName)
             .NotEmpty()
-            .NotNull()
-            .WithMessage("{FirstName} is required");
+            .WithMessage("{PropertyName} is required.");
         RuleFor(o => o.LastName)
             .NotEmpty()
-            .NotNull()
-            .WithMessage("{LastName} is required");
+            .WithMessage("{PropertyName} is required.");
     }
 }
