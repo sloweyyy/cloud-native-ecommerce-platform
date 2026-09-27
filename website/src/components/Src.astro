@@ -1,0 +1,23 @@
+---
+/**
+ * Link to a file or folder in the GitHub repository.
+ *
+ *   <Src path="src/Services/Catalog/Catalog.API/Program.cs" />
+ *   <Src path="deploy/helm" tree>helm charts</Src>
+ *
+ * Every `path` used with this component is validated by `npm run check:links`
+ * (scripts/check-repo-links.mjs), which fails if the path does not exist in the repo.
+ */
+import { REPO_BLOB, REPO_TREE } from '../lib/repo';
+
+interface Props {
+  path: string;
+  tree?: boolean;
+}
+
+const { path, tree = false } = Astro.props;
+const href = `${tree ? REPO_TREE : REPO_BLOB}/${path}`;
+const hasSlot = Astro.slots.has('default');
+---
+
+<a class="src-link" href={href} target="_blank" rel="noopener noreferrer">{hasSlot ? <slot /> : <code>{path}</code>}</a>

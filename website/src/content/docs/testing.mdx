@@ -1,0 +1,86 @@
+---
+title: Testing
+description: k6 load tests against the gateway, Jest unit tests and Playwright end-to-end tests for the micro-frontends, and the current state of backend testing.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Src from '../../components/Src.astro';
+
+| Layer | Tooling | State |
+|---|---|---|
+| Load and performance | k6, in <Src path="tests/load/k6" tree /> | <span class="pill ok">substantial</span> |
+| Frontend unit | Jest via Nx (`nx run-many --target=test`) | <span class="pill partial">5 spec files</span> |
+| Frontend end-to-end | Playwright, in <Src path="frontend/web/e2e" tree /> | <span class="pill ok">5 suites for Module Federation behaviour</span> |
+| Backend unit and integration | none yet | <span class="pill gap">being added</span> |
+
+## Load testing with k6
+
+The k6 suite is the most complete testing asset in the repository. <Src path="tests/load/k6/config.js" /> centralizes the service definitions, both **direct** paths (`/api/v1/...` for port-forwarded services) and **gateway** paths (the Ocelot upstream templates), plus the load profiles below.
+
+| Profile | Shape (virtual users over time) | Thresholds |
+|---|---|---|
+| smoke | 1 VU for 1 min | p95 below 500 ms, errors below 1% |
+| load | ramp to 10, hold 1 min, ramp down | p95 below 800 ms, errors below 5% |
+| stress | 100, 200, 300 VUs (port-forward) or 100, 300, 500 VUs (gateway) | p95 below 2 s, errors below 10% |
+| spike | 2, then a jump to 100 for 2 min, then back to 2 | p95 below 2 s, p99 below 5 s, errors below 10% |
+| soak | 20 VUs for about 10 min | p95 below 800 ms, p99 below 1.2 s |
+
+Scripts:
+
+| Script | Purpose |
+|---|---|
+| <Src path="tests/load/k6/gateway-smoke-test.js" /> | 10 VUs for 30 s through the gateway; p95 below 2 s, errors below 5%. Used by the CI workflow |
+| <Src path="tests/load/k6/catalog-test.js" />, <Src path="tests/load/k6/basket-test.js" />, <Src path="tests/load/k6/ordering-test.js" />, <Src path="tests/load/k6/discount-test.js" /> | Per-service scenarios |
+| <Src path="tests/load/k6/stress-test.js" />, <Src path="tests/load/k6/spike-test.js" />, <Src path="tests/load/k6/soak-test.js" /> | Profile-driven tests with custom summaries |
+| <Src path="tests/load/k6/workflow-shopping.js" /> | End-to-end journey (browse, view product, add to basket, view basket, checkout, order history) with custom `workflow_duration`, `workflow_success` and `workflow_failed` metrics; p95 workflow below 10 s |
+| <Src path="tests/load/k6/workflow-website.js" /> | The journey as the website performs it |
+| <Src path="tests/load/k6/verify-failures-test.js" /> | Checks that failures are detected and reported |
+
+Runner scripts (`run-all-tests.sh`, `run-with-gateway.sh`, `smart-port-forward.sh`) handle port-forwarding or targeting a gateway URL. <Src path="tests/load/k6/push-metrics.sh" /> pushes results to a Prometheus Pushgateway for the Grafana k6 dashboard.
+
+```bash
+cd tests/load/k6
+k6 run gateway-smoke-test.js                                   # local gateway on :8010
+AWS_GATEWAY_URL=http://<nlb-host> k6 run -e TEST_TYPE=stress stress-test.js
+```
+
+In CI, <Src path=".github/workflows/performance-test.yml" /> runs on demand only. The weekly schedule was removed because the workflow does not yet provision the databases and the Discount service, so scheduled runs only failed. <Src path="docs/dependency-management.md" /> records this decision.
+
+## Frontend tests
+
+- **Unit (Jest, via Nx):** `host/src/app/app.spec.tsx`, the store's route test and utility tests (`productUtils`, `formatUtils`), and checkout's `formatUtils` test. CI runs `nx affected --target=test --passWithNoTests`, so only projects touched by the PR run.
+- **End to end (Playwright):** <Src path="frontend/web/playwright.config.ts" /> starts the host with `--devRemotes=store,account,checkout` on port 4200 and runs Chromium. The suites cover what is specific to micro-frontends:
+  - `module-federation.spec.ts`: each remote loads dynamically, remotes load in sequence, load errors are handled, and state survives navigation.
+  - `cross-microfrontend.spec.ts`: navigation and shared state across remotes.
+  - `deep-linking.spec.ts` and `browser-history.spec.ts`: URLs inside a remote survive reloads and back/forward.
+  - `error-handling.spec.ts`: an unavailable remote degrades gracefully.
+
+The Playwright suite is not wired into CI yet.
+
+## Backend tests
+
+`dotnet test Ecommerce.sln` runs **97 tests** (86 unit, 11 integration), all under <Src path="tests" tree />. They use xUnit, NSubstitute and Shouldly, with shared settings in `tests/Directory.Build.props` and package versions in `Directory.Packages.props`.
+
+| Project | Tests | What it covers |
+|---|---|---|
+| `tests/unit/Common.Mediator.Tests` | 8 | Dispatch, pipeline-behaviour ordering, and a DI regression test with `ValidateScopes = true` |
+| `tests/unit/Common.Api.Tests` | 12 | Exception to RFC 7807 mapping (400 / 404 / 409 / 500), no stack traces outside Development |
+| `tests/unit/Basket.Application.Tests` | 25 | Discount application, gRPC failure fallback, empty basket for new users, checkout validation |
+| `tests/unit/Catalog.Application.Tests` | 14 | Not-found handling, paging clamps |
+| `tests/unit/Ordering.Application.Tests` | 27 | Validators, not-found handling in handlers |
+| `tests/integration/Ordering.IntegrationTests` | 7 | Migrations on a fresh and a legacy SQL Server (Testcontainers), fail-fast startup, consumer idempotency via the MassTransit test harness |
+| `tests/integration/Discount.IntegrationTests` | 4 | Coupons survive restart, idempotent seeding, concurrent startups (Testcontainers PostgreSQL) |
+
+### End-to-end smoke test
+
+<Src path="scripts/smoke/e2e.sh" /> runs against a running Compose stack and drives the whole system through the gateway: list and fetch products, create a basket (the discount is applied over gRPC), reject an invalid checkout with 400 while keeping the basket, check out (202), then poll Ordering until the order produced by the RabbitMQ consumer appears. It also asserts the error contracts (404 problem details, empty basket for a new user, clamped paging).
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+bash scripts/smoke/e2e.sh
+```
+
+### Next layers
+
+1. **Contract checks** for the `.proto` and the integration-event types, so publisher and consumer cannot drift apart.
