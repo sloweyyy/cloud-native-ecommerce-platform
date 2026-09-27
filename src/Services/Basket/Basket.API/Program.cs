@@ -125,12 +125,9 @@ builder.Services.AddMassTransit(config =>
 {
     config.UsingRabbitMq((ct, cfg) =>
     {
-        var rabbitMqUri = new Uri(builder.Configuration["EventBusSettings:HostAddress"] ?? "amqp://guest:guest@localhost:5672");
-        cfg.Host(rabbitMqUri.Host, h =>
-        {
-            h.Username(rabbitMqUri.UserInfo.Split(':')[0]);
-            h.Password(rabbitMqUri.UserInfo.Split(':')[1]);
-        });
+        // Pass the full URI (as Catalog/Ordering do) so MassTransit keeps the port and
+        // virtual host and URL-decodes the credentials.
+        cfg.Host(new Uri(builder.Configuration["EventBusSettings:HostAddress"] ?? "amqp://guest:guest@localhost:5672"));
     });
 });
 
