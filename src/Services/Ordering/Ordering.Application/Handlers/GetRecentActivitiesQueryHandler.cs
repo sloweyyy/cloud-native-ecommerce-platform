@@ -28,8 +28,8 @@ public class GetRecentActivitiesQueryHandler
         CancellationToken cancellationToken)
     {
         var corePagedResult = await _activityRepository.GetActivitiesAsync(
-            pageIndex: request.PageIndex,
-            pageSize: request.PageSize,
+            pageIndex: Math.Max(0, request.PageIndex),
+            pageSize: Math.Clamp(request.PageSize, 1, IActivityRepository.MaxPageSize),
             activityType: request.ActivityType,
             entityType: request.EntityType,
             from: request.From,

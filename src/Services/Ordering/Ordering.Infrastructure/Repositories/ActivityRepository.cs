@@ -26,6 +26,10 @@ public class ActivityRepository : RepositoryBase<Activity>, IActivityRepository
         DateTime? to = null,
         string? actor = null)
     {
+        // 0-based paging: guard against a negative skip and an unbounded/empty page.
+        pageIndex = Math.Max(0, pageIndex);
+        pageSize = Math.Clamp(pageSize, 1, IActivityRepository.MaxPageSize);
+
         var query = _dbContext.Set<Activity>().AsQueryable();
 
         // Apply filters

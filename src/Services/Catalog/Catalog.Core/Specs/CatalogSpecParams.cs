@@ -2,15 +2,22 @@
 
 public class CatalogSpecParams
 {
-    private const int MaxPageSize = 70;
+    public const int MaxPageSize = 70;
+    private int _pageIndex = 1;
     private int _pageSize = 12;
 
-    public int PageIndex { get; set; } = 1;
+    // 1-based. Values below 1 would produce a negative skip in the repository.
+    public int PageIndex
+    {
+        get => _pageIndex;
+        set => _pageIndex = Math.Max(1, value);
+    }
 
+    // Clamped to 1..MaxPageSize: 0 would otherwise mean "no limit" to MongoDB.
     public int PageSize
     {
         get => _pageSize;
-        set => _pageSize = value > MaxPageSize ? MaxPageSize : value;
+        set => _pageSize = Math.Clamp(value, 1, MaxPageSize);
     }
 
     public string? BrandId { get; set; }
