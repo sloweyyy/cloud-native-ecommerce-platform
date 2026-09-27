@@ -1,0 +1,148 @@
+/* ------------------------------------------------------------------
+   Theme tokens (Starlight custom properties)
+   ------------------------------------------------------------------ */
+:root {
+  --sl-font: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sl-font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sl-content-width: 50rem;
+}
+
+/* Dark mode (default) */
+:root {
+  --sl-color-accent-low: #1e1b4b;
+  --sl-color-accent: #6366f1;
+  --sl-color-accent-high: #c7d2fe;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eef0f6;
+  --sl-color-gray-2: #c3c7d4;
+  --sl-color-gray-3: #8b91a5;
+  --sl-color-gray-4: #555b6e;
+  --sl-color-gray-5: #353a4a;
+  --sl-color-gray-6: #1f2330;
+  --sl-color-black: #12141c;
+}
+
+/* Light mode */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e0e7ff;
+  --sl-color-accent: #4f46e5;
+  --sl-color-accent-high: #312e81;
+  --sl-color-white: #12141c;
+  --sl-color-gray-1: #1f2330;
+  --sl-color-gray-2: #353a4a;
+  --sl-color-gray-3: #555b6e;
+  --sl-color-gray-4: #8b91a5;
+  --sl-color-gray-5: #c3c7d4;
+  --sl-color-gray-6: #eef0f6;
+  --sl-color-gray-7: #f7f8fb;
+  --sl-color-black: #ffffff;
+}
+
+/* ------------------------------------------------------------------
+   Typography
+   ------------------------------------------------------------------ */
+.sl-markdown-content h2 {
+  letter-spacing: -0.015em;
+  margin-top: 2.5rem;
+}
+.sl-markdown-content h3 {
+  letter-spacing: -0.01em;
+}
+.sl-markdown-content p,
+.sl-markdown-content li {
+  line-height: 1.7;
+}
+
+/* Tables: compact, scroll on small screens */
+.sl-markdown-content table {
+  display: block;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+.sl-markdown-content table code {
+  white-space: nowrap;
+}
+
+/* Repo links rendered by <Src> */
+a.src-link code {
+  border-bottom: 1px dashed var(--sl-color-accent);
+}
+
+/* ------------------------------------------------------------------
+   Mermaid diagrams
+   ------------------------------------------------------------------ */
+.sl-markdown-content pre.mermaid {
+  background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.75rem;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  overflow-x: auto;
+}
+:root:not([data-theme='light']) .sl-markdown-content pre.mermaid {
+  background: #171a25;
+}
+
+/* ------------------------------------------------------------------
+   Landing page hero
+   ------------------------------------------------------------------ */
+[data-has-hero] .hero {
+  padding-block: clamp(2.5rem, 7vw, 5.5rem);
+}
+[data-has-hero] .hero h1 {
+  font-size: clamp(2.4rem, 5.2vw, 3.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  background: linear-gradient(120deg, var(--sl-color-white) 30%, var(--sl-color-accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+[data-has-hero] .hero .tagline {
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  color: var(--sl-color-gray-2);
+  max-width: 40rem;
+}
+[data-has-hero] .page {
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, color-mix(in srgb, var(--sl-color-accent) 22%, transparent), transparent 70%),
+    radial-gradient(40rem 24rem at -10% 10%, color-mix(in srgb, #06b6d4 14%, transparent), transparent 70%);
+}
+
+/* Stat strip on the landing page */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin-block: 1.5rem 2rem;
+}
+.stat-strip > div {
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--sl-color-gray-6) 55%, transparent);
+}
+.stat-strip strong {
+  display: block;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  color: var(--sl-color-white);
+  letter-spacing: -0.02em;
+}
+.stat-strip span {
+  font-size: 0.85rem;
+  color: var(--sl-color-gray-3);
+}
+
+/* Status pills used in tables */
+.pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pill.ok { background: #16a34a22; color: #16a34a; }
+.pill.partial { background: #d9770622; color: #d97706; }
+.pill.gap { background: #dc262622; color: #dc2626; }

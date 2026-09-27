@@ -1,0 +1,59 @@
+---
+title: Known gaps
+description: An honest list of what is missing or fragile in the current code, each item linked to the file that shows it.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Src from '../../components/Src.astro';
+
+This project is a learning and portfolio platform. The architecture and delivery tooling are broad, and several production concerns are still open. Everything below was found by reading the code. The [roadmap](/roadmap/) tracks the fixes.
+
+<Aside type="tip">
+If you are evaluating the project: the gaps are listed here on purpose. Knowing where a system falls short, and why it matters, is part of the engineering.
+</Aside>
+
+## Correctness
+
+### Checkout publish and delete are not atomic
+
+Basket publishes `BasketCheckoutEvent`, then deletes the cart, in two steps with no transactional outbox (<Src path="src/Services/Basket/Basket.API/Controllers/BasketController.cs" />). Duplicates are harmless now, because Ordering's consumer is idempotent on `CorrelationId`, but a crash between the steps can still leave a cart behind after the order was created.
+
+### Validation failures are not logged
+
+Validation runs outside `UnhandledExceptionBehaviour`, so rejected commands are returned as 400 problem details but are not logged by the pipeline.
+
+<Aside type="note" title="Recently fixed">
+The mediator's root-provider lifetime bug, Discount dropping its table on startup, exceptions surfacing as 500s, `null` mapper crashes, unbounded paging, non-idempotent checkout consumers and Ordering's incomplete migrations were fixed in [#562](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/562) and [#564](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/564). See the [roadmap](/roadmap/).
+</Aside>
+
+## Security
+
+| Gap | Evidence |
+|---|---|
+| No authentication or authorization on any API | No `AddAuthentication` or `[Authorize]` anywhere in `src/`; `UseAuthorization()` has nothing to enforce |
+| CORS allows any origin | `AllowAnyOrigin()` in every `Program.cs` and the gateway |
+| Card number and CVV travel in events and are stored in plain text | <Src path="src/BuildingBlocks/EventBus.Messages/Events/BasketCheckoutEvent.cs" />, <Src path="src/Services/Ordering/Ordering.Core/Entities/Order.cs" /> |
+| Actors hard-coded | `"system"` in Catalog events, `"slowey"` in Ordering audit fields |
+| Basket trusts client prices | `ShoppingCartItem.Price` comes from the request body |
+| mTLS permissive only; Ordering outside the mesh | No `PeerAuthentication` in <Src path="deploy/istio" tree />; `sidecar.istio.io/inject: "false"` for Ordering |
+| Development credentials in the repo | <Src path=".env.example" />, <Src path="deploy/k8s/secrets.yaml" /> |
+
+## Operability
+
+| Gap | Evidence |
+|---|---|
+| No health endpoints or probes | Health-check packages referenced, never mapped; API Deployments have no probes |
+| No app-level metrics | Business dashboards query `revenue_total` and similar series that nothing emits |
+| Traces break at RabbitMQ | MassTransit activity source not registered |
+| NetworkPolicies and PDBs are not applied, and would break things if they were | `default-deny` with no allow rules; `minAvailable: 1` with 1 replica |
+| Elasticsearch version drift | Sink templates for ES 8; containers run ES 7.9.2; AWS uses OpenSearch 2.11 |
+
+## Delivery
+
+| Gap | Evidence |
+|---|---|
+| Test gates are soft in CI | 97 backend tests exist, but the CI integration job is still `continue-on-error`; the k8s deployment test swallows failures |
+| Security scans and CD smoke test never block | `exit-code: 0`, `fail-build: false`, smoke test exits 0 when the LB is not ready |
+| Two IaC paths that disagree | Terraform provisions managed data stores; CD deploys in-cluster databases with Helm; resource names differ |
+| Terraform state is local | Backend block commented out in <Src path="deploy/terraform/backend.tf" /> |
+| Dead gateway routes | `/Discount` REST routes and the Istio discount VirtualService target a gRPC-only service |

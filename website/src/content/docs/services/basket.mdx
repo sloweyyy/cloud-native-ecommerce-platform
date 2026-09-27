@@ -1,0 +1,115 @@
+---
+title: Basket service
+description: Redis-backed shopping carts, discount lookup over gRPC with graceful fallback, and checkout that publishes an integration event (v1 and v2).
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Src from '../../../components/Src.astro';
+
+Basket holds each shopper's cart in Redis. When a cart is saved, it applies coupons from the Discount service over gRPC. At checkout, it publishes an integration event to RabbitMQ and clears the cart.
+
+| | |
+|---|---|
+| Source | <Src path="src/Services/Basket" tree /> |
+| Store | Redis, through `IDistributedCache` (key = user name, value = JSON `ShoppingCart`) |
+| Calls | Discount over gRPC (`GrpcSettings:DiscountUrl`) |
+| Publishes | `BasketCheckoutEvent` (v1), `BasketCheckoutEventV2` (v2) |
+| Local port | 8001 (container port 80) |
+
+## Layers
+
+| Project | What is in it |
+|---|---|
+| <Src path="src/Services/Basket/Basket.API" tree /> | v1 and v2 `BasketController`, and `Program.cs` (versioned Swagger, gRPC client, Redis, MassTransit) |
+| <Src path="src/Services/Basket/Basket.Application" tree /> | Commands, queries and handlers, `DiscountGrpcService`, `BasketMapper`; compiles `discount.proto` as a gRPC **client** |
+| <Src path="src/Services/Basket/Basket.Core" tree /> | `ShoppingCart`, `ShoppingCartItem`, `BasketCheckout`, `BasketCheckoutV2`, `IBasketRepository` |
+| <Src path="src/Services/Basket/Basket.Infrastructure" tree /> | `BasketRepository` over `IDistributedCache` |
+
+## Endpoints
+
+| Method | Route | Handler | Notes |
+|---|---|---|---|
+| GET | `api/v1/Basket/GetBasket/{userName}` | `GetBasketByUserNameQuery` | |
+| POST | `api/v1/Basket/CreateBasket` | `CreateShoppingCartCommand` | Upserts the whole cart; applies discounts |
+| DELETE | `api/v1/Basket/DeleteBasket/{userName}` | `DeleteBasketByUserNameCommand` | |
+| POST | `api/v1/Basket/Checkout` | inline in controller | Publishes `BasketCheckoutEvent`, deletes the cart, returns `202 Accepted` |
+| POST | `api/v2/Basket/Checkout` | inline in controller | Same flow with the slimmer `BasketCheckoutEventV2` (user name and total only) |
+
+Controllers: <Src path="src/Services/Basket/Basket.API/Controllers/BasketController.cs" /> and <Src path="src/Services/Basket/Basket.API/Controllers/V2/BasketController.cs" />. Swagger publishes separate `v1` and `v2` documents, and a `DocInclusionPredicate` assigns each action by the `[ApiVersion]` on its controller.
+
+## Data model
+
+```mermaid
+classDiagram
+  class ShoppingCart {
+    +string UserName
+    +List~ShoppingCartItem~ Items
+  }
+  class ShoppingCartItem {
+    +int Quantity
+    +decimal Price
+    +decimal OriginalPrice
+    +decimal DiscountAmount
+    +string ProductId
+    +string ProductName
+    +string ImageFile
+    +decimal FinalPrice()
+  }
+  class ShoppingCartResponse {
+    +string UserName
+    +List Items
+    +decimal TotalPrice()
+  }
+  ShoppingCart "1" *-- "many" ShoppingCartItem
+  ShoppingCart ..> ShoppingCartResponse : BasketMapper
+```
+
+In Redis, the cart is serialized with `System.Text.Json`. `BasketRepository` reads it with `PropertyNameCaseInsensitive = true`, a comment notes, to match the old Newtonsoft behaviour, so carts cached before the migration still deserialize (<Src path="src/Services/Basket/Basket.Infrastructure/Repositories/BasketRepository.cs" />). Carts are stored with no expiry.
+
+`TotalPrice` is computed in the response as `sum(Price * Quantity)`, where `Price` is already the discounted unit price (<Src path="src/Services/Basket/Basket.Application/Responses/ShoppingCartResponse.cs" />).
+
+## Discount application
+
+`CreateShoppingCartCommandHandler` (<Src path="src/Services/Basket/Basket.Application/Handlers/CreateShoppingCartCommandHandler.cs" />) walks every item:
+
+1. If `OriginalPrice` is not set, it copies `Price` into it.
+2. If discounts are not bypassed (`BypassDiscount:Enabled`), the item has no discount yet, and `Price == OriginalPrice`, it calls `DiscountGrpcService.GetDiscount(ProductName)`.
+3. It sets `DiscountAmount = coupon.Amount` and `Price = OriginalPrice - DiscountAmount`.
+
+The "not yet discounted" check makes the operation idempotent: re-saving a cart does not apply the same coupon twice. The calls run **sequentially**, one gRPC round trip per undiscounted item.
+
+`DiscountGrpcService` (<Src path="src/Services/Basket/Basket.Application/GrpcService/DiscountGrpcService.cs" />) catches `RpcException`. For `Unavailable` it logs a warning, and for other codes it logs an error. Either way it returns a zero-amount coupon, so the cart saves at full price rather than failing.
+
+The gRPC client is registered with `AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>` and a plain `HttpClientHandler`, and talks cleartext HTTP/2 (h2c) to Discount on port 8080 (`GrpcSettings__DiscountUrl=http://discount.api:8080` in <Src path="docker-compose.override.yml" />). OpenTelemetry's `AddGrpcClientInstrumentation()` creates spans for these calls.
+
+## Checkout
+
+```mermaid
+flowchart LR
+  req["POST /Checkout"] --> get["GetBasketByUserNameQuery"]
+  get -->|"null"| bad["400 Bad Request"]
+  get -->|cart| map["BasketMapper: BasketCheckout to BasketCheckoutEvent"]
+  map --> total["TotalPrice = cart.TotalPrice (server side)"]
+  total --> pub["IPublishEndpoint.Publish"]
+  pub --> del["DeleteBasketByUserNameCommand"]
+  del --> ok["202 Accepted"]
+```
+
+The total price in the event comes from the stored cart, not the request body, which prevents the client from under-reporting the total. Item prices themselves are client-supplied, though, as noted on the [architecture page](/architecture/#what-crosses-a-boundary).
+
+<Aside type="caution" title="Known issues">
+- Publish and delete are two independent steps with no outbox. If the process dies after the publish, the cart survives and a retry re-publishes; Ordering's consumer is idempotent on the event's `CorrelationId`, so this cannot create a duplicate order. The request is validated **before** anything is published, so an invalid checkout returns 400 and keeps the cart.
+- The v1 event carries card number, expiry and CVV in clear text through RabbitMQ, and Ordering stores them. A real system would tokenize payment data before it reaches the backend.
+- Discount calls have a gRPC deadline, so a hung Discount service cannot hang basket creation; on failure the cart is priced without a discount.
+- The gateway rate-limits checkout to one request per 3-second window (see [API Gateway](/api-gateway/)).
+</Aside>
+
+## Configuration
+
+| Key | Example | Purpose |
+|---|---|---|
+| `CacheSettings:ConnectionString` | `basketdb:6379` | Redis |
+| `GrpcSettings:DiscountUrl` | `http://discount.api:8080` | Discount gRPC endpoint |
+| `EventBusSettings:HostAddress` | `amqp://guest:guest@rabbitmq:5672` | RabbitMQ; the full URI (host, port, vhost, credentials) is passed to MassTransit |
+| `BypassDiscount:Enabled` | `false` (default) | Skip gRPC discount lookup, useful for load tests |
+| `ElasticConfiguration:Uri`, `Otlp:Endpoint` | | Logging and tracing |

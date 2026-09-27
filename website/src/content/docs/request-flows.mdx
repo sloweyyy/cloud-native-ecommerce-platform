@@ -1,0 +1,175 @@
+---
+title: Request flows
+description: Sequence diagrams, traced through the code, for browsing the catalog, adding to cart with a gRPC discount lookup, and checkout through RabbitMQ to Ordering.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Src from '../../components/Src.astro';
+
+Each diagram below follows the actual call chain: gateway route, controller, mediator request, handler, repository and store. The file references let you follow along in the code.
+
+## 1. Browse the catalog
+
+A shopper opens the store, which requests the first page of products with a brand filter.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Browser (store MFE)
+  participant GW as Ocelot gateway
+  participant CC as CatalogController
+  participant M as IMediator
+  participant H as GetAllProductsHandler
+  participant R as ProductRepository
+  participant DB as MongoDB (Products)
+
+  U->>GW: GET /Catalog/GetAllProducts?pageIndex=1&pageSize=12&brandId=...
+  GW->>CC: GET /api/v1/Catalog/GetAllProducts?...
+  CC->>M: Send(GetAllProductsQuery(CatalogSpecParams))
+  M->>H: Handle(query)
+  H->>R: GetProducts(specParams)
+  R->>R: Build filter (search regex, Brands.Id, Types.Id)
+  R->>DB: CountDocumentsAsync(filter)
+  DB-->>R: total
+  R->>DB: Find(filter).Sort(...).Skip(12*(page-1)).Limit(12)
+  DB-->>R: products
+  R-->>H: Pagination of Product
+  H-->>CC: Pagination of ProductResponse (Mapperly)
+  CC-->>GW: 200 OK
+  GW-->>U: 200 OK { pageIndex, pageSize, count, data }
+```
+
+Code path: route in <Src path="src/ApiGateways/Ocelot.ApiGateway/ocelot.Development.json" />, then <Src path="src/Services/Catalog/Catalog.API/Controllers/CatalogController.cs" />, <Src path="src/Services/Catalog/Catalog.Application/Handlers/GetAllProductsHandler.cs" /> and <Src path="src/Services/Catalog/Catalog.Infrastructure/Repositories/ProductRepository.cs" />.
+
+Brands and types for the filter sidebar come from `GET /Catalog/GetAllBrands` and `GET /Catalog/GetAllTypes`, which follow the same shape with a plain `Find(_ => true)`. Product images are loaded by the browser **directly from S3** (or LocalStack), using the URL stored in `ImageFile`. They never pass through the API.
+
+## 2. Add to cart, with a discount lookup over gRPC
+
+The cart is saved as a whole on every change. For each item that has no discount yet, Basket asks Discount for a coupon.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Browser (checkout MFE)
+  participant GW as Ocelot gateway
+  participant BC as BasketController
+  participant H as CreateShoppingCartCommandHandler
+  participant DG as DiscountGrpcService
+  participant DS as Discount.API (gRPC)
+  participant DH as GetDiscountQueryHandler
+  participant PG as PostgreSQL (Coupon)
+  participant R as Redis
+
+  U->>GW: POST /Basket/CreateBasket { userName, items[] }
+  GW->>BC: POST /api/v1/Basket/CreateBasket
+  BC->>H: mediator.Send(CreateShoppingCartCommand)
+  loop each item where DiscountAmount == 0 and Price == OriginalPrice
+    H->>DG: GetDiscount(productName)
+    DG->>DS: DiscountProtoService.GetDiscount (HTTP/2, h2c :8080)
+    DS->>DH: mediator.Send(GetDiscountQuery)
+    DH->>PG: SELECT * FROM Coupon WHERE ProductName = @p
+    PG-->>DH: coupon row, or none (placeholder Amount 0)
+    DH-->>DS: CouponModel
+    DS-->>DG: CouponModel { amount }
+    DG-->>H: coupon
+    H->>H: DiscountAmount = amount, Price = OriginalPrice - amount
+  end
+  alt Discount unavailable (RpcException)
+    DG-->>H: CouponModel { amount = 0 }, warning logged
+  end
+  H->>R: SET userName = JSON(cart)
+  H->>R: GET userName
+  R-->>H: cart
+  H-->>BC: ShoppingCartResponse (TotalPrice computed)
+  BC-->>GW: 200 OK
+  GW-->>U: 200 OK
+```
+
+Code path: <Src path="src/Services/Basket/Basket.Application/Handlers/CreateShoppingCartCommandHandler.cs" />, <Src path="src/Services/Basket/Basket.Application/GrpcService/DiscountGrpcService.cs" />, <Src path="src/Services/Discount/Discount.API/Services/DiscountService.cs" />, <Src path="src/Services/Discount/Discount.Application/Handlers/GetDiscountQueryHandler.cs" /> and <Src path="src/Services/Basket/Basket.Infrastructure/Repositories/BasketRepository.cs" />.
+
+Points to notice:
+
+- The lookups are **sequential**, one round trip per new item. For large carts, a batched `GetDiscounts(names[])` RPC or `Task.WhenAll` would cut latency.
+- The discount is applied **once**, and the item's state (`DiscountAmount != 0`) records that it was applied. The coupon is not re-evaluated if it changes later.
+- The gRPC hop is traced end to end: Basket registers the gRPC client instrumentation, and Discount's ASP.NET Core instrumentation picks up the propagated context.
+
+## 3. Checkout: BasketCheckoutEvent to Ordering
+
+Checkout is split into a synchronous half, which completes with `202 Accepted`, and an asynchronous half, where Ordering creates the order.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Browser (checkout MFE)
+  participant GW as Ocelot gateway
+  participant BC as BasketController (v1)
+  participant R as Redis
+  participant MQ as RabbitMQ
+  participant OC as BasketOrderingConsumer
+  participant V as ValidationBehaviour
+  participant OH as CheckoutOrderCommandHandler
+  participant SQL as SQL Server
+  participant AC as OrderActivityConsumer
+
+  U->>GW: POST /Basket/Checkout { userName, address, payment... }
+  Note over GW: RateLimitOptions: Limit 1 per 3s period
+  GW->>BC: POST /api/v1/Basket/Checkout
+  BC->>R: GetBasket(userName)
+  alt no cart
+    BC-->>U: 400 Bad Request
+  end
+  BC->>BC: Map to BasketCheckoutEvent, TotalPrice = cart.TotalPrice
+  BC->>MQ: Publish(BasketCheckoutEvent)
+  BC->>R: DeleteBasket(userName)
+  BC-->>GW: 202 Accepted
+  GW-->>U: 202 Accepted
+
+  Note over MQ,OC: asynchronous from here
+  MQ->>OC: deliver from basketcheckout-queue
+  OC->>V: mediator.Send(CheckoutOrderCommand)
+  V->>V: FluentValidation (UserName, TotalPrice, Email, names)
+  V->>OH: next()
+  OH->>SQL: INSERT Orders (audit fields set in SaveChangesAsync)
+  SQL-->>OH: new Id
+  OH-->>OC: orderId
+  OC->>MQ: Publish(OrderActivityEvent { OrderId, Actor })
+  MQ->>AC: deliver from order-activity-queue
+  AC->>SQL: EXISTS Activities WHERE EventId = ?
+  AC->>SQL: INSERT Activities ("Order.Created")
+```
+
+Code path: <Src path="src/Services/Basket/Basket.API/Controllers/BasketController.cs" />, <Src path="src/Services/Ordering/Ordering.API/EventBusConsumer/BasketOrderingConsumer.cs" />, <Src path="src/Services/Ordering/Ordering.Application/Behaviour/ValidationBehaviour.cs" />, <Src path="src/Services/Ordering/Ordering.Application/Handlers/CheckoutOrderCommandHandler.cs" /> and <Src path="src/Services/Ordering/Ordering.API/EventBusConsumer/OrderActivityConsumer.cs" />.
+
+<Aside type="caution" title="Failure modes worth knowing">
+- **Publish succeeds, cart delete fails:** the order is created, and the cart reappears for the user.
+- **Process crashes between the DB insert and `Publish(OrderActivityEvent)`:** the order exists, but the activity feed never shows it. There is no outbox.
+- **Validation fails in the consumer** (for example, an empty email): the message faults to `basketcheckout-queue_error`. The user already received `202`, and nothing notifies them.
+- **The client polls** `GET /Order/{userName}` to see the order, because there is no push or status endpoint.
+</Aside>
+
+### The v2 variant
+
+`POST /Basket/CheckoutV2` goes to `api/v2/Basket/Checkout`. That endpoint publishes `BasketCheckoutEventV2` (user name and total only) to `basketcheckout-queue-v2`, where `BasketOrderingConsumerV2` creates a minimal order through `CheckoutOrderCommandV2`. It does not publish an activity event.
+
+## Product activity (admin feed)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor A as Admin MFE
+  participant CC as CatalogController
+  participant Mongo as MongoDB
+  participant MQ as RabbitMQ
+  participant PC as ProductActivityConsumer (Ordering)
+  participant SQL as SQL Server (Activities)
+
+  A->>CC: POST /Catalog/CreateProduct
+  CC->>Mongo: InsertOne(product)
+  CC->>MQ: Publish(ProductActivityEvent { Created, Actor = "system" })
+  CC-->>A: 200 ProductResponse
+  MQ->>PC: product-activity-queue
+  PC->>SQL: skip if EventId exists, else INSERT
+  A->>SQL: later: GET /Activity?entityType=Product (gateway, ActivityController)
+```
+
+The activity feed lives in Ordering's database even though it records Catalog events. It works as a read model built from events, and the admin dashboard reads it through `GET /Activity`, which the gateway caches for 10 seconds.

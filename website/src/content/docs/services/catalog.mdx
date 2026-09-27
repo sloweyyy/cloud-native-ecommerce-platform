@@ -1,0 +1,122 @@
+---
+title: Catalog service
+description: Products, brands and types in MongoDB, product images in S3 or LocalStack, paginated search, and product activity events.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+import Src from '../../../components/Src.astro';
+
+The Catalog service owns everything a shopper browses: products, their brand and type, and their images. It is the largest service by surface area, with 13 HTTP endpoints, S3 integration and seed data.
+
+| | |
+|---|---|
+| Source | <Src path="src/Services/Catalog" tree /> |
+| Store | MongoDB: database `CatalogDb`, collections `Products`, `Brands`, `Types` |
+| Object storage | S3 bucket (`AWS:S3:BucketName`), or LocalStack when `USE_LOCALSTACK=true` |
+| Publishes | `ProductActivityEvent` (on create and update) |
+| Local port | 8000 (container port 80) |
+
+## Layers
+
+| Project | What is in it |
+|---|---|
+| <Src path="src/Services/Catalog/Catalog.API" tree /> | `CatalogController`, `AdminController`, and the `Program.cs` composition root (Serilog, OpenTelemetry, API versioning, mediator, S3 client, MassTransit) |
+| <Src path="src/Services/Catalog/Catalog.Application" tree /> | 7 commands, 6 queries, 13 handlers, `ProductMapper` (Mapperly), response DTOs |
+| <Src path="src/Services/Catalog/Catalog.Core" tree /> | `Product`, `ProductBrand`, `ProductType`, repository interfaces, `IImageStorageService`, `CatalogSpecParams`, `Pagination<T>` |
+| <Src path="src/Services/Catalog/Catalog.Infrastructure" tree /> | `CatalogContext` (Mongo collections), JSON seeders, `ProductRepository`, `S3ImageStorageService` |
+
+## Endpoints
+
+All routes are under `api/v1/Catalog` (<Src path="src/Services/Catalog/Catalog.API/Controllers/CatalogController.cs" />) unless noted.
+
+| Method | Route | Mediator request | Notes |
+|---|---|---|---|
+| GET | `GetAllProducts?pageIndex&pageSize&brandId&typeId&sort&search` | `GetAllProductsQuery` | Paginated; returns `Pagination<ProductResponse>` |
+| GET | `GetProductById/{id}` | `GetProductByIdQuery` | Returns `200` with `null` if not found (no 404) |
+| GET | `GetProductByProductName/{productName}` | `GetProductByNameQuery` | Case-insensitive exact name match |
+| GET | `GetProductsByBrandName/{brand}` | `GetProductByBrandQuery` | Matches the embedded `Brands.Name` |
+| GET | `GetAllBrands` | `GetAllBrandsQuery` | |
+| GET | `GetAllTypes` | `GetAllTypesQuery` | |
+| POST | `CreateProduct` | `CreateProductCommand` | Publishes `ProductActivityEvent { ActivityType = Created }` |
+| PUT | `UpdateProduct` | `UpdateProductCommand` | Deletes the old S3 image if the URL changed; publishes `Updated` |
+| DELETE | `{id}` | `DeleteProductByIdCommand` | Deletes the S3 image, then the document; publishes nothing |
+| POST | `CreateBrand` | `CreateBrandCommand` | Rejects duplicate names (case-insensitive) |
+| POST | `CreateType` | `CreateTypeCommand` | Rejects duplicate names |
+| POST | `UploadProductImage` (multipart `imageFile`) | `UploadProductImageCommand` | Validates extension and size, returns the public URL |
+| POST | `api/v1/Admin/MigrateImagesToS3` | `MigrateImagesToS3Command` | One-off migration of local images to S3 (<Src path="src/Services/Catalog/Catalog.API/Controllers/AdminController.cs" />) |
+
+## Data model
+
+```mermaid
+classDiagram
+  class BaseEntity {
+    +string Id
+  }
+  class Product {
+    +string Name
+    +string Summary
+    +string Description
+    +string ImageFile
+    +decimal Price
+    +ProductBrand Brands
+    +ProductType Types
+  }
+  class ProductBrand {
+    +string Name
+  }
+  class ProductType {
+    +string Name
+  }
+  BaseEntity <|-- Product
+  BaseEntity <|-- ProductBrand
+  BaseEntity <|-- ProductType
+  Product *-- ProductBrand : embedded copy
+  Product *-- ProductType : embedded copy
+```
+
+Brand and type are **embedded** in each product document, as well as stored in their own collections. Filtering by `brandId` queries `Brands.Id` inside the product (<Src path="src/Services/Catalog/Catalog.Infrastructure/Repositories/ProductRepository.cs" />). Reads avoid a join, but renaming a brand does not update the products that embed it.
+
+`Price` is stored as BSON `Decimal128` to avoid floating-point rounding (<Src path="src/Services/Catalog/Catalog.Core/Entities/Product.cs" />).
+
+## Implementation notes
+
+### Pagination, filtering and sorting
+
+`CatalogSpecParams` defaults to page 1 with 12 items, and its setter clamps `PageSize` at 70 (<Src path="src/Services/Catalog/Catalog.Core/Specs/CatalogSpecParams.cs" />). The repository builds a MongoDB `FilterDefinition` from the optional parameters:
+
+- `search`: `Name.ToLower().Contains(...)`, translated by the driver into a case-insensitive regex. There is no text index, so this scans the collection.
+- `brandId` and `typeId`: equality on the embedded IDs.
+- `sort`: `priceAsc`, `priceDesc`, or anything else for name ascending.
+
+It runs `CountDocumentsAsync` and a `Find().Sort().Skip().Limit()` for the page, so a request makes two round trips.
+
+### Image storage (S3 and LocalStack)
+
+`Program.cs` builds one of two `IAmazonS3` clients:
+
+- **LocalStack**, when `USE_LOCALSTACK` is true and `AWS_ENDPOINT_URL` is set: `ServiceURL` points at the endpoint, with `ForcePathStyle = true`.
+- **AWS**: `ServiceURL = https://s3.{region}.amazonaws.com`, with credentials from `FallbackCredentialsFactory` (environment variables or IRSA on EKS).
+
+`S3ImageStorageService` (<Src path="src/Services/Catalog/Catalog.Infrastructure/Services/S3ImageStorageService.cs" />) validates the extension against `ImageSettings.AllowedExtensions` (`.png`, `.jpg`, `.jpeg`, `.webp`) and the size against `MaxFileSizeInMB` (5). It generates a collision-free key (`products/{sanitized}_{yyyyMMddHHmmss}_{8 hex}.ext`) and returns either a path-style LocalStack URL or a virtual-hosted AWS URL. Deleting parses the key back out of any of the three URL shapes. Update and delete handlers write to MongoDB **first** and delete the old S3 object only after the write succeeds; image clean-up is best-effort and never fails the request. Unknown or malformed product IDs return `404` problem details.
+
+### Seeding
+
+`CatalogSeeder` runs **once at startup** from `Program.cs`. It creates case-insensitive unique indexes on brand and type names, then seeds empty collections from the JSON files in <Src path="src/Services/Catalog/Catalog.Infrastructure/Data/SeedData" tree /> with awaited bulk inserts (duplicate-key errors from a concurrent replica are ignored). With LocalStack enabled, it uses `products-local.json`, whose image URLs point at LocalStack. `IMongoClient` and `ICatalogContext` are singletons, and a seeding failure stops the process.
+
+<Aside type="caution" title="Known issues">
+- `ProductActivityEvent.Actor` is hard-coded to `"system"` (with a `TODO: Get from auth context`), because there is no authentication yet.
+- No pipeline behaviours are registered, so commands are not validated beyond the checks written in the handlers.
+</Aside>
+
+## Configuration
+
+| Key | Example | Purpose |
+|---|---|---|
+| `DatabaseSettings:ConnectionString` | `mongodb://admin:admin1234@catalogdb:27017/?authSource=admin` | MongoDB connection |
+| `DatabaseSettings:DatabaseName` | `CatalogDb` | Database |
+| `DatabaseSettings:CollectionName` / `BrandsCollection` / `TypesCollection` | `Products` / `Brands` / `Types` | Collection names |
+| `EventBusSettings:HostAddress` | `amqp://guest:guest@rabbitmq:5672` | RabbitMQ |
+| `ElasticConfiguration:Uri` | `http://elasticsearch:9200` | Serilog sink |
+| `AWS:S3:BucketName` / `Region` / `ImagePrefix` / `ServiceUrl` | `ecommerce-product-images` / `us-east-1` / `products/` | Image storage |
+| `USE_LOCALSTACK`, `AWS_ENDPOINT_URL` | `true`, `http://localstack:4566` | Switch to LocalStack |
+| `Otlp:Endpoint` | defaults to `http://jaeger-collector.istio-system:4317` | Trace export |

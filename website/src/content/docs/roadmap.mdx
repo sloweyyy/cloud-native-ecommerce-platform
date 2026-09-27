@@ -1,0 +1,50 @@
+---
+title: Roadmap and engineering log
+description: What changed recently, and what is planned next. Kept deliberately short and easy to update.
+---
+
+import Src from '../../components/Src.astro';
+
+{/*
+  HOW TO UPDATE THIS PAGE
+  - New work shipped: add a row at the TOP of "Engineering log" (date, change, PR/commit link).
+  - Starting a planned item: change its status pill to <span class="pill partial">in progress</span>.
+  - Finished a planned item: move it to the log and delete it from "Planned".
+  Pills: ok = done, partial = in progress, gap = not started.
+*/}
+
+This page is the project's changelog for humans: a short list of engineering changes that matter, and what is planned next. The full, generated history is in <Src path="CHANGELOG.md" />, which semantic-release maintains.
+
+## Planned
+
+In rough priority order. Each item links to where the gap is described.
+
+| # | Item | Why | Status |
+|---|---|---|---|
+| 1 | **Health checks and probes** | Map `/health/live` and `/health/ready` (packages are already referenced), add Kubernetes liveness and readiness probes | <span class="pill gap">not started</span> |
+| 2 | **JWT authentication** | Validate the Azure AD B2C tokens the frontend already sends: Ocelot `AuthenticationOptions` plus `AddAuthentication().AddJwtBearer()` in services; replace the hard-coded `"system"` and `"slowey"` actors | <span class="pill gap">not started</span> |
+| 3 | **Transactional outbox** | Reliable publish for Basket checkout and Catalog activity (the checkout consumer is already idempotent) ([Event bus](/building-blocks/event-bus/#delivery-semantics)) | <span class="pill partial">in progress</span> |
+| 4 | **Observability depth** | Shared telemetry extension; MassTransit, EF Core, Mongo and Redis spans; OTel metrics that feed the business dashboards | <span class="pill gap">not started</span> |
+| 5 | **.NET Aspire for local orchestration** | Replace the Compose-based inner loop with an Aspire AppHost (service discovery, dashboard with logs, traces and metrics) while keeping Compose and Helm for deployment | <span class="pill gap">exploring</span> |
+| 6 | **Payment data hygiene** | Stop sending and storing card number and CVV; tokenize at the edge | <span class="pill gap">not started</span> |
+| 7 | **Infrastructure convergence** | Pick one IaC path (Terraform), enable its remote state, align naming with CD, add an `apply` job with environment approvals | <span class="pill gap">not started</span> |
+| 8 | **Strict mTLS and policies** | `PeerAuthentication` STRICT, sidecars for Ordering, `AuthorizationPolicy` per service, working NetworkPolicies | <span class="pill gap">not started</span> |
+
+## Engineering log
+
+Newest first.
+
+| Date | Change | Reference |
+|---|---|---|
+| 2026-09 | **Backend correctness + tests**: mediator resolves handlers per scope (every Development request used to 500), shared RFC 7807 errors via `Common.Api`, 404/empty basket instead of 500, paging clamps, checkout validated before publishing, gRPC deadline, log-forging fix. 86 unit tests plus an end-to-end smoke test that drives checkout through the gateway, RabbitMQ and Ordering | [#564](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/564) |
+| 2026-09 | **Data integrity + fail-fast startup**: Ordering migrations regenerated (fresh databases got no schema), Discount stops dropping coupons, Catalog seeds once with unique indexes, S3 delete after the DB write, idempotent checkout consumers with retry. 11 Testcontainers integration tests | [#562](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/562) |
+| 2026-09 | **Documentation website** (this site): Astro + Starlight, every page grounded in the code, with interactive architecture diagram | `website/` |
+| 2026-09 | **Clearer frontend names**: `frontend/micro-frontends` renamed to `frontend/web` (current), `frontend/client` to `frontend/legacy-angular` (deprecated) | merged with #556 |
+| 2026-09 | **Standardized repository layout**: `src/Services`, `src/ApiGateways`, `src/BuildingBlocks`, `frontend/`, `deploy/`, `docs/`, `tests/load/k6`. All workflows, Dependabot, Compose, scripts and docs updated. Dockerfiles now copy the full project graph and `global.json` before restore, so the restore layer caches | [#556](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/556) |
+| 2026-09 | **Nx 23.2.1 alignment**: all 11 Nx packages migrated together with `nx migrate` (a Dependabot security bump had moved only 4), webpack pinned, `@module-federation/runtime` added; `npm audit` went from 31 to 3 findings | [#541](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/541) |
+| 2026-06 | **Green CI**: lockfile re-sync, k6 install fix, redundant workflow dropped, Dependabot grouping; Nx excluded from Dependabot; dependency and CI policy documented | [#468](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/468), [#475](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/475), [#477](https://github.com/sloweyyy/cloud-native-ecommerce-platform/pull/477) |
+| 2026-05 | **Auto-merge** for Dependabot patch and minor bumps | `dependabot-auto-merge.yml` |
+| 2026-05 | **MediatR replaced** with in-house `Common.Mediator` (MediatR 13+ is commercially licensed) | [Mediator](/building-blocks/mediator/) |
+| 2026-05 | **.NET 10 modernization**: target framework `net10.0`, SDK pinned in `global.json`, central package management, AutoMapper replaced with Mapperly, MassTransit aligned on 8.x, Newtonsoft removed, known CVEs fixed | `Directory.Packages.props` |
+| 2026-05 | Docker build matrix restricted to `linux/amd64` (`protoc` segfaults under QEMU arm64) | `docker.yml` |
+| 2026-03 | **Terraform for AWS**: 8 modules (VPC, security, EKS, ECR, databases, Amazon MQ, S3, OpenSearch) plus a Terraform CI workflow | <Src path="deploy/terraform" tree /> |
