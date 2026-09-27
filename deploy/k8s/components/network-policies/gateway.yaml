@@ -1,0 +1,55 @@
+# API gateway: the public entry point. Accepts traffic from any source (ingress
+# controller, LoadBalancer, Istio gateway, other namespaces) and may only call
+# the four backend APIs plus logging.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ocelotapigw
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: ocelotapigw
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+      ports:
+        - protocol: TCP
+          port: 80
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: basket
+      ports:
+        - protocol: TCP
+          port: 80
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ordering
+      ports:
+        - protocol: TCP
+          port: 80
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: discount
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Serilog -> Elasticsearch (logging component)
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: elasticsearch
+      ports:
+        - protocol: TCP
+          port: 9200

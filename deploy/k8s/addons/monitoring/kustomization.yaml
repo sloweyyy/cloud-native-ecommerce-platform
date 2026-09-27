@@ -1,0 +1,38 @@
+# Optional lightweight monitoring stack in its own `monitoring` namespace:
+# Prometheus (Kubernetes service discovery, scrapes pods annotated with
+# prometheus.io/scrape=true) + Grafana with Prometheus pre-provisioned.
+#
+#   kubectl apply -k deploy/k8s/addons/monitoring
+#
+# For anything beyond local use prefer the kube-prometheus-stack Helm chart
+# (see deploy/helm/prometheus/README.md).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: monitoring
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: eshopping-monitoring
+    includeSelectors: false
+
+resources:
+  - namespace.yaml
+  - prometheus.yaml
+  - grafana.yaml
+  - ingress.yaml
+
+configMapGenerator:
+  - name: prometheus-config
+    files:
+      - prometheus.yml
+  - name: grafana-datasources
+    files:
+      - grafana-datasources.yaml
+
+# DEV-ONLY Grafana admin credentials.
+secretGenerator:
+  - name: grafana-admin
+    literals:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin

@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: redis-configmap
-data:
-  redis-url: "redis-service:6379"

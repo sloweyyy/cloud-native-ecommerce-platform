@@ -1,0 +1,18 @@
+# Opt the ecommerce namespace into Istio sidecar injection.
+# Data stores opt out per pod (sidecar.istio.io/inject: "false") so database
+# start-up is never gated on the proxy. The Gateway/VirtualServices live in
+# deploy/istio and are applied separately once Istio is installed.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      kind: Namespace
+      name: ecommerce
+    patch: |-
+      - op: add
+        path: /metadata/labels/istio-injection
+        value: enabled
+
+resources:
+  - network-policy.yaml

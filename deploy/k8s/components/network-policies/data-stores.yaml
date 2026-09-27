@@ -1,0 +1,140 @@
+# Data stores accept connections only from the services that own them. They
+# need no egress beyond DNS, which default-deny-all + allow-dns-egress enforce.
+# Admin ports are also reachable through `kubectl port-forward`, which does not
+# traverse pod networking.
+# MongoDB: only the Catalog API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: catalogdb
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: catalogdb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+      ports:
+        - protocol: TCP
+          port: 27017
+---
+# Redis: only the Basket API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: basketdb
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: basketdb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: basket
+      ports:
+        - protocol: TCP
+          port: 6379
+---
+# PostgreSQL: the Discount service (and pgAdmin from the management addon)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: discountdb
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: discountdb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: discount
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: pgadmin
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+# SQL Server: only the Ordering API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: orderdb
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: orderdb
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ordering
+      ports:
+        - protocol: TCP
+          port: 1433
+---
+# RabbitMQ AMQP: publishers/consumers only
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rabbitmq
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: basket
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ordering
+      ports:
+        - protocol: TCP
+          port: 5672
+    # Management UI through the ingress component (rabbitmq.localhost)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 15672
+---
+# LocalStack S3: only the Catalog API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: localstack
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: localstack
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+      ports:
+        - protocol: TCP
+          port: 4566

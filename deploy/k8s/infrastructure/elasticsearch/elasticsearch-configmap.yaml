@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: elasticsearch-configmap
-data:
-  elasticsearch-url: "http://elasticsearch-service:9200"

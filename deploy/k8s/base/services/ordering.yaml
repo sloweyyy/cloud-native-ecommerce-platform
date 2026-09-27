@@ -1,0 +1,102 @@
+# Ordering API (REST, SQL Server + RabbitMQ consumer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshopping-ordering
+  labels:
+    app.kubernetes.io/name: ordering
+    app.kubernetes.io/instance: eshopping-ordering
+    app.kubernetes.io/component: api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ordering
+    app.kubernetes.io/instance: eshopping-ordering
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+      appProtocol: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshopping-ordering
+  labels:
+    app.kubernetes.io/name: ordering
+    app.kubernetes.io/instance: eshopping-ordering
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ordering
+      app.kubernetes.io/instance: eshopping-ordering
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ordering
+        app.kubernetes.io/instance: eshopping-ordering
+        app.kubernetes.io/component: api
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        # "app" user of the mcr.microsoft.com/dotnet/aspnet images.
+        runAsNonRoot: true
+        runAsUser: 1654
+        runAsGroup: 1654
+        seccompProfile:
+          type: RuntimeDefault
+        # The images listen on port 80 as a non-root user. Allow that without
+        # NET_BIND_SERVICE (containerd < 2.0 does not do this by default).
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "0"
+      containers:
+        - name: ordering
+          image: eshop/ordering.api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ordering-config
+            - secretRef:
+                name: ordering-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          # /health/live and /health/ready are provided by the services' health
+          # checks (liveness = process up, readiness = dependencies reachable).
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 36
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

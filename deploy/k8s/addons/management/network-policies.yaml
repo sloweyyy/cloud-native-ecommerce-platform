@@ -1,0 +1,52 @@
+# Allow-rules for the admin tools; needed because the platform's
+# network-policies component puts a default-deny on the ecommerce namespace.
+# pgAdmin -> PostgreSQL ingress is already allowed by the discountdb policy.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: pgadmin
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: pgadmin
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: discountdb
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: portainer
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: portainer
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 9000
+  egress:
+    # Kubernetes API server (address differs per distribution).
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443

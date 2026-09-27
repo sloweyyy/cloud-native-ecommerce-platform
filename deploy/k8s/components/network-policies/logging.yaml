@@ -1,0 +1,60 @@
+# Elasticsearch: log shipping from every .NET workload, queries from Kibana
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: elasticsearch
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: elasticsearch
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: catalog
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: basket
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: discount
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ordering
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ocelotapigw
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: kibana
+      ports:
+        - protocol: TCP
+          port: 9200
+---
+# Kibana: UI reachable from any source (ingress controller / port-forward) and
+# may only query Elasticsearch.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kibana
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: kibana
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 5601
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: elasticsearch
+      ports:
+        - protocol: TCP
+          port: 9200

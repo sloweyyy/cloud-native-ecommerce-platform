@@ -1,0 +1,98 @@
+# Discount gRPC service (PostgreSQL)
+#
+# Service name/port match Helm (eshopping-discount-discount-grpc:8080) and the
+# callers: Basket (GrpcSettings__DiscountUrl) and ocelot.k8s.json.
+# The port is named "grpc" with appProtocol grpc so Istio treats it as HTTP/2.
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshopping-discount-discount-grpc
+  labels:
+    app.kubernetes.io/name: discount
+    app.kubernetes.io/instance: eshopping-discount
+    app.kubernetes.io/component: api
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: discount
+    app.kubernetes.io/instance: eshopping-discount
+  ports:
+    - name: grpc
+      port: 8080
+      targetPort: grpc
+      protocol: TCP
+      appProtocol: grpc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eshopping-discount
+  labels:
+    app.kubernetes.io/name: discount
+    app.kubernetes.io/instance: eshopping-discount
+    app.kubernetes.io/component: api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discount
+      app.kubernetes.io/instance: eshopping-discount
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: discount
+        app.kubernetes.io/instance: eshopping-discount
+        app.kubernetes.io/component: api
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        # "app" user of the mcr.microsoft.com/dotnet/aspnet images.
+        runAsNonRoot: true
+        runAsUser: 1654
+        runAsGroup: 1654
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: discount
+          image: eshop/discount.grpc
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8080
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: discount-config
+            - secretRef:
+                name: discount-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          # Kestrel serves ONLY cleartext HTTP/2 (h2c) on 8080
+          # (src/Services/Discount/Discount.API/appsettings.json), and kubelet HTTP
+          # probes speak HTTP/1.1, so /health/* cannot be probed on this port.
+          # Use TCP until the service exposes an HTTP/1.1 health port or the
+          # grpc.health.v1 service (then switch to httpGet or `grpc:` probes).
+          startupProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: grpc
+            periodSeconds: 10
+            failureThreshold: 3

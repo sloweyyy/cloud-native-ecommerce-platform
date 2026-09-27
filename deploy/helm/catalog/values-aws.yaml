@@ -42,24 +42,14 @@ env:
     - name: AWS_REGION
       value: "ap-southeast-1"
 
-# ConfigMap values (will be set via --set flags)
-configmap:
-  - name: DatabaseSettings__ConnectionString
-    key: DatabaseSettings__ConnectionString
-  - name: DatabaseSettings__DatabaseName
-    key: DatabaseSettings__DatabaseName
-  - name: DatabaseSettings__CollectionName
-    key: DatabaseSettings__CollectionName
-  - name: DatabaseSettings__BrandsCollection
-    key: DatabaseSettings__BrandsCollection
-  - name: DatabaseSettings__TypesCollection
-    key: DatabaseSettings__TypesCollection
-  - name: AWS__S3__BucketName
-    key: AWS__S3__BucketName
-  - name: AWS__S3__Region
-    key: AWS__S3__Region
-  - name: AWS__S3__ImagePrefix
-    key: AWS__S3__ImagePrefix
+# ConfigMap overrides. The chart's configmap template reads a map and falls back
+# to built-in defaults for any key left unset; supply real AWS values at deploy
+# time, e.g. --set configmap.DatabaseSettings__ConnectionString=... Keys:
+# DatabaseSettings__ConnectionString, DatabaseSettings__DatabaseName,
+# DatabaseSettings__CollectionName, DatabaseSettings__BrandsCollection,
+# DatabaseSettings__TypesCollection, AWS__S3__BucketName, AWS__S3__Region,
+# AWS__S3__ImagePrefix
+configmap: {}
 
 # Service Account for IRSA (IAM Roles for Service Accounts)
 serviceAccount:

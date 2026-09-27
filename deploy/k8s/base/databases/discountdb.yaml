@@ -1,0 +1,92 @@
+# Discount database - PostgreSQL (StatefulSet + PVC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshopping-discountdb
+  labels:
+    app.kubernetes.io/name: discountdb
+    app.kubernetes.io/instance: eshopping-discountdb
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: discountdb
+    app.kubernetes.io/instance: eshopping-discountdb
+  ports:
+    - name: tcp-postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eshopping-discountdb
+  labels:
+    app.kubernetes.io/name: discountdb
+    app.kubernetes.io/instance: eshopping-discountdb
+    app.kubernetes.io/component: database
+spec:
+  serviceName: eshopping-discountdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: discountdb
+      app.kubernetes.io/instance: eshopping-discountdb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: discountdb
+        app.kubernetes.io/instance: eshopping-discountdb
+        app.kubernetes.io/component: database
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_DB
+              value: DiscountDb
+            # Sub-directory so the volume's lost+found does not break initdb.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          envFrom:
+            - secretRef:
+                name: discountdb-credentials
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi

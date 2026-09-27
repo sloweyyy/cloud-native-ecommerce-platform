@@ -1,181 +1,120 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Deploy the eShopping platform from the kustomize manifests in this directory.
+#
+# Usage: ./deploy-all.sh [options]
+#   --overlay <name>     overlays/<name> to apply: local (default) | ci
+#   --with-istio         also enable Istio sidecar injection and apply deploy/istio
+#                        (requires `istioctl` on PATH; installs the demo profile
+#                        if Istio is not present yet). Only with --overlay local.
+#   --with-monitoring    also apply addons/monitoring (Prometheus + Grafana)
+#   --with-management    also apply addons/management (pgAdmin + Portainer)
+#   --timeout <dur>      per-workload rollout timeout (default 600s)
+#   --no-wait            apply only, do not wait for rollouts
+#   -h | --help
+#
+# Images: the manifests reference eshop/<service>:latest with
+# imagePullPolicy IfNotPresent. Build them and load them into your cluster
+# first (see deploy/README.md), e.g. `kind load docker-image eshop/catalog.api:latest`.
+set -euo pipefail
 
-# Deploy all Kubernetes manifests for e-commerce platform
-# This script deploys infrastructure, databases, microservices, monitoring, and management tools
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+NAMESPACE=ecommerce
+OVERLAY=local
+WITH_ISTIO=false
+WITH_MONITORING=false
+WITH_MANAGEMENT=false
+TIMEOUT=600s
+WAIT=true
 
-set -e
+usage() { sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; }
 
-echo "======================================"
-echo "Deploying E-Commerce Platform to K8s"
-echo "======================================"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --overlay) OVERLAY="$2"; shift 2 ;;
+    --with-istio) WITH_ISTIO=true; shift ;;
+    --with-monitoring) WITH_MONITORING=true; shift ;;
+    --with-management) WITH_MANAGEMENT=true; shift ;;
+    --timeout) TIMEOUT="$2"; shift 2 ;;
+    --no-wait) WAIT=false; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
 
-# 1. Deploy Infrastructure Components
-echo ""
-echo "1. Deploying Infrastructure (RabbitMQ, Elasticsearch, Kibana)..."
-kubectl apply -f infrastructure/rabbitmq/rabbitmq.yaml
-kubectl apply -f infrastructure/elasticsearch/elasticsearch.yaml
-kubectl apply -f infrastructure/kibana/kibana.yaml
+log() { printf '\n==> %s\n' "$*"; }
 
-# 2. Deploy Databases
-echo ""
-echo "2. Deploying Databases..."
+command -v kubectl >/dev/null || { echo "kubectl not found on PATH" >&2; exit 1; }
+kubectl cluster-info >/dev/null || { echo "Cannot reach the Kubernetes cluster (check your kubeconfig context)" >&2; exit 1; }
 
-# Catalog DB (MongoDB)
-echo "   - Deploying Catalog DB (MongoDB)..."
-kubectl apply -f databases/mongodb.yaml
+target="overlays/${OVERLAY}"
+if [[ "${WITH_ISTIO}" == "true" ]]; then
+  [[ "${OVERLAY}" == "local" ]] || { echo "--with-istio is only supported with --overlay local" >&2; exit 2; }
+  target="overlays/local-istio"
+fi
+[[ -f "${SCRIPT_DIR}/${target}/kustomization.yaml" ]] || { echo "No such overlay: ${target}" >&2; exit 2; }
 
-# Basket DB (Redis)
-echo "   - Deploying Basket DB (Redis)..."
-kubectl apply -f basket/basket-db/basket-db.yaml
-
-# Discount DB (PostgreSQL)
-echo "   - Deploying Discount DB (PostgreSQL)..."
-kubectl apply -f discount/discount-db/discount-db.yaml
-
-# Ordering DB (SQL Server)
-echo "   - Deploying Ordering DB (SQL Server)..."
-kubectl apply -f ordering/ordering-db/ordering-db.yaml
-
-# Wait for databases to be ready
-echo ""
-echo "3. Waiting for databases to be ready..."
-kubectl wait --for=condition=ready pod -l app=catalogdb --timeout=120s || true
-kubectl wait --for=condition=ready pod -l app=redis --timeout=120s || true
-kubectl wait --for=condition=ready pod -l app=postgres --timeout=120s || true
-kubectl wait --for=condition=ready pod -l app=sqlserver --timeout=180s || true
-
-# 4. Deploy Microservices
-echo ""
-echo "4. Deploying Microservices..."
-
-# Catalog API
-echo "   - Deploying Catalog API..."
-kubectl apply -f catalog/catalog-api/catalog-api.yaml
-
-# Basket API
-echo "   - Deploying Basket API..."
-kubectl apply -f basket/basket-api/basket-api.yaml
-
-# Discount API
-echo "   - Deploying Discount API..."
-kubectl apply -f discount/discount-api/discount-api.yaml
-
-# Ordering API
-echo "   - Deploying Ordering API..."
-kubectl apply -f ordering/ordering-api/ordering-api.yaml
-
-# 5. Deploy API Gateway
-echo ""
-echo "5. Deploying API Gateway (Ocelot)..."
-kubectl apply -f gateway/ocelot-gateway.yaml
-
-# 6. Deploy Monitoring Stack
-echo ""
-echo "6. Deploying Monitoring Stack (Prometheus)..."
-kubectl apply -f monitoring/prometheus/prometheus-rbac.yaml
-kubectl apply -f monitoring/prometheus/prometheus-configmap.yaml
-kubectl apply -f monitoring/prometheus/prometheus.yaml
-
-# 7. Deploy Management Tools
-echo ""
-echo "7. Deploying Management Tools (Portainer, pgAdmin)..."
-kubectl apply -f management/portainer/portainer-rbac.yaml
-kubectl apply -f management/portainer/portainer.yaml
-kubectl apply -f management/pgadmin/pgadmin.yaml
-
-# 8. Deploy Service Mesh (Istio)
-echo ""
-echo "8. Deploying Service Mesh (Istio)..."
-if [ ! -d "istio-1.20.0" ]; then
-    echo "   Downloading Istio..."
-    curl -L https://istio.io/downloadIstio | sh -
+if [[ "${WITH_ISTIO}" == "true" ]]; then
+  command -v istioctl >/dev/null || { echo "--with-istio needs istioctl on PATH (https://istio.io/latest/docs/setup/getting-started/)" >&2; exit 1; }
+  if ! kubectl get deployment istiod -n istio-system >/dev/null 2>&1; then
+    log "Installing Istio (demo profile)"
+    istioctl install --set profile=demo -y
+  fi
 fi
 
-# Find the istio directory
-ISTIO_DIR=$(find . -maxdepth 1 -name "istio-*" -type d | head -n 1)
+log "Applying ${target}"
+kubectl apply -k "${SCRIPT_DIR}/${target}"
 
-echo "   Installing Istio control plane..."
-${ISTIO_DIR}/bin/istioctl install --set values.defaultRevision=default -y
-
-echo "   Enabling Istio injection on default namespace..."
-kubectl label namespace default istio-injection=enabled --overwrite
-
-echo "   Installing Istio addons (Jaeger, Kiali, Grafana)..."
-kubectl apply -f ${ISTIO_DIR}/samples/addons/jaeger.yaml
-kubectl apply -f ${ISTIO_DIR}/samples/addons/kiali.yaml
-kubectl apply -f ${ISTIO_DIR}/samples/addons/grafana.yaml
-
-echo "   Waiting for Istio components..."
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=grafana -n istio-system --timeout=600s || echo "   Grafana may not be ready yet"
-kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=kiali -n istio-system --timeout=600s || echo "   Kiali may not be ready yet"
-
-echo "   Configuring Istio monitoring integration..."
-if [ -f "scripts/monitoring/fix-kiali-prometheus-connection.sh" ]; then
-    ./scripts/monitoring/fix-kiali-prometheus-connection.sh
-else
-    echo "   Kiali fix script not found, skipping..."
+if [[ "${WITH_ISTIO}" == "true" ]]; then
+  log "Applying Istio gateway, routes and tracing (deploy/istio)"
+  kubectl apply -f "${REPO_ROOT}/deploy/istio/gateway.yaml" \
+                -f "${REPO_ROOT}/deploy/istio/virtualservices.yaml" \
+                -f "${REPO_ROOT}/deploy/istio/telemetry-tracing.yaml"
+fi
+if [[ "${WITH_MONITORING}" == "true" ]]; then
+  log "Applying addons/monitoring"
+  kubectl apply -k "${SCRIPT_DIR}/addons/monitoring"
+  if [[ "${WITH_ISTIO}" == "true" ]]; then
+    kubectl apply -f "${REPO_ROOT}/deploy/istio/monitoring-virtualservices.yaml"
+  fi
+fi
+if [[ "${WITH_MANAGEMENT}" == "true" ]]; then
+  log "Applying addons/management"
+  kubectl apply -k "${SCRIPT_DIR}/addons/management"
 fi
 
-if [ -f "scripts/monitoring/enable-istio-metrics.sh" ]; then
-    ./scripts/monitoring/enable-istio-metrics.sh
-else
-    echo "   Istio metrics script not found, skipping..."
+if [[ "${WAIT}" == "true" ]]; then
+  # Data stores first, then the APIs, then the gateway: mirrors start-up order.
+  log "Waiting for rollouts (timeout ${TIMEOUT} each)"
+  wait_all() {
+    local ns="$1" kind="$2" selector="$3" names
+    names=$(kubectl get "${kind}" -n "${ns}" -l "${selector}" -o name)
+    for obj in ${names}; do
+      echo "  ${obj}"
+      kubectl rollout status "${obj}" -n "${ns}" --timeout="${TIMEOUT}"
+    done
+  }
+  for component in database messaging storage logging api gateway; do
+    wait_all "${NAMESPACE}" statefulset "app.kubernetes.io/component=${component}"
+    wait_all "${NAMESPACE}" deployment "app.kubernetes.io/component=${component}"
+  done
+  if [[ "${WITH_MONITORING}" == "true" ]]; then
+    wait_all monitoring statefulset "app.kubernetes.io/part-of=eshopping-monitoring"
+  fi
+  if [[ "${WITH_MANAGEMENT}" == "true" ]]; then
+    wait_all "${NAMESPACE}" statefulset "app.kubernetes.io/part-of=eshopping-management"
+  fi
 fi
 
-if [ -f "scripts/setup-grafana.sh" ]; then
-    ./scripts/setup-grafana.sh
-fi
+log "Deployed. Pods in ${NAMESPACE}:"
+kubectl get pods -n "${NAMESPACE}" -o wide
 
-if [ -f "scripts/monitoring/setup-grafana-prometheus-connection.sh" ]; then
-    ./scripts/monitoring/setup-grafana-prometheus-connection.sh > /dev/null 2>&1 || echo "   Grafana setup may have warnings"
-fi
+cat <<EOF
 
-echo "   Restarting services to inject Istio sidecars..."
-kubectl rollout restart deployment eshopping-catalog
-kubectl rollout restart deployment eshopping-basket
-kubectl rollout restart deployment eshopping-discount
-kubectl rollout restart deployment eshopping-ordering
-kubectl rollout restart deployment eshopping-gateway-ocelotapigw
-
-echo "   Waiting for services to restart with sidecars..."
-kubectl rollout status deployment eshopping-catalog --timeout=300s
-kubectl rollout status deployment eshopping-basket --timeout=300s
-kubectl rollout status deployment eshopping-discount --timeout=300s
-kubectl rollout status deployment eshopping-ordering --timeout=300s
-kubectl rollout status deployment eshopping-gateway-ocelotapigw --timeout=300s
-
-# 9. Deploy Ingress (if exists)
-echo ""
-echo "9. Deploying Ingress Resources..."
-kubectl apply -f ingress/ 2>/dev/null || echo "   No ingress resources found, skipping..."
-
-# Display deployment status
-echo ""
-echo "======================================"
-echo "Deployment Complete!"
-echo "======================================"
-echo ""
-echo "Checking deployment status..."
-kubectl get pods
-echo ""
-echo "Services:"
-kubectl get svc
-
-echo ""
-echo "======================================"
-echo "Access Points (use kubectl port-forward):"
-echo "======================================"
-echo "API Gateway (Ocelot):     kubectl port-forward svc/eshopping-gateway-ocelotapigw 8010:80"
-echo "Catalog API:              kubectl port-forward svc/eshopping-catalog 8000:80"
-echo "Basket API:               kubectl port-forward svc/eshopping-basket 8001:80"
-echo "Discount API:             kubectl port-forward svc/eshopping-discount-discount-grpc 8002:8080"
-echo "Ordering API:             kubectl port-forward svc/eshopping-ordering 8003:80"
-echo "RabbitMQ Management:      kubectl port-forward svc/eshopping-rabbitmq 15672:5672"
-echo "Kibana:                   kubectl port-forward svc/eshopping-kibana 5601:5601"
-echo "Prometheus:               kubectl port-forward svc/prometheus-server 9090:80 -n monitoring"
-echo "Grafana:                  kubectl port-forward svc/grafana 3000:3000 -n istio-system"
-echo "Jaeger (Tracing):         kubectl port-forward -n istio-system svc/tracing 16686:80"
-echo "Kiali (Service Mesh):     kubectl port-forward -n istio-system svc/kiali 20001:20001"
-echo "Portainer:                kubectl port-forward svc/portainer 9000:9000"
-echo "pgAdmin:                  kubectl port-forward svc/pgadmin 5050:80"
-echo "======================================"
+Access (port-forward all with ./port-forward.sh):
+  API gateway   kubectl -n ${NAMESPACE} port-forward svc/eshopping-ocelotapigw 8010:80
+  RabbitMQ UI   kubectl -n ${NAMESPACE} port-forward svc/eshopping-rabbitmq 15672:15672
+  Kibana        kubectl -n ${NAMESPACE} port-forward svc/eshopping-kibana 5601:5601   (local overlay)
+  With ingress-nginx installed: http://api.localhost, http://rabbitmq.localhost, http://kibana.localhost
+Validate:       ./validate-deployment.sh
+EOF

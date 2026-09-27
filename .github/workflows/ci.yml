@@ -320,6 +320,14 @@ jobs:
       - name: Install yamllint
         run: pip install yamllint
 
+      - name: Install kubeconform
+        env:
+          KUBECONFORM_VERSION: v0.8.0
+        run: |
+          curl -sSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" | tar xz kubeconform
+          sudo mv kubeconform /usr/local/bin/
+          kubeconform -v
+
       - name: Validate Kubernetes manifests
         run: |
           chmod +x .github/scripts/validate-k8s-manifests.sh

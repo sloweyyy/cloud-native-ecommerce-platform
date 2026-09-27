@@ -1,0 +1,30 @@
+# Optional admin tools, deployed next to the platform in the `ecommerce`
+# namespace (apply the base/overlay first):
+#   - pgAdmin    (Discount PostgreSQL)          http://pgadmin.localhost
+#   - Portainer  (cluster UI, cluster-admin!)   http://portainer.localhost
+#
+#   kubectl apply -k deploy/k8s/addons/management
+#
+# Local development only: Portainer is bound to cluster-admin.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ecommerce
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: eshopping-management
+    includeSelectors: false
+
+resources:
+  - pgadmin.yaml
+  - portainer.yaml
+  - network-policies.yaml
+  - ingress.yaml
+
+# DEV-ONLY pgAdmin login.
+secretGenerator:
+  - name: pgadmin-credentials
+    literals:
+      - PGADMIN_DEFAULT_EMAIL=admin@eshopping.dev
+      - PGADMIN_DEFAULT_PASSWORD=admin1234

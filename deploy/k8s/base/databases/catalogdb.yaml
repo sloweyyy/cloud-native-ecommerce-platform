@@ -1,0 +1,95 @@
+# Catalog database - MongoDB (StatefulSet, data on a PersistentVolumeClaim)
+apiVersion: v1
+kind: Service
+metadata:
+  name: eshopping-catalogdb
+  labels:
+    app.kubernetes.io/name: catalogdb
+    app.kubernetes.io/instance: eshopping-catalogdb
+    app.kubernetes.io/component: database
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: catalogdb
+    app.kubernetes.io/instance: eshopping-catalogdb
+  ports:
+    - name: mongo
+      port: 27017
+      targetPort: mongo
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eshopping-catalogdb
+  labels:
+    app.kubernetes.io/name: catalogdb
+    app.kubernetes.io/instance: eshopping-catalogdb
+    app.kubernetes.io/component: database
+spec:
+  serviceName: eshopping-catalogdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalogdb
+      app.kubernetes.io/instance: eshopping-catalogdb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: catalogdb
+        app.kubernetes.io/instance: eshopping-catalogdb
+        app.kubernetes.io/component: database
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mongo
+          image: mongo:7.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: CatalogDb
+          envFrom:
+            - secretRef:
+                name: catalogdb-credentials
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          startupProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi

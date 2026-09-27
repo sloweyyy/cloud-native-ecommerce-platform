@@ -1,0 +1,23 @@
+# Zero-trust networking for the ecommerce namespace.
+#
+# default-deny-all blocks every ingress/egress flow, then each workload gets an
+# explicit allow-list for exactly the flows it needs (DNS, its data store, the
+# event bus, logging, tracing, ...). The deny and the allows ship together in
+# this component so it can never be applied half-way.
+#
+# Requires a CNI that enforces NetworkPolicy (Calico, Cilium, AWS VPC CNI with
+# network policies enabled, kindnet >= v0.24, ...). On CNIs that do not enforce
+# policies these objects are inert.
+#
+# If you also use the istio component, it adds the extra allow rules the Envoy
+# sidecars need to reach istiod.
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - default-deny.yaml
+  - allow-dns.yaml
+  - gateway.yaml
+  - services.yaml
+  - data-stores.yaml
+  - logging.yaml

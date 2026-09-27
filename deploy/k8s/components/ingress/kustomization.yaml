@@ -1,0 +1,12 @@
+# Host-based ingress-nginx routes for the platform. *.localhost resolves to
+# 127.0.0.1 in browsers and curl, so no /etc/hosts edits are needed locally:
+#   http://api.localhost       -> Ocelot API gateway (all public APIs)
+#   http://rabbitmq.localhost  -> RabbitMQ management UI
+#   http://kibana.localhost    -> Kibana (needs the logging component)
+# Host-based routing avoids path rewrites entirely (the old rules used
+# `rewrite-target: /` without a capture group, which sent every request to "/").
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - ingress.yaml
