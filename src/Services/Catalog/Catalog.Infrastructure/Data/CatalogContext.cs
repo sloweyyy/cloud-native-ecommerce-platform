@@ -4,6 +4,11 @@ using MongoDB.Driver;
 
 namespace Catalog.Infrastructure.Data;
 
+/// <summary>
+/// Thread-safe holder for the Mongo collections; registered as a singleton together with a
+/// singleton <see cref="IMongoClient"/>. Indexes and seed data are handled once at startup by
+/// <see cref="CatalogSeeder"/>, not per request.
+/// </summary>
 public class CatalogContext : ICatalogContext
 {
     public IMongoCollection<Product> Products { get; }
@@ -12,16 +17,12 @@ public class CatalogContext : ICatalogContext
 
     public IMongoCollection<ProductType> Types { get; }
 
-    public CatalogContext(IConfiguration configuration)
+    public CatalogContext(IMongoClient client, IConfiguration configuration)
     {
-        var client = new MongoClient(configuration.GetValue<string>("DatabaseSettings:ConnectionString"));
         var database = client.GetDatabase(configuration.GetValue<string>("DatabaseSettings:DatabaseName"));
         Brands = database.GetCollection<ProductBrand>(
             configuration.GetValue<string>("DatabaseSettings:BrandsCollection"));
         Types = database.GetCollection<ProductType>(configuration.GetValue<string>("DatabaseSettings:TypesCollection"));
         Products = database.GetCollection<Product>(configuration.GetValue<string>("DatabaseSettings:CollectionName"));
-        BrandContextSeed.SeedData(Brands);
-        TypeContextSeed.SeedData(Types);
-        CatalogContextSeed.SeedData(Products);
     }
 }

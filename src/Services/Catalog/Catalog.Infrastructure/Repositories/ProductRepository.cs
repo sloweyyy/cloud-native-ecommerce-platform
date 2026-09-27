@@ -110,7 +110,16 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
         if (await ((IBrandRepository)this).BrandExists(brand.Name))
             throw new ArgumentException($"Brand '{brand.Name}' already exists");
 
-        await _context.Brands.InsertOneAsync(brand);
+        try
+        {
+            await _context.Brands.InsertOneAsync(brand);
+        }
+        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+        {
+            // Lost a race with a concurrent insert; the unique index on Name is the real guard.
+            throw new ArgumentException($"Brand '{brand.Name}' already exists", ex);
+        }
+
         return brand;
     }
 
@@ -135,7 +144,16 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
         if (await ((ITypesRepository)this).TypeExists(type.Name))
             throw new ArgumentException($"Type '{type.Name}' already exists");
 
-        await _context.Types.InsertOneAsync(type);
+        try
+        {
+            await _context.Types.InsertOneAsync(type);
+        }
+        catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+        {
+            // Lost a race with a concurrent insert; the unique index on Name is the real guard.
+            throw new ArgumentException($"Type '{type.Name}' already exists", ex);
+        }
+
         return type;
     }
 
