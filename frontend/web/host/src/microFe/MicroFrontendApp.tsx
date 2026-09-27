@@ -17,7 +17,7 @@
 import { init, loadRemote } from '@module-federation/runtime';
 import { Spin } from 'antd';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { getMicroFrontendConfig } from '../config/microFrontendRegistry';
 import { getRemoteUrl } from '../helpers/environment';
 import { ErrorBoundary, ErrorBoundaryFallback } from './ErrorBoundary';
@@ -87,7 +87,7 @@ const MicroFrontendContent: React.FC<{ appName: string }> = ({ appName }) => {
         // Get remote URL for current environment
         const remoteUrl = getRemoteUrl(microFrontendConfig.urls);
 
-        console.log(`[MicroFrontendApp] Loading ${appName} from ${remoteUrl}`);
+        console.log('[MicroFrontendApp] Loading %s from %s', String(appName), String(remoteUrl));
 
         // Initialize Module Federation runtime
         init({
@@ -151,10 +151,10 @@ const MicroFrontendContent: React.FC<{ appName: string }> = ({ appName }) => {
           },
         });
 
-        console.log(`[MicroFrontendApp] Successfully loaded ${appName}`);
+        console.log('[MicroFrontendApp] Successfully loaded %s', String(appName));
         setIsLoading(false);
       } catch (err) {
-        console.error(`[MicroFrontendApp] Error loading ${appName}:`, err);
+        console.error('[MicroFrontendApp] Error loading %s:', String(appName), err);
         if (isMounted) {
           setError(
             err instanceof Error
@@ -174,9 +174,9 @@ const MicroFrontendContent: React.FC<{ appName: string }> = ({ appName }) => {
       if (unmountFnRef.current) {
         try {
           unmountFnRef.current(containerIdRef.current);
-          console.log(`[MicroFrontendApp] Unmounted ${appName}`);
+          console.log('[MicroFrontendApp] Unmounted %s', String(appName));
         } catch (err) {
-          console.error(`[MicroFrontendApp] Error unmounting ${appName}:`, err);
+          console.error('[MicroFrontendApp] Error unmounting %s:', String(appName), err);
         }
       }
     };
@@ -277,7 +277,8 @@ const MicroFrontendApp: React.FC<MicroFrontendAppProps> = (props) => {
   // Validate app is registered
   if (!microFrontendConfig) {
     console.error(
-      `[MicroFrontendApp] Micro frontend "${appName}" not found in registry`
+      '[MicroFrontendApp] Micro frontend "%s" not found in registry',
+      String(appName)
     );
 
     return (

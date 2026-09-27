@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import { Card, Typography, Button, Spin, Space, Flex, Result } from 'antd';
 import { LoginOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useAuth } from '@ecommerce-platform/auth-provider';

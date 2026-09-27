@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router';
 import { Layout as AntLayout } from 'antd';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';

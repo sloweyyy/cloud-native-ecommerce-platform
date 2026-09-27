@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { Space, Button } from 'antd';
 import { useNavigate } from '../../utils/navigation-handler';
 import { isStandaloneMode } from '../../utils/navigation';

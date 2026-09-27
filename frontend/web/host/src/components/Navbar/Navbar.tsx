@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Flex, Typography, Button } from 'antd';
 import NavbarActions from './NavbarActions';

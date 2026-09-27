@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import CartPreview, { CartItem } from '../../CartPreview/CartPreview';
 import { NavbarActionButton } from './NavbarActionButton';

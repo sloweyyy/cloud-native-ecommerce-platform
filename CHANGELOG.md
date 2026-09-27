@@ -37,6 +37,44 @@ All services are available as Docker images:
 
 **Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.9...0.11.10
 
+## [0.11.9] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(backend): correctness fixes, RFC 7807 errors, unit tests + e2e smoke test (#564) (1783fd3)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: update changelog for 0.11.8 (#563) (bb92504)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- No infrastructure changes
+
+### Other Changes
+- No other changes
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.8...0.11.9
+
 ## [0.11.8] - 2026-09-27
 
 ## What's Changed
