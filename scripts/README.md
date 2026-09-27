@@ -11,6 +11,7 @@ Utility scripts organized by purpose. All scripts should be run from the **proje
 | `access/` | Service access portals | `access-services.sh`, `access-services-aws-smart.sh` |
 | `debug/` | Debugging utilities | `check-logs.sh`, `database-access.sh` |
 | `monitoring/` | Observability setup | Grafana, Prometheus health checks and setup |
+| `smoke/` | End-to-end smoke tests | `e2e.sh` (catalog → basket → checkout → order through the gateway) |
 
 ## Quick Reference
 
@@ -23,6 +24,9 @@ Utility scripts organized by purpose. All scripts should be run from the **proje
 
 # Deploy with Docker Compose
 ./scripts/deploy/docker-deploy.sh
+
+# Smoke-test a running compose stack through the gateway
+./scripts/smoke/e2e.sh
 
 # Build Docker images
 ./scripts/deploy/build-images.sh
