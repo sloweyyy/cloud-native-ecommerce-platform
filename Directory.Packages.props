@@ -99,4 +99,14 @@
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.9.0" />
   </ItemGroup>
 
+  <!-- Integration tests (tests/integration/*): xUnit + Shouldly + Testcontainers. -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.15.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.15.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
 </Project>
