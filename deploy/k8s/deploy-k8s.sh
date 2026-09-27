@@ -157,7 +157,7 @@ deploy_monitoring() {
     
     kubectl apply -f monitoring/rbac.yaml
     kubectl apply -f monitoring/prometheus.yaml
-    kubectl apply -f deploy/monitoring/grafana.yaml
+    kubectl apply -f monitoring/grafana.yaml
     
     log_info "Waiting for monitoring services to be ready..."
     kubectl wait --for=condition=ready pod -l app=prometheus -n monitoring --timeout=300s || echo "Prometheus may not be ready"

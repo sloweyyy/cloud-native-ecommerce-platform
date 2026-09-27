@@ -272,7 +272,7 @@ All advanced scenarios can push metrics to Prometheus via PushGateway:
 **Poor:** > 5%
 
 **By Error Type:**
-- 4xx errors: Usually frontend/client/test issues
+- 4xx errors: Usually frontend/legacy-angular/test issues
 - 500 errors: Application crashes
 - 502/503 errors: Overload or deployment issues
 - 504 errors: Timeouts (database, external APIs)

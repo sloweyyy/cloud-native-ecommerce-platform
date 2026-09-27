@@ -260,7 +260,7 @@ deploy_localstack() {
         fi
 
         # Create bucket and upload images TO LocalStack S3
-        bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/client/src/images/products
+        bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/legacy-angular/src/images/products
 
         kill $PF_PID 2>/dev/null || true
     else
@@ -473,7 +473,7 @@ deploy_monitoring() {
 configure_frontend() {
     log_info "Configuring Angular frontend..."
     
-    cd frontend/client
+    cd frontend/legacy-angular
     
     # Update API endpoints to use localhost:8010
     log_info "Updating API endpoints..."
@@ -536,7 +536,7 @@ setup_port_forwards() {
 start_frontend() {
     log_info "Starting Angular development server..."
     
-    cd frontend/client
+    cd frontend/legacy-angular
     
     # Start Angular in background
     npm start > /dev/null 2>&1 &

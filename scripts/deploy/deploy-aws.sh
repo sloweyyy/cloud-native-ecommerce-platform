@@ -266,7 +266,7 @@ deploy_s3_bucket() {
 upload_product_images() {
     log_info "Uploading product images to S3 bucket..."
 
-    PRODUCT_IMAGES_DIR="frontend/client/src/images/products"
+    PRODUCT_IMAGES_DIR="frontend/legacy-angular/src/images/products"
     if [ -d "$PRODUCT_IMAGES_DIR" ]; then
         aws_cmd s3 sync "$PRODUCT_IMAGES_DIR/" "s3://${S3_BUCKET}/products/" --quiet
         IMAGE_COUNT=$(aws_cmd s3 ls "s3://${S3_BUCKET}/products/" --recursive | wc -l | tr -d ' ')

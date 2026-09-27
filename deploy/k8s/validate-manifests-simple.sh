@@ -172,7 +172,7 @@ generate_summary() {
     
     echo "📊 Resource Count:"
     echo "  Total YAML files: $total_files"
-    echo "  deploy: $deployments"
+    echo "  Deployments: $deployments"
     echo "  Services: $services"
     echo "  ConfigMaps: $configmaps"
     echo "  Secrets: $secrets"

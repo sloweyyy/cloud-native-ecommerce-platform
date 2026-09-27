@@ -187,7 +187,7 @@ kubectl apply -f gateway/ocelot-gateway.yaml
 # Deploy monitoring
 kubectl apply -f monitoring/rbac.yaml
 kubectl apply -f monitoring/prometheus.yaml
-kubectl apply -f deploy/monitoring/grafana.yaml
+kubectl apply -f monitoring/grafana.yaml
 
 # Deploy management tools
 kubectl apply -f management/portainer.yaml

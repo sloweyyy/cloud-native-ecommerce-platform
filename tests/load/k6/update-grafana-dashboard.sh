@@ -26,7 +26,7 @@ if [ -z "${GRAFANA_PASSWORD}" ]; then
     GRAFANA_PASSWORD=$(kubectl get secret -n monitoring grafana -o jsonpath='{.data.admin-password}' 2>/dev/null | base64 -d 2>/dev/null || echo "admin")
 fi
 
-DASHBOARD_FILE="../../deploy/monitoring/grafana-dashboard-k6.json"
+DASHBOARD_FILE="../../../deploy/monitoring/grafana-dashboard-k6.json"
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

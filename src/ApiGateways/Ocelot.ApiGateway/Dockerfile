@@ -8,7 +8,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /repo
 # Restore layer: copy only the project graph so `dotnet restore` is cached
 # until a .csproj or central package version changes.
-COPY ["Directory.Packages.props", "./"]
+COPY ["global.json", "Directory.Packages.props", "./"]
 COPY ["src/ApiGateways/Ocelot.ApiGateway/Ocelot.ApiGateway.csproj", "src/ApiGateways/Ocelot.ApiGateway/"]
 RUN dotnet restore "src/ApiGateways/Ocelot.ApiGateway/Ocelot.ApiGateway.csproj"
 COPY src/ src/

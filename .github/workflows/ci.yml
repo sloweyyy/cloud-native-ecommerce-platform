@@ -35,7 +35,7 @@ jobs:
               - '*.sln'
               - '**/*.csproj'
             frontend:
-              - 'frontend/micro-frontends/**'
+              - 'frontend/web/**'
             docker:
               - 'docker-compose*.yml'
               - '**/Dockerfile'
@@ -124,7 +124,7 @@ jobs:
           format: "sarif"
           severity: "CRITICAL,HIGH"
           output: "trivy-results.sarif"
-          skip-dirs: "frontend/client/node_modules,frontend/micro-frontends/node_modules"
+          skip-dirs: "frontend/legacy-angular/node_modules,frontend/web/node_modules"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -152,7 +152,7 @@ jobs:
     if: needs.detect-changes.outputs.frontend == 'true'
     defaults:
       run:
-        working-directory: ./frontend/micro-frontends
+        working-directory: ./frontend/web
     steps:
       - uses: actions/checkout@v7
         with:
@@ -163,17 +163,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: frontend/micro-frontends/package-lock.json
+          cache-dependency-path: frontend/web/package-lock.json
 
       - name: Cache Nx
         uses: actions/cache@v6
         with:
           path: |
-            frontend/micro-frontends/.nx/cache
-            frontend/micro-frontends/node_modules/.cache
-          key: ${{ runner.os }}-nx-${{ hashFiles('frontend/micro-frontends/package-lock.json') }}-${{ hashFiles('frontend/micro-frontends/**/project.json') }}
+            frontend/web/.nx/cache
+            frontend/web/node_modules/.cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('frontend/web/package-lock.json') }}-${{ hashFiles('frontend/web/**/project.json') }}
           restore-keys: |
-            ${{ runner.os }}-nx-${{ hashFiles('frontend/micro-frontends/package-lock.json') }}-
+            ${{ runner.os }}-nx-${{ hashFiles('frontend/web/package-lock.json') }}-
             ${{ runner.os }}-nx-
 
       - name: Install dependencies

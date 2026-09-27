@@ -23,7 +23,7 @@ kubectl delete -f management/pgadmin/pgadmin.yaml 2>/dev/null || true
 # Remove Monitoring Stack
 echo ""
 echo "3. Removing Monitoring Stack..."
-kubectl delete -f deploy/monitoring/grafana/grafana.yaml 2>/dev/null || true
+kubectl delete -f monitoring/grafana/grafana.yaml 2>/dev/null || true
 kubectl delete -f monitoring/prometheus/prometheus.yaml 2>/dev/null || true
 kubectl delete -f monitoring/prometheus/prometheus-configmap.yaml 2>/dev/null || true
 kubectl delete -f monitoring/prometheus/prometheus-rbac.yaml 2>/dev/null || true

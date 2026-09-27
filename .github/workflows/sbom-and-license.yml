@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Check npm license compliance
-        working-directory: ./frontend/micro-frontends
+        working-directory: ./frontend/web
         run: |
           npx license-checker --production --summary --failOn "GPL-3.0;AGPL-3.0" || true
           echo "## npm License Report" >> $GITHUB_STEP_SUMMARY

@@ -26,7 +26,7 @@ sleep 10
 echo ""
 echo -e "${BLUE}☁️  Initializing LocalStack S3...${NC}"
 if [ -f "scripts/init-localstack-s3.sh" ]; then
-    bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/client/src/images/products
+    bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/legacy-angular/src/images/products
 else
     echo -e "${YELLOW}⚠️  init-localstack-s3.sh not found, skipping S3 initialization${NC}"
 fi

@@ -73,7 +73,7 @@ cleanup_management() {
 # Cleanup monitoring stack
 cleanup_monitoring() {
     log_info "Cleaning up monitoring stack..."
-    safe_delete "deploy/monitoring/grafana.yaml"
+    safe_delete "monitoring/grafana.yaml"
     safe_delete "monitoring/prometheus.yaml"
     safe_delete "monitoring/rbac.yaml"
 }

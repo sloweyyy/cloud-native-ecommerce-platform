@@ -1,6 +1,6 @@
 version: 1
 applications:
-  - appRoot: frontend/client
+  - appRoot: frontend/legacy-angular
     frontend:
       phases:
         preBuild:

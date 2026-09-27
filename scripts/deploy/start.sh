@@ -49,7 +49,7 @@ log_success "Port forwards started!"
 
 # Start Angular frontend
 log_info "Starting Angular frontend..."
-cd frontend/client
+cd frontend/legacy-angular
 npm start > /dev/null 2>&1 &
 cd ../..
 

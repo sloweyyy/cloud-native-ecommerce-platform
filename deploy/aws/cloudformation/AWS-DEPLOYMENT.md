@@ -221,7 +221,7 @@ See [deploy/aws/cloudformation/README.md](README.md) for manual CloudFormation d
 
 - **Detailed Architecture**: [deploy/aws/cloudformation/README.md](README.md)
 - **Local Development**: [deploy.sh](../../../scripts/deploy/deploy-aws.sh) for Minikube deployment
-- **Main README**: [README.md](README.md) for project overview
+- **Main README**: [README.md](../../../README.md) for project overview
 
 ## 🎯 Comparison: Local vs AWS
 
@@ -237,4 +237,4 @@ See [deploy/aws/cloudformation/README.md](README.md) for manual CloudFormation d
 
 ---
 
-**Need help?** Check the [troubleshooting guide](deploy/aws/cloudformation/README.md#-troubleshooting) or open an issue on GitHub.
+**Need help?** Check the [troubleshooting guide](README.md#-troubleshooting) or open an issue on GitHub.

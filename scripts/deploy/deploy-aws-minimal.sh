@@ -214,9 +214,9 @@ if [ -f "$SEED_FILE" ]; then
 fi
 
 # Upload product images if they exist
-if [ -d "frontend/client/src/images/products" ]; then
+if [ -d "frontend/legacy-angular/src/images/products" ]; then
     log_info "Uploading product images to S3..."
-    aws s3 sync frontend/client/src/images/products/ "s3://${S3_BUCKET}/products/" --quiet
+    aws s3 sync frontend/legacy-angular/src/images/products/ "s3://${S3_BUCKET}/products/" --quiet
     IMAGE_COUNT=$(aws s3 ls "s3://${S3_BUCKET}/products/" --recursive | wc -l)
     log_success "Uploaded ${IMAGE_COUNT} product images"
 else

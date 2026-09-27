@@ -187,7 +187,7 @@ graph TB
         S3["S3 Bucket<br/>Product Images"]
     end
 
-    subgraph "Kubernetes deploy"
+    subgraph "Kubernetes Deployments"
         Databases["Databases (Helm)<br/>MongoDB, Redis,<br/>PostgreSQL, SQL Server"]
         Apps["Microservices (Helm)<br/>Catalog, Basket, Discount,<br/>Ordering, API Gateway"]
         Monitoring["Monitoring Stack (Helm)<br/>Prometheus, Grafana,<br/>Elasticsearch, Kibana, Jaeger"]
@@ -406,8 +406,8 @@ cloud-native-ecommerce-platform/
 │       └── EventBus.Messages/    #   Integration events (MassTransit contracts)
 │
 ├── frontend/
-│   ├── micro-frontends/          # Nx monorepo: host shell + store/checkout/account/admin remotes
-│   └── client/                   # Legacy Angular SPA (kept for reference / migration history)
+│   ├── web/                      # Current web app: React micro-frontends (Nx + Module Federation)
+│   └── legacy-angular/           # Deprecated Angular SPA, kept for reference / migration history
 │
 ├── deploy/                       # Everything needed to run the platform somewhere
 │   ├── k8s/                      # Raw Kubernetes manifests + deploy/validate scripts
@@ -522,7 +522,7 @@ Controllers/Endpoints → Mediator Pipeline → Commands/Queries
 ### E2E Testing (Playwright)
 
 ```bash
-cd frontend/micro-frontends
+cd frontend/web
 npm run test:e2e              # Run all tests
 npm run test:e2e:ui           # Interactive mode
 npm run test:e2e:debug        # Debug mode
@@ -764,7 +764,7 @@ For detailed configuration options, see:
 ### Frontend Development
 
 ```bash
-cd frontend/micro-frontends
+cd frontend/web
 
 # Install dependencies
 npm install

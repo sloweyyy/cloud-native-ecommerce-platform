@@ -91,7 +91,7 @@ Documentation improvements are always welcome:
 
 4. **Frontend development (Micro-frontends)**
    ```bash
-   cd frontend/micro-frontends
+   cd frontend/web
    npm install
    npx nx serve host
    ```
@@ -106,7 +106,7 @@ dotnet test
 dotnet test --collect:"XPlat Code Coverage"
 
 # Frontend tests
-cd frontend/micro-frontends
+cd frontend/web
 npx nx run-many --target=test --all
 ```
 

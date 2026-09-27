@@ -1,4 +1,4 @@
-# 📊 Monitoring deploy
+# 📊 Monitoring Deployments
 
 This directory contains monitoring-related deployment configurations and permanent fixes for the Cloud-Native E-Commerce Platform.
 

@@ -258,7 +258,7 @@ update_prometheus_config() {
     log_step "Updating Prometheus configuration..."
 
     local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-    local prometheus_values="${script_dir}/../../deploy/helm/prometheus/prometheus-values.yaml"
+    local prometheus_values="${script_dir}/../../../deploy/helm/prometheus/prometheus-values.yaml"
 
     if [ -f "$prometheus_values" ]; then
         log_info "Upgrading Prometheus with updated configuration..."

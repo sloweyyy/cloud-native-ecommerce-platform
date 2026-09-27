@@ -8,11 +8,11 @@
 **/dist/
 **/build/
 **/target/
-frontend/client/node_modules/
-frontend/client/dist/
-frontend/client/.angular/
-frontend/micro-frontends/node_modules/
-frontend/micro-frontends/dist/
+frontend/legacy-angular/node_modules/
+frontend/legacy-angular/dist/
+frontend/legacy-angular/.angular/
+frontend/web/node_modules/
+frontend/web/dist/
 
 # .NET build outputs
 **/bin/
@@ -74,7 +74,7 @@ istio-*/
 *.key
 
 # Product images (not needed for build, only for migration)
-frontend/client/src/images/products/
+frontend/legacy-angular/src/images/products/
 
 # Postman collections
 PostmanCollection/

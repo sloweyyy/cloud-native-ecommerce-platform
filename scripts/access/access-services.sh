@@ -179,7 +179,7 @@ start_port_forwards() {
     # Start Angular frontend if not running
     if ! pgrep -f "ng serve" > /dev/null; then
         log_info "Starting Angular frontend..."
-        cd frontend/client
+        cd frontend/legacy-angular
         npm start > /dev/null 2>&1 &
         cd ../..
     fi
