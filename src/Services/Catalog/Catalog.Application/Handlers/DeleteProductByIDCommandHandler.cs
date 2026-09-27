@@ -33,7 +33,18 @@ public class DeleteProductByIDCommandHandler : IRequestHandler<DeleteProductById
             return false;
         }
 
-        // Delete the S3 image if it exists
+        // Delete the product from database first so a failed delete never leaves it without an image
+        var result = await _productRepository.DeleteProduct(request.Id);
+
+        if (!result)
+        {
+            _logger.LogWarning("Failed to delete product from database: Id={ProductId}", request.Id);
+            return false;
+        }
+
+        _logger.LogInformation("Successfully deleted product: Id={ProductId}", request.Id);
+
+        // Then delete the S3 image if it exists
         if (!string.IsNullOrWhiteSpace(product.ImageFile))
         {
             try
@@ -52,22 +63,10 @@ public class DeleteProductByIDCommandHandler : IRequestHandler<DeleteProductById
             }
             catch (Exception ex)
             {
-                // Log the error but don't fail the product deletion
+                // The product is already deleted; an orphaned image is preferable to failing the request.
                 _logger.LogError(ex, "Error deleting product image from S3: ProductId={ProductId}, ImageUrl={ImageUrl}",
                     request.Id, product.ImageFile);
             }
-        }
-
-        // Delete the product from database
-        var result = await _productRepository.DeleteProduct(request.Id);
-
-        if (result)
-        {
-            _logger.LogInformation("Successfully deleted product: Id={ProductId}", request.Id);
-        }
-        else
-        {
-            _logger.LogWarning("Failed to delete product from database: Id={ProductId}", request.Id);
         }
 
         return result;

@@ -94,7 +94,8 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
         var updatedProduct = await _context
             .Products
             .ReplaceOneAsync(p => p.Id == product.Id, product);
-        return updatedProduct.IsAcknowledged && updatedProduct.ModifiedCount > 0;
+        // Matched, not Modified: saving an unchanged product is still a successful update.
+        return updatedProduct.IsAcknowledged && updatedProduct.MatchedCount > 0;
     }
 
     async Task<IEnumerable<ProductBrand>> IBrandRepository.GetAllBrands()
