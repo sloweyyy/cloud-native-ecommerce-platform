@@ -1,4 +1,5 @@
 ﻿using Catalog.Core.Entities;
+using Catalog.Core.Exceptions;
 using Catalog.Core.Repositories;
 using Catalog.Core.Specs;
 using Catalog.Infrastructure.Data;
@@ -109,7 +110,7 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
     async Task<ProductBrand> IBrandRepository.CreateBrand(ProductBrand brand)
     {
         if (await ((IBrandRepository)this).BrandExists(brand.Name))
-            throw new ArgumentException($"Brand '{brand.Name}' already exists");
+            throw new DuplicateEntityException("Brand", brand.Name);
 
         try
         {
@@ -143,7 +144,7 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
     async Task<ProductType> ITypesRepository.CreateType(ProductType type)
     {
         if (await ((ITypesRepository)this).TypeExists(type.Name))
-            throw new ArgumentException($"Type '{type.Name}' already exists");
+            throw new DuplicateEntityException("Type", type.Name);
 
         try
         {

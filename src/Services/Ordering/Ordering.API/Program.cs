@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Common.Api;
 using Common.Logging;
 using MassTransit;
 using OpenTelemetry.Resources;
@@ -38,6 +39,10 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddControllers();
+
+// RFC 7807 problem details + shared exception -> status code mapping
+builder.Services.AddApiProblemDetails();
+
 // Add API Versioning
 builder.Services.AddApiVersioning(options =>
 {
@@ -80,13 +85,15 @@ builder.Services.AddMassTransit(config =>
 
 var app = builder.Build();
 
+// Must be first so it wraps every other middleware (replaces UseDeveloperExceptionPage).
+app.UseApiExceptionHandler();
+
 //Apply db migration + seed; throws (and stops the process) if the database cannot be migrated
 await app.MigrateDatabaseAsync<OrderContext>((context, services, ct) =>
     OrderContextSeed.SeedAsync(context, services.GetRequiredService<ILogger<OrderContextSeed>>(), ct));
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }

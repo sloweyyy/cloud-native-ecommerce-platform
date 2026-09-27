@@ -1,8 +1,10 @@
-﻿namespace Ordering.Application.Exceptions;
+﻿using Common.Exceptions;
 
-public class OrderNotFoundException : ApplicationException
+namespace Ordering.Application.Exceptions;
+
+public class OrderNotFoundException : NotFoundException
 {
-    public OrderNotFoundException(string name, object key) : base($"Entity {name} - {key} is not found.")
+    public OrderNotFoundException(string name, object key) : base(name, key)
     {
     }
 }

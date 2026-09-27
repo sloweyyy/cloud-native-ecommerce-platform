@@ -5,6 +5,7 @@ using Basket.Application.GrpcService;
 using Basket.Application.Handlers;
 using Basket.Core.Repositories;
 using Basket.Infrastructure.Repositories;
+using Common.Api;
 using Common.Logging;
 using Discount.Grpc.Protos;
 using MassTransit;
@@ -42,6 +43,9 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddControllers();
+
+// RFC 7807 problem details + shared exception -> status code mapping
+builder.Services.AddApiProblemDetails();
 
 // Add API Versioning and API Explorer for Swagger
 builder.Services.AddApiVersioning(options =>
@@ -128,10 +132,12 @@ builder.Services.AddMassTransit(config =>
 
 var app = builder.Build();
 
+// Must be first so it wraps every other middleware (replaces UseDeveloperExceptionPage).
+app.UseApiExceptionHandler();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

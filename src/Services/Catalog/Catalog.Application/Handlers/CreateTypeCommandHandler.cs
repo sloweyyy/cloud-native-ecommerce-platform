@@ -3,6 +3,7 @@ using Catalog.Application.Mappers;
 using Catalog.Application.Responses;
 using Catalog.Core.Entities;
 using Catalog.Core.Repositories;
+using Common.Exceptions;
 using Common.Mediator;
 
 namespace Catalog.Application.Handlers;
@@ -19,7 +20,7 @@ public class CreateTypeCommandHandler : IRequestHandler<CreateTypeCommand, Types
   public async Task<TypesResponse> Handle(CreateTypeCommand request, CancellationToken cancellationToken)
   {
     if (string.IsNullOrWhiteSpace(request.Name))
-      throw new ArgumentException("Type name is required", nameof(request.Name));
+      throw new BadRequestException("Type name is required");
 
     var typeEntity = ProductMapper.Instance.ToProductType(request);
     if (typeEntity is null)

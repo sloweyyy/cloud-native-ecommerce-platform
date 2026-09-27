@@ -22,6 +22,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Common.Exceptions\Common.Exceptions.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Common.Mediator\Common.Mediator.csproj" />
   </ItemGroup>
 

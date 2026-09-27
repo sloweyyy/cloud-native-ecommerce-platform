@@ -4,6 +4,7 @@ using Catalog.Application.Handlers;
 using Catalog.Core.Repositories;
 using Catalog.Infrastructure.Data;
 using Catalog.Infrastructure.Repositories;
+using Common.Api;
 using Common.Logging;
 using EventBus.Messages.Common;
 using MassTransit;
@@ -40,6 +41,10 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddControllers();
+
+// RFC 7807 problem details + shared exception -> status code mapping
+builder.Services.AddApiProblemDetails();
+
 // Add API Versioning
 builder.Services.AddApiVersioning(options =>
 {
@@ -154,13 +159,15 @@ builder.Services.AddMassTransit(config =>
 
 var app = builder.Build();
 
+// Must be first so it wraps every other middleware (replaces UseDeveloperExceptionPage).
+app.UseApiExceptionHandler();
+
 // Create indexes and seed reference data once; throws (and stops the process) on failure
 await app.Services.GetRequiredService<CatalogSeeder>().SeedAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }

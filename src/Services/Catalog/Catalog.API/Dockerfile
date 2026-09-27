@@ -10,6 +10,8 @@ WORKDIR /repo
 # Restore layer: copy only the project graph so `dotnet restore` is cached
 # until a .csproj or central package version changes.
 COPY ["global.json", "Directory.Packages.props", "./"]
+COPY ["src/BuildingBlocks/Common.Api/Common.Api.csproj", "src/BuildingBlocks/Common.Api/"]
+COPY ["src/BuildingBlocks/Common.Exceptions/Common.Exceptions.csproj", "src/BuildingBlocks/Common.Exceptions/"]
 COPY ["src/BuildingBlocks/Common.Logging/Common.Logging.csproj", "src/BuildingBlocks/Common.Logging/"]
 COPY ["src/BuildingBlocks/Common.Mediator/Common.Mediator.csproj", "src/BuildingBlocks/Common.Mediator/"]
 COPY ["src/BuildingBlocks/EventBus.Messages/EventBus.Messages.csproj", "src/BuildingBlocks/EventBus.Messages/"]
