@@ -1,4 +1,42 @@
 # Changelog
+## [0.11.7] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- No bug fixes
+
+### 🔧 Improvements
+- refactor: standardize repository layout (src/, frontend/, deploy/, docs/, tests/) (#556) (714557e)
+
+### 📚 Documentation
+- refactor: standardize repository layout (src/, frontend/, deploy/, docs/, tests/) (#556) (714557e)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- No infrastructure changes
+
+### Other Changes
+- No other changes
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.6...0.11.7
+
 ## [0.11.6] - 2026-09-27
 
 ## What's Changed
