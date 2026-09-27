@@ -1,4 +1,8 @@
 import '@testing-library/jest-dom';
+import { TextDecoder, TextEncoder } from 'util';
+
+// react-router v7 relies on TextEncoder/TextDecoder, which jsdom does not provide.
+Object.assign(globalThis, { TextEncoder, TextDecoder });
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

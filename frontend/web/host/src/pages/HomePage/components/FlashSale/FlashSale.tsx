@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Card, Badge, Button, Row, Col, Flex, Space, Typography, Statistic } from 'antd';
 import { FireOutlined } from '@ant-design/icons';

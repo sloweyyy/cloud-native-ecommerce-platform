@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Card, Typography, Image, Row, Col, Spin, Space, Flex } from 'antd';
 import { useCategories } from '../../../../services/categories';
 import { themeConfig } from '../../../../config/theme';

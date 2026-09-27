@@ -3,7 +3,7 @@
  */
 
 import { useCallback } from 'react';
-import { useNavigate as useReactRouterNavigate } from 'react-router-dom';
+import { useNavigate as useReactRouterNavigate } from 'react-router';
 import {
   isStandaloneMode,
   navigateWithFallback,
@@ -21,7 +21,7 @@ import {
  * In MFE mode (loaded by host):
  * - Uses normal React Router navigation
  * 
- * Note: This hook requires react-router-dom to be available.
+ * Note: This hook requires react-router (v7) to be available.
  * For non-React Router contexts, use navigateWithFallback directly.
  */
 export const useNavigate = (appName?: string) => {

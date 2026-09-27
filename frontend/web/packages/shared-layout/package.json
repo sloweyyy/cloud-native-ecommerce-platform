@@ -47,7 +47,7 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "react-router-dom": ">=6.0.0",
+    "react-router": ">=7.0.0",
     "antd": ">=5.0.0",
     "@tanstack/react-query": ">=5.0.0",
     "@ecommerce-platform/auth-provider": "*"
@@ -59,7 +59,7 @@
     "react-dom": {
       "optional": false
     },
-    "react-router-dom": {
+    "react-router": {
       "optional": false
     },
     "antd": {
@@ -77,7 +77,7 @@
     "@types/react-dom": "19.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0",
+    "react-router": "^7.18.4",
     "antd": "^5.21.0",
     "@tanstack/react-query": "^5.56.0",
     "tsup": "^8.0.0",

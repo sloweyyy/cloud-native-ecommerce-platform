@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Button, Row, Flex, Space } from 'antd';
 import { useProducts } from '../../../../services/products';
 import { themeConfig } from '../../../../config/theme';

@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router';
 import { Spin, Result, Button } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useAuth } from '@ecommerce-platform/auth-provider';

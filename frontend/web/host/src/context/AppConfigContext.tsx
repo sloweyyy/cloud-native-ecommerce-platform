@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { message } from 'antd';
 import { MicroFrontendConfig, AppContext, User } from '@ecommerce-platform/app-injector';
 import { useAuth } from '@ecommerce-platform/auth-provider';
