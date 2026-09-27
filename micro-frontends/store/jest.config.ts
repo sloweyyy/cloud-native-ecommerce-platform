@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   displayName: 'store',
   preset: '../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
