@@ -1,4 +1,45 @@
 # Changelog
+## [0.11.8] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(backend): data integrity & fail-fast startup (#562) (778e774)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: update changelog for 0.11.7 (#557) (b025cc2)
+- docs: update changelog for 0.11.6 (#555) (d83f070)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- No infrastructure changes
+
+### Other Changes
+- chore: Bump the dotnet-minor-and-patch group with 7 updates (#561) (bb77d0d)
+- chore(deps): bump the minor-and-patch group in /frontend/web with 10 updates (#560) (3d6415b)
+- chore(deps): bump the minor-and-patch group in /frontend/legacy-angular with 8 updates (#559) (121846f)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.7...0.11.8
+
 ## [0.11.7] - 2026-09-27
 
 ## What's Changed
