@@ -9,6 +9,7 @@ namespace Common.Mediator;
 /// <see cref="IRequestHandler{TRequest, TResponse}"/> from the DI container and
 /// composes any registered <see cref="IPipelineBehavior{TRequest, TResponse}"/>
 /// instances around it (outer-most behavior registered first).
+/// Registered as scoped, so <c>serviceProvider</c> is the caller's scope.
 /// </summary>
 internal sealed class Mediator(IServiceProvider serviceProvider) : IMediator
 {
@@ -53,8 +54,11 @@ internal sealed class Mediator(IServiceProvider serviceProvider) : IMediator
             var behaviors = ((IEnumerable<object>)sp.GetServices(_behaviorInterface)).ToArray();
 
             // Innermost call: handler.Handle(request, ct)
+            // DoNotWrapExceptions: surface the handler's own exception (e.g. a validation
+            // or not-found exception) instead of a TargetInvocationException, so that
+            // exception-to-status mapping further up the stack sees the real type.
             RequestHandlerDelegate<TResponse> next = () =>
-                (Task<TResponse>)_handleMethod.Invoke(handler, new[] { request, ct })!;
+                (Task<TResponse>)_handleMethod.Invoke(handler, BindingFlags.DoNotWrapExceptions, null, new[] { request, ct }, null)!;
 
             // Wrap behaviors from inside out, so the first-registered behavior runs first.
             for (var i = behaviors.Length - 1; i >= 0; i--)
@@ -62,7 +66,7 @@ internal sealed class Mediator(IServiceProvider serviceProvider) : IMediator
                 var behavior = behaviors[i];
                 var inner = next;
                 next = () =>
-                    (Task<TResponse>)_behaviorHandleMethod.Invoke(behavior, new object[] { request, inner, ct })!;
+                    (Task<TResponse>)_behaviorHandleMethod.Invoke(behavior, BindingFlags.DoNotWrapExceptions, null, new object[] { request, inner, ct }, null)!;
             }
 
             return next();
