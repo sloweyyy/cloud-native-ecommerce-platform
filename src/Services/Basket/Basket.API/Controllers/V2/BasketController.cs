@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using Common.Logging;
+using Asp.Versioning;
 using Basket.Application.Commands;
 using Basket.Application.Mappers;
 using Basket.Application.Queries;
@@ -53,7 +54,7 @@ public class BasketController : ControllerBase
         var eventMsg = BasketMapper.Instance.ToBasketCheckoutEventV2(basketCheckout);
         eventMsg.TotalPrice = basket.TotalPrice;
         await _publishEndpoint.Publish(eventMsg);
-        _logger.LogInformation($"Basket Published for {basket.UserName} with V2 endpoint");
+        _logger.LogInformation("Basket Published for {UserName} with V2 endpoint", LogSanitizer.Sanitize(basket.UserName));
         //remove the basket
         var deleteCmd = new DeleteBasketByUserNameCommand(basketCheckout.UserName);
         await _mediator.Send(deleteCmd);

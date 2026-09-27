@@ -1,3 +1,4 @@
+using Common.Logging;
 using Common.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
@@ -32,10 +33,11 @@ public sealed class ProblemDetailsExceptionHandler(
         // .NET 10 suppresses the middleware's own diagnostics once a handler returns true.
         if (status >= StatusCodes.Status500InternalServerError)
             logger.LogError(exception, "Unhandled exception for {Method} {Path}",
-                httpContext.Request.Method, httpContext.Request.Path);
+                httpContext.Request.Method, LogSanitizer.Sanitize(httpContext.Request.Path.Value));
         else
             logger.LogInformation("Request {Method} {Path} failed with {StatusCode}: {Message}",
-                httpContext.Request.Method, httpContext.Request.Path, status, exception.Message);
+                httpContext.Request.Method, LogSanitizer.Sanitize(httpContext.Request.Path.Value), status,
+                LogSanitizer.Sanitize(exception.Message));
 
         httpContext.Response.StatusCode = status;
         var written = await problemDetailsService.TryWriteAsync(new ProblemDetailsContext

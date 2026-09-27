@@ -49,7 +49,8 @@ public class CreateShoppingCartCommandHandler : IRequestHandler<CreateShoppingCa
 
                 // Update the Price to reflect the discounted price
                 item.Price = item.OriginalPrice - item.DiscountAmount;
-                _logger.LogInformation($"Discount of {coupon.Amount} applied to {item.ProductName}. New Price: {item.Price}");
+                _logger.LogInformation("Discount of {DiscountAmount} applied to {ProductName}. New Price: {Price}",
+                    item.DiscountAmount, item.ProductName, item.Price);
             }
         }
 

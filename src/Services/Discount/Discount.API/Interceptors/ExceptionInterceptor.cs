@@ -1,3 +1,4 @@
+using Common.Logging;
 using Common.Exceptions;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
@@ -58,7 +59,8 @@ public class ExceptionInterceptor : Interceptor
             return new RpcException(new Status(code, detail, exception));
         }
 
-        _logger.LogInformation("gRPC call {Method} failed with {StatusCode}: {Message}", method, code, exception.Message);
+        _logger.LogInformation("gRPC call {Method} failed with {StatusCode}: {Message}", method, code,
+            LogSanitizer.Sanitize(exception.Message));
         return new RpcException(new Status(code, exception.Message, exception));
     }
 }

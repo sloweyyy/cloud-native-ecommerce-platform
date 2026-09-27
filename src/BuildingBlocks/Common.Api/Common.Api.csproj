@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Exceptions\Common.Exceptions.csproj" />
+    <ProjectReference Include="..\Common.Logging\Common.Logging.csproj" />
   </ItemGroup>
 
 </Project>

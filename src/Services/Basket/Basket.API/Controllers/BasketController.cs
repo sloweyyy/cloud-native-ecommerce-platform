@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using Common.Logging;
+using Asp.Versioning;
 using Basket.Application.Commands;
 using Basket.Application.GrpcService;
 using Basket.Application.Mappers;
@@ -82,7 +83,7 @@ public class BasketController : ApiController
         var eventMsg = BasketMapper.Instance.ToBasketCheckoutEvent(basketCheckout);
         eventMsg.TotalPrice = basket.TotalPrice;
         await _publishEndpoint.Publish(eventMsg);
-        _logger.LogInformation($"Basket Published for {basket.UserName}");
+        _logger.LogInformation("Basket Published for {UserName}", LogSanitizer.Sanitize(basket.UserName));
         //remove the basket
         var deleteCmd = new DeleteBasketByUserNameCommand(basketCheckout.UserName);
         await _mediator.Send(deleteCmd);
