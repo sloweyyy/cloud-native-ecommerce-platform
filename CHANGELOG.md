@@ -1,4 +1,115 @@
 # Changelog
+## [0.11.6] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(mfe): align nx on 23.2.1 and remediate npm advisories (#541) (300e7c5)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: add dependency management & CI policy guide (#477) (80b55e6)
+- docs: update changelog for 0.11.4 (#473) (7b1813d)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- chore(deps-dev): Bump piscina from 4.9.2 to 4.9.4 in /micro-frontends (#540) (18fa558)
+- chore(deps): Bump undici from 6.27.0 to 6.28.1 in /client (#539) (c898909)
+- chore(deps): Bump postcss-selector-parser from 7.1.1 to 7.1.5 in /micro-frontends (#531) (d6cd215)
+- chore(deps): Bump immutable from 5.1.5 to 5.1.9 in /micro-frontends (#498) (5a895cd)
+- chore(deps): Bump webpack-dev-server from 5.2.5 to 5.2.6 in /micro-frontends (#494) (19cd317)
+- docs: add dependency management & CI policy guide (#477) (80b55e6)
+
+### Other Changes
+- chore(deps): Bump socket.io-parser from 4.2.4 to 4.2.7 in /client (#514) (8e3460e)
+- chore(deps): Bump the github-actions group across 1 directory with 4 updates (#486) (72ba2b9)
+- chore: Bump the dotnet-minor-and-patch group with 7 updates (#554) (92ce386)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 7 updates (#553) (922669a)
+- chore(deps-dev): Bump brace-expansion from 1.1.18 to 1.1.21 in /micro-frontends (#552) (afd6031)
+- chore: Bump the dotnet-minor-and-patch group with 7 updates (#551) (7d6cf85)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 7 updates (#550) (d248620)
+- chore(deps): Bump the minor-and-patch group in /client with 10 updates (#549) (c8b4fc0)
+- chore(deps-dev): Bump vitest from 4.1.9 to 4.1.11 in /micro-frontends (#548) (bf65540)
+- chore(deps-dev): Bump js-yaml from 4.3.1 to 4.3.2 in /client (#547) (ded74e6)
+- chore(deps-dev): Bump hono from 4.13.2 to 4.13.7 in /client (#546) (2755060)
+- chore(deps): Bump svgo in /micro-frontends (#545) (ee7c378)
+- chore(deps-dev): Bump js-yaml from 3.14.2 to 3.15.2 in /micro-frontends (#544) (f2fdcb1)
+- chore(deps-dev): Bump the minor-and-patch group in /micro-frontends with 7 updates (#543) (91313b4)
+- chore(deps): Bump http-proxy-middleware in /micro-frontends (#542) (0c31c4f)
+- chore(deps-dev): Bump @humanfs/node from 0.16.7 to 0.16.8 in /micro-frontends (#538) (b4631b8)
+- chore(deps): Bump the minor-and-patch group in /client with 4 updates (#537) (7583970)
+- chore(deps-dev): Bump fast-uri from 3.1.5 to 3.1.7 in /client (#536) (f619d8c)
+- chore(deps): Bump browserslist from 4.28.2 to 4.28.8 in /micro-frontends (#535) (66d2a5b)
+- chore(deps): Bump fast-uri from 3.1.5 to 3.1.7 in /micro-frontends (#534) (1704100)
+- chore(deps-dev): Bump brace-expansion from 1.1.16 to 1.1.18 in /micro-frontends (#533) (9d295a8)
+- chore(deps-dev): Bump browserslist from 4.28.2 to 4.28.8 in /client (#532) (bc9f5ed)
+- chore(deps-dev): Bump postcss-selector-parser from 7.1.1 to 7.1.5 in /client (#530) (d42db67)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 12 updates (#529) (ce9fd16)
+- chore: Bump the dotnet-minor-and-patch group with 4 updates (#528) (a82b626)
+- chore(deps): Bump the minor-and-patch group in /client with 10 updates (#527) (1b64623)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 7 updates (#526) (c95208d)
+- chore: Bump the dotnet-minor-and-patch group with 5 updates (#525) (ecff7b4)
+- chore(deps): Bump the minor-and-patch group in /client with 8 updates (#524) (0db391e)
+- chore: Bump the dotnet-minor-and-patch group with 6 updates (#523) (ed13d1d)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 7 updates (#522) (4c039d2)
+- chore(deps): Bump the minor-and-patch group in /client with 10 updates (#521) (eabdf36)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 8 updates (#520) (211157c)
+- chore: Bump the dotnet-minor-and-patch group with 2 updates (#519) (b8f32d1)
+- chore(deps): Bump the minor-and-patch group in /client with 4 updates (#518) (cc6b610)
+- chore(deps-dev): Bump js-yaml from 4.3.0 to 4.3.1 in /client (#517) (c618d63)
+- chore(deps-dev): Bump hono from 4.12.31 to 4.13.1 in /client (#516) (e927668)
+- chore(deps): Bump fast-uri from 3.1.4 to 3.1.5 in /micro-frontends (#515) (0d77ead)
+- chore(deps-dev): Bump ip-address from 10.2.0 to 10.4.0 in /client (#513) (9f450c4)
+- chore(deps-dev): Bump fast-uri from 3.1.4 to 3.1.5 in /client (#512) (9534f17)
+- chore(deps-dev): Bump brace-expansion from 1.1.12 to 1.1.18 in /client (#510) (4a1550a)
+- chore: Bump the dotnet-minor-and-patch group with 6 updates (#509) (4b7b502)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 4 updates (#508) (e438f4d)
+- chore(deps): Bump the minor-and-patch group in /client with 7 updates (#507) (a19e1da)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 5 updates (#506) (130b550)
+- chore: Bump the dotnet-minor-and-patch group with 2 updates (#505) (e7f988d)
+- chore(deps-dev): Bump typescript-eslint from 8.64.0 to 8.65.0 in /client in the minor-and-patch group (#504) (6081797)
+- chore(deps): Bump postcss from 8.5.15 to 8.5.23 in /micro-frontends (#502) (ca458ea)
+- chore(deps-dev): Bump brace-expansion from 1.1.12 to 1.1.16 in /micro-frontends (#500) (c5c4fa9)
+- chore(deps-dev): Bump fast-uri from 3.1.2 to 3.1.4 in /client (#499) (c63b6c7)
+- chore(deps): Bump svgo in /micro-frontends (#497) (684711a)
+- chore(deps): Bump shell-quote from 1.8.4 to 1.10.0 in /micro-frontends (#496) (c0d795d)
+- chore(deps): Bump fast-uri from 3.1.2 to 3.1.4 in /micro-frontends (#495) (0a7bd75)
+- chore(deps-dev): Bump tar from 7.5.16 to 7.5.20 in /client (#493) (d5087e4)
+- chore(deps-dev): Bump js-yaml from 4.2.0 to 4.3.0 in /client (#492) (e4fcf96)
+- chore(deps-dev): Bump immutable from 5.1.5 to 5.1.9 in /client (#491) (d949c3d)
+- chore(deps-dev): Bump hono from 4.12.26 to 4.12.31 in /client (#490) (4bd1204)
+- chore(deps): Bump engine.io from 6.6.4 to 6.6.9 in /client (#489) (5d8c11f)
+- chore: Bump the dotnet-minor-and-patch group with 8 updates (#488) (770fee4)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 7 updates (#487) (acfd8d7)
+- chore(deps-dev): Bump typescript-eslint from 8.63.0 to 8.64.0 in /client in the minor-and-patch group (#485) (b8c8ddb)
+- chore(deps): Bump websocket-driver from 0.7.4 to 0.7.5 in /micro-frontends (#484) (5898f9f)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 4 updates (#483) (47d0451)
+- chore(deps): Bump the minor-and-patch group in /client with 12 updates (#482) (c48ea2f)
+- chore: Bump the dotnet-minor-and-patch group with 1 update (#481) (93a5477)
+- chore(deps-dev): Bump minimatch from 3.1.2 to 3.1.5 in /micro-frontends (#480) (a82bc8e)
+- chore(deps): Bump the minor-and-patch group in /micro-frontends with 4 updates (#479) (7a9be26)
+- chore(deps-dev): Bump the minor-and-patch group in /client with 3 updates (#478) (1a3371a)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.5...0.11.6
+
 ## [0.11.4] - 2026-06-28
 
 ## What's Changed
