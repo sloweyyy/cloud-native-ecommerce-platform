@@ -1,4 +1,42 @@
 # Changelog
+## [0.11.10] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- No bug fixes
+
+### 🔧 Improvements
+- refactor(k8s): single Kustomize tree + real manifest validation in CI (#567) (ffd03f2)
+
+### 📚 Documentation
+- docs(website): Astro Starlight documentation site (#566) (1720161)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- refactor(k8s): single Kustomize tree + real manifest validation in CI (#567) (ffd03f2)
+
+### Other Changes
+- No other changes
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.9...0.11.10
+
 ## [0.11.8] - 2026-09-27
 
 ## What's Changed
