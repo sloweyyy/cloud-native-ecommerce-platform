@@ -18,4 +18,11 @@ public class Order : EntityBase
     public string? Expiration { get; set; }
     public string? Cvv { get; set; }
     public int? PaymentMethod { get; set; }
+
+    /// <summary>
+    /// CorrelationId of the integration event that created this order (null for orders created
+    /// through the API). Unique, so a redelivered or re-published checkout event cannot create
+    /// a second order.
+    /// </summary>
+    public string? CorrelationId { get; set; }
 }

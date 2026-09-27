@@ -10,6 +10,7 @@ namespace Ordering.Application.Mappers;
 [Mapper]
 public partial class OrderMapper
 {
+    [MapperIgnoreSource(nameof(Order.CorrelationId))]
     public partial OrderResponse ToOrderResponse(Order order);
     public partial List<OrderResponse> ToOrderResponseList(IEnumerable<Order> orders);
 
@@ -21,6 +22,7 @@ public partial class OrderMapper
     public partial Order ToOrder(CheckoutOrderCommandV2 command);
 
     // In-place update: copies fields from source onto target without allocating a new entity.
+    [MapperIgnoreTarget(nameof(Order.CorrelationId))]
     public partial void UpdateOrder(UpdateOrderCommand source, Order target);
 
     public partial CheckoutOrderCommand ToCheckoutOrderCommand(BasketCheckoutEvent message);

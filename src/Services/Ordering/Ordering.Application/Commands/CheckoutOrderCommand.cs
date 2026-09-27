@@ -18,4 +18,7 @@ public class CheckoutOrderCommand : IRequest<int>
     public string? Expiration { get; set; }
     public string? Cvv { get; set; }
     public int? PaymentMethod { get; set; }
+
+    /// <summary>Idempotency key: the originating integration event's CorrelationId.</summary>
+    public string? CorrelationId { get; set; }
 }

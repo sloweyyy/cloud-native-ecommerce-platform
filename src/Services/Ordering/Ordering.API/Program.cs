@@ -1,6 +1,5 @@
 using Asp.Versioning;
 using Common.Logging;
-using EventBus.Messages.Common;
 using MassTransit;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -70,24 +69,12 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddMassTransit(config =>
 {
     // Mark this as consumer
-    config.AddConsumer<BasketOrderingConsumer>();
-    config.AddConsumer<BasketOrderingConsumerV2>();
-    config.AddConsumer<ProductActivityConsumer>();
-    config.AddConsumer<OrderActivityConsumer>();
+    config.AddOrderingConsumers();
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]);
-        // provide the queue name with cosumer settings
-        cfg.ReceiveEndpoint(EventBusConstant.BasketCheckoutQueue,
-            c => { c.ConfigureConsumer<BasketOrderingConsumer>(ctx); });
-        // V2 Version
-        cfg.ReceiveEndpoint(EventBusConstant.BasketCheckoutQueueV2,
-            c => { c.ConfigureConsumer<BasketOrderingConsumerV2>(ctx); });
-        // Activity queues
-        cfg.ReceiveEndpoint(EventBusConstant.ProductActivityQueue,
-            c => { c.ConfigureConsumer<ProductActivityConsumer>(ctx); });
-        cfg.ReceiveEndpoint(EventBusConstant.OrderActivityQueue,
-            c => { c.ConfigureConsumer<OrderActivityConsumer>(ctx); });
+        // Retry policy + receive endpoints (queues) for the consumers
+        cfg.ConfigureOrderingEndpoints(ctx);
     });
 });
 
