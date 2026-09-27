@@ -152,35 +152,35 @@ build_and_push_images() {
 
     # Build and push each service
     log_info "Building Catalog API..."
-    docker build --platform linux/amd64 -t catalogapi:latest -f Services/Catalog/Catalog.API/Dockerfile .
+    docker build --platform linux/amd64 -t catalogapi:latest -f src/Services/Catalog/Catalog.API/Dockerfile .
     docker tag catalogapi:latest "${ECR_REGISTRY}/catalogapi:latest"
     docker tag catalogapi:latest "${ECR_REGISTRY}/catalogapi:${ENV_NAME}"
     push_docker_image "${ECR_REGISTRY}/catalogapi:latest"
     push_docker_image "${ECR_REGISTRY}/catalogapi:${ENV_NAME}"
 
     log_info "Building Basket API..."
-    docker build --platform linux/amd64 -t basketapi:latest -f Services/Basket/Basket.API/Dockerfile .
+    docker build --platform linux/amd64 -t basketapi:latest -f src/Services/Basket/Basket.API/Dockerfile .
     docker tag basketapi:latest "${ECR_REGISTRY}/basketapi:latest"
     docker tag basketapi:latest "${ECR_REGISTRY}/basketapi:${ENV_NAME}"
     push_docker_image "${ECR_REGISTRY}/basketapi:latest"
     push_docker_image "${ECR_REGISTRY}/basketapi:${ENV_NAME}"
 
     log_info "Building Discount API..."
-    docker build --platform linux/amd64 -t discountapi:latest -f Services/Discount/Discount.API/Dockerfile .
+    docker build --platform linux/amd64 -t discountapi:latest -f src/Services/Discount/Discount.API/Dockerfile .
     docker tag discountapi:latest "${ECR_REGISTRY}/discountapi:latest"
     docker tag discountapi:latest "${ECR_REGISTRY}/discountapi:${ENV_NAME}"
     push_docker_image "${ECR_REGISTRY}/discountapi:latest"
     push_docker_image "${ECR_REGISTRY}/discountapi:${ENV_NAME}"
 
     log_info "Building Ordering API..."
-    docker build --platform linux/amd64 -t orderingapi:latest -f Services/Ordering/Ordering.API/Dockerfile .
+    docker build --platform linux/amd64 -t orderingapi:latest -f src/Services/Ordering/Ordering.API/Dockerfile .
     docker tag orderingapi:latest "${ECR_REGISTRY}/orderingapi:latest"
     docker tag orderingapi:latest "${ECR_REGISTRY}/orderingapi:${ENV_NAME}"
     push_docker_image "${ECR_REGISTRY}/orderingapi:latest"
     push_docker_image "${ECR_REGISTRY}/orderingapi:${ENV_NAME}"
 
     log_info "Building API Gateway..."
-    docker build --platform linux/amd64 -t ocelotapigateway:latest -f ApiGateways/Ocelot.ApiGateway/Dockerfile .
+    docker build --platform linux/amd64 -t ocelotapigateway:latest -f src/ApiGateways/Ocelot.ApiGateway/Dockerfile .
     docker tag ocelotapigateway:latest "${ECR_REGISTRY}/ocelotapigateway:latest"
     docker tag ocelotapigateway:latest "${ECR_REGISTRY}/ocelotapigateway:${ENV_NAME}"
     push_docker_image "${ECR_REGISTRY}/ocelotapigateway:latest"
@@ -196,7 +196,7 @@ deploy_vpc() {
     aws_cmd cloudformation deploy \
         --region "$REGION" \
         --stack-name "$STACK_VPC" \
-        --template-file Infrastructure/aws/cloudformation/vpc.yaml \
+        --template-file deploy/aws/cloudformation/vpc.yaml \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameter-overrides EnvName="$ENV_NAME"
 
@@ -238,7 +238,7 @@ deploy_s3_bucket() {
         aws_cmd cloudformation deploy \
             --region "$REGION" \
             --stack-name "$STACK_S3" \
-            --template-file Infrastructure/aws/cloudformation/s3-bucket.yaml \
+            --template-file deploy/aws/cloudformation/s3-bucket.yaml \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides EnvName="$ENV_NAME"
 
@@ -266,7 +266,7 @@ deploy_s3_bucket() {
 upload_product_images() {
     log_info "Uploading product images to S3 bucket..."
 
-    PRODUCT_IMAGES_DIR="client/src/images/products"
+    PRODUCT_IMAGES_DIR="frontend/client/src/images/products"
     if [ -d "$PRODUCT_IMAGES_DIR" ]; then
         aws_cmd s3 sync "$PRODUCT_IMAGES_DIR/" "s3://${S3_BUCKET}/products/" --quiet
         IMAGE_COUNT=$(aws_cmd s3 ls "s3://${S3_BUCKET}/products/" --recursive | wc -l | tr -d ' ')
@@ -280,7 +280,7 @@ upload_product_images() {
 update_seed_data_urls() {
     log_info "Updating seed data with correct S3 bucket URLs..."
 
-    SEED_FILE="Services/Catalog/Catalog.Infrastructure/Data/SeedData/products.json"
+    SEED_FILE="src/Services/Catalog/Catalog.Infrastructure/Data/SeedData/products.json"
     S3_URL_PATTERN="https://${S3_BUCKET}.s3.${REGION}.amazonaws.com/products/"
 
     if [ -f "$SEED_FILE" ]; then
@@ -316,7 +316,7 @@ deploy_eks() {
             aws_cmd cloudformation deploy \
                 --region "$REGION" \
                 --stack-name "$STACK_EKS" \
-                --template-file Infrastructure/aws/cloudformation/eks-cluster.yaml \
+                --template-file deploy/aws/cloudformation/eks-cluster.yaml \
                 --capabilities CAPABILITY_NAMED_IAM \
                 --parameter-overrides \
                     EnvName="$ENV_NAME" \
@@ -334,7 +334,7 @@ deploy_eks() {
         aws_cmd cloudformation deploy \
             --region "$REGION" \
             --stack-name "$STACK_EKS" \
-            --template-file Infrastructure/aws/cloudformation/eks-cluster.yaml \
+            --template-file deploy/aws/cloudformation/eks-cluster.yaml \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides \
                 EnvName="$ENV_NAME" \
@@ -568,7 +568,7 @@ deploy_databases() {
         kubectl apply -f - 2>/dev/null || log_info "Namespace already exists"
     kubectl label namespace "$NAMESPACE" istio-injection=enabled --overwrite
 
-    cd Deployments/helm
+    cd deploy/helm
 
     # Phase 1: Core databases (required for app)
     CORE_DB_CHARTS=(catalogdb basketdb discountdb orderdb rabbitmq elasticsearch)
@@ -735,7 +735,7 @@ setup_irsa_for_catalog() {
 deploy_api_services() {
     log_info "[7/10] Deploying API microservices..."
 
-    cd Deployments/helm
+    cd deploy/helm
 
     SERVICE_CHARTS=(catalog basket discount ordering ocelotapigw)
 
@@ -1017,7 +1017,7 @@ configure_istio_networking() {
 
     # Apply Istio Gateway
     log_info "Creating Istio gateway..."
-    kubectl apply -f Deployments/istio/gateway.yaml -n ${NAMESPACE}
+    kubectl apply -f deploy/istio/gateway.yaml -n ${NAMESPACE}
 
     # Apply Virtual Services with correct service hosts (using eshopping-* prefix)
     log_info "Configuring virtual services..."
@@ -1105,8 +1105,8 @@ EOF
 
     # Configure Jaeger tracing
     log_info "Enabling Jaeger distributed tracing (100% sampling)..."
-    kubectl apply -f Deployments/istio/telemetry-tracing.yaml
-    kubectl apply -f Deployments/istio/tracing-config.yaml 2>/dev/null || log_warning "Tracing config applied (IstioOperator may need manual verification)"
+    kubectl apply -f deploy/istio/telemetry-tracing.yaml
+    kubectl apply -f deploy/istio/tracing-config.yaml 2>/dev/null || log_warning "Tracing config applied (IstioOperator may need manual verification)"
 
     log_success "Istio networking and tracing configured"
 }
@@ -1156,7 +1156,7 @@ deploy_monitoring() {
 
     helm upgrade --install prometheus prometheus-community/prometheus \
         --namespace monitoring \
-        -f Deployments/helm/prometheus/prometheus-values.yaml \
+        -f deploy/helm/prometheus/prometheus-values.yaml \
         --wait --timeout 600s
 
     # Install Grafana with Helm (separate from Istio)
@@ -1340,7 +1340,7 @@ EOF
     # Create K6 dashboard ConfigMap directly from file
     kubectl create configmap k6-dashboard \
         --namespace monitoring \
-        --from-file=k6-dashboard.json=Deployments/monitoring/grafana-dashboard-k6.json \
+        --from-file=k6-dashboard.json=deploy/monitoring/grafana-dashboard-k6.json \
         --dry-run=client -o yaml | \
         kubectl apply -f -
     
@@ -1482,7 +1482,7 @@ EOF
 #     aws_cmd cloudformation deploy \
 #         --region "$REGION" \
 #         --stack-name "$STACK_ALB" \
-#         --template-file Infrastructure/aws/cloudformation/alb-ingress.yaml \
+#         --template-file deploy/aws/cloudformation/alb-ingress.yaml \
 #         --capabilities CAPABILITY_NAMED_IAM \
 #         --parameter-overrides \
 #             EnvName="$ENV_NAME" \
@@ -1564,7 +1564,7 @@ display_access_info() {
     echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-catalog 8081:80"
     echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-basket 8082:80"
     echo "      kubectl port-forward -n ${NAMESPACE} svc/eshopping-ordering 8083:80"
-    echo "   3. Run tests: ./tests/k6/push-metrics.sh"
+    echo "   3. Run tests: ./tests/load/k6/push-metrics.sh"
     echo "   4. View real-time metrics in Grafana k6 dashboard"
     echo ""
     echo "   Jaeger (Distributed Tracing - 100% sampling enabled):"
@@ -1842,7 +1842,7 @@ main() {
         python3 << EOF
 import re
 cert_arn = "$CERT_ARN"
-with open("Deployments/helm/ocelotapigw/values.yaml", "r") as f:
+with open("deploy/helm/ocelotapigw/values.yaml", "r") as f:
     content = f.read()
 pattern = r'service\.beta\.kubernetes\.io/aws-load-balancer-ssl-cert: ".*"'
 replacement = f'service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "{cert_arn}"'
@@ -1852,7 +1852,7 @@ if updated == content:
         "service.beta.kubernetes.io/aws-load-balancer-ssl-cert: \"\"",
         replacement
     )
-with open("Deployments/helm/ocelotapigw/values.yaml", "w") as f:
+with open("deploy/helm/ocelotapigw/values.yaml", "w") as f:
     f.write(updated)
 print("Certificate updated successfully")
 EOF

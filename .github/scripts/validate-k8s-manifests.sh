@@ -34,7 +34,7 @@ validate_yaml_syntax() {
     log_info "Validating YAML syntax with yamllint..."
     
     if command -v yamllint &> /dev/null; then
-        if yamllint Deployments/k8s; then
+        if yamllint deploy/k8s; then
             log_success "YAML syntax validation passed"
             return 0
         else
@@ -75,7 +75,7 @@ EOF
 
         export KUBECONFIG="$temp_kubeconfig"
 
-        find Deployments/k8s -name "*.yaml" -type f | while read -r manifest; do
+        find deploy/k8s -name "*.yaml" -type f | while read -r manifest; do
             log_info "Validating $manifest"
             if kubectl apply --dry-run=client -f "$manifest" &>/dev/null; then
                 log_success "✅ $manifest passed schema validation"
@@ -101,7 +101,7 @@ validate_best_practices() {
     log_info "Checking security and best practices with kube-score..."
     
     if command -v kube-score &> /dev/null; then
-        find Deployments/k8s -name "*.yaml" -type f | while read -r manifest; do
+        find deploy/k8s -name "*.yaml" -type f | while read -r manifest; do
             log_info "Checking $manifest"
             kube-score score "$manifest" || log_warning "⚠️ kube-score found issues in $manifest"
         done
@@ -140,7 +140,7 @@ EOF
         
         export KUBECONFIG="$temp_kubeconfig"
         
-        find Deployments/k8s -name "*.yaml" -type f | while read -r manifest; do
+        find deploy/k8s -name "*.yaml" -type f | while read -r manifest; do
             log_info "Testing dry-run for $manifest"
             if kubectl apply --dry-run=client -f "$manifest" &>/dev/null; then
                 log_success "✅ $manifest passed dry-run validation"

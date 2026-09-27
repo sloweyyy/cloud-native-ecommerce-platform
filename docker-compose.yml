@@ -22,13 +22,13 @@ services:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:
       context: .
-      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+      dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
 
   basket.api:
     image: ${DOCKER_REGISTRY-}basketapi
     build:
       context: .
-      dockerfile: Services/Basket/Basket.API/Dockerfile
+      dockerfile: src/Services/Basket/Basket.API/Dockerfile
   
   portainer:
     image: portainer/portainer-ce
@@ -37,13 +37,13 @@ services:
     image: ${DOCKER_REGISTRY-}discountapi
     build:
       context: .
-      dockerfile: Services/Discount/Discount.API/Dockerfile
+      dockerfile: src/Services/Discount/Discount.API/Dockerfile
 
   ordering.api:
     image: ${DOCKER_REGISTRY-}orderingapi
     build:
       context: .
-      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+      dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
   
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
@@ -74,7 +74,7 @@ services:
     image: ${DOCKER_REGISTRY-}ocelotapigateway
     build:
       context: .
-      dockerfile: ApiGateways/Ocelot.ApiGateway/Dockerfile
+      dockerfile: src/ApiGateways/Ocelot.ApiGateway/Dockerfile
 
 volumes:
  mongo_data:

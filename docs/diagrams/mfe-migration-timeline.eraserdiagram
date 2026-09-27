@@ -1,0 +1,44 @@
+// Figure 4.8: Migration Timeline - Monolith to Micro-Frontends
+// Strangler-style modernization approach
+
+// ==================== PHASE 1: BASELINE ====================
+Phase 1 [icon: box, color: red] {
+  Angular Monolith [icon: angular]
+  Single Build [icon: package]
+  Full Coverage [icon: check-circle]
+}
+
+// ==================== PHASE 2: INTRODUCE SHELL ====================
+Phase 2 [icon: layers, color: orange] {
+  Host Shell [icon: home]
+  First Remote Store [icon: shopping-bag]
+  MF Contracts [icon: file-text]
+  Legacy Fallback [icon: corner-down-left]
+}
+
+// ==================== PHASE 3: EXTRACT BY JOURNEY ====================
+Phase 3 [icon: git-branch, color: yellow] {
+  Store Remote [icon: shopping-bag]
+  Checkout Remote [icon: shopping-cart]
+  Account Remote [icon: user]
+  Shared Packages [icon: package]
+}
+
+// ==================== PHASE 4: FULL MFE ====================
+Phase 4 [icon: check-square, color: green] {
+  Host Shell [icon: home]
+  All Remotes [icon: grid]
+  Auth Provider [icon: lock]
+  App Injector [icon: code]
+}
+
+// ==================== TIMELINE FLOW ====================
+Phase 1 > Phase 2 : Introduce shell + contracts
+Phase 2 > Phase 3 : Extract user journeys
+Phase 3 > Phase 4 : Stabilize shared packages
+
+// ==================== KEY MILESTONES ====================
+// Phase 1: Working monolith (frontend/client/)
+// Phase 2: Shell + Store remote established
+// Phase 3: Checkout + Account extracted
+// Phase 4: Legacy decommissioned

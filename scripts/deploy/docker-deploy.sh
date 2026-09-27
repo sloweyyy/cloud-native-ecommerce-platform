@@ -357,11 +357,11 @@ initialize_localstack_s3() {
 
     # Run the initialization script
     log_info "Creating S3 bucket and uploading product images..."
-    if bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 client/src/images/products; then
+    if bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/client/src/images/products; then
         log_success "LocalStack S3 bucket initialized with product images"
     else
         log_warning "LocalStack S3 initialization failed, you may need to run it manually"
-        log_info "Manual command: bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 client/src/images/products"
+        log_info "Manual command: bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/client/src/images/products"
     fi
 
     echo ""

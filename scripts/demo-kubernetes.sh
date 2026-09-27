@@ -70,7 +70,7 @@ demo2() {
     step "Current Catalog pods..."
     kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/name=catalog
     echo ""
-    info "To test HPA: k6 run tests/k6/stress-test.js"
+    info "To test HPA: k6 run tests/load/k6/stress-test.js"
     info "Watch scaling: watch -n 2 kubectl get hpa,pods -n $NAMESPACE"
     pause
 }

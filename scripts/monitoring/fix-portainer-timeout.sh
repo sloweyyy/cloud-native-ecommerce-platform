@@ -47,7 +47,7 @@ fi
 
 # Upgrade Portainer with new configuration
 log_info "Upgrading Portainer with extended timeout configuration..."
-cd Deployments/helm
+cd deploy/helm
 helm upgrade eshopping-portainer ./portainer --namespace default --timeout 600s
 
 # Wait for rollout to complete

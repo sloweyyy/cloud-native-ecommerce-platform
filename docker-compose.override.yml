@@ -112,7 +112,7 @@ services:
       - AWS__S3__ImagePrefix=products/
     volumes:
       - ~/.aws:/root/.aws:ro
-      - ./client/src/images/products:/app/images/products:ro
+      - ./frontend/client/src/images/products:/app/images/products:ro
     depends_on:
       catalogdb:
         condition: service_healthy

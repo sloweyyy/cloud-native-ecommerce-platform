@@ -82,16 +82,16 @@ Documentation improvements are always welcome:
    dotnet build Ecommerce.sln
    
    # Run individual services (in separate terminals)
-   cd Services/Catalog/Catalog.API && dotnet run
-   cd Services/Basket/Basket.API && dotnet run
-   cd Services/Discount/Discount.API && dotnet run
-   cd Services/Ordering/Ordering.API && dotnet run
-   cd ApiGateways/Ocelot.ApiGateway && dotnet run
+   cd src/Services/Catalog/Catalog.API && dotnet run
+   cd src/Services/Basket/Basket.API && dotnet run
+   cd src/Services/Discount/Discount.API && dotnet run
+   cd src/Services/Ordering/Ordering.API && dotnet run
+   cd src/ApiGateways/Ocelot.ApiGateway && dotnet run
    ```
 
 4. **Frontend development (Micro-frontends)**
    ```bash
-   cd micro-frontends
+   cd frontend/micro-frontends
    npm install
    npx nx serve host
    ```
@@ -106,7 +106,7 @@ dotnet test
 dotnet test --collect:"XPlat Code Coverage"
 
 # Frontend tests
-cd micro-frontends
+cd frontend/micro-frontends
 npx nx run-many --target=test --all
 ```
 

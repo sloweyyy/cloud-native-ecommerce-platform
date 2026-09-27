@@ -31,18 +31,16 @@ jobs:
         with:
           filters: |
             backend:
-              - 'Services/**'
-              - 'ApiGateways/**'
-              - 'Infrastructure/**'
+              - 'src/**'
               - '*.sln'
               - '**/*.csproj'
             frontend:
-              - 'micro-frontends/**'
+              - 'frontend/micro-frontends/**'
             docker:
               - 'docker-compose*.yml'
               - '**/Dockerfile'
             k8s:
-              - 'Deployments/**'
+              - 'deploy/**'
 
   code-quality:
     runs-on: ubuntu-latest
@@ -126,7 +124,7 @@ jobs:
           format: "sarif"
           severity: "CRITICAL,HIGH"
           output: "trivy-results.sarif"
-          skip-dirs: "client/node_modules,micro-frontends/node_modules"
+          skip-dirs: "frontend/client/node_modules,frontend/micro-frontends/node_modules"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -154,7 +152,7 @@ jobs:
     if: needs.detect-changes.outputs.frontend == 'true'
     defaults:
       run:
-        working-directory: ./micro-frontends
+        working-directory: ./frontend/micro-frontends
     steps:
       - uses: actions/checkout@v7
         with:
@@ -165,17 +163,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: micro-frontends/package-lock.json
+          cache-dependency-path: frontend/micro-frontends/package-lock.json
 
       - name: Cache Nx
         uses: actions/cache@v6
         with:
           path: |
-            micro-frontends/.nx/cache
-            micro-frontends/node_modules/.cache
-          key: ${{ runner.os }}-nx-${{ hashFiles('micro-frontends/package-lock.json') }}-${{ hashFiles('micro-frontends/**/project.json') }}
+            frontend/micro-frontends/.nx/cache
+            frontend/micro-frontends/node_modules/.cache
+          key: ${{ runner.os }}-nx-${{ hashFiles('frontend/micro-frontends/package-lock.json') }}-${{ hashFiles('frontend/micro-frontends/**/project.json') }}
           restore-keys: |
-            ${{ runner.os }}-nx-${{ hashFiles('micro-frontends/package-lock.json') }}-
+            ${{ runner.os }}-nx-${{ hashFiles('frontend/micro-frontends/package-lock.json') }}-
             ${{ runner.os }}-nx-
 
       - name: Install dependencies
@@ -201,11 +199,11 @@ jobs:
       matrix:
         service:
           [
-            { name: "catalog-api", path: "Services/Catalog/Catalog.API" },
-            { name: "basket-api", path: "Services/Basket/Basket.API" },
-            { name: "discount-api", path: "Services/Discount/Discount.API" },
-            { name: "ordering-api", path: "Services/Ordering/Ordering.API" },
-            { name: "ocelot-gateway", path: "ApiGateways/Ocelot.ApiGateway" },
+            { name: "catalog-api", path: "src/Services/Catalog/Catalog.API" },
+            { name: "basket-api", path: "src/Services/Basket/Basket.API" },
+            { name: "discount-api", path: "src/Services/Discount/Discount.API" },
+            { name: "ordering-api", path: "src/Services/Ordering/Ordering.API" },
+            { name: "ocelot-gateway", path: "src/ApiGateways/Ocelot.ApiGateway" },
           ]
     steps:
       - uses: actions/checkout@v7
@@ -312,7 +310,7 @@ jobs:
       - name: Lint Helm charts
         run: |
           echo "🔍 Linting Helm charts..."
-          for chart in Deployments/helm/*/; do
+          for chart in deploy/helm/*/; do
             if [ -f "$chart/Chart.yaml" ]; then
               echo "Linting $chart"
               helm lint "$chart"

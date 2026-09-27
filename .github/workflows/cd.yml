@@ -44,15 +44,15 @@ jobs:
       matrix:
         service:
           - name: catalogapi
-            path: Services/Catalog/Catalog.API
+            path: src/Services/Catalog/Catalog.API
           - name: basketapi
-            path: Services/Basket/Basket.API
+            path: src/Services/Basket/Basket.API
           - name: discountapi
-            path: Services/Discount/Discount.API
+            path: src/Services/Discount/Discount.API
           - name: orderingapi
-            path: Services/Ordering/Ordering.API
+            path: src/Services/Ordering/Ordering.API
           - name: ocelotapigateway
-            path: ApiGateways/Ocelot.ApiGateway
+            path: src/ApiGateways/Ocelot.ApiGateway
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -184,7 +184,7 @@ jobs:
 
       - name: Deploy databases with Helm
         run: |
-          cd Deployments/helm
+          cd deploy/helm
 
           echo "Deploying databases..."
           for db in catalogdb basketdb discountdb orderdb rabbitmq; do
@@ -202,7 +202,7 @@ jobs:
 
       - name: Deploy microservices with Helm
         run: |
-          cd Deployments/helm
+          cd deploy/helm
 
           echo "Deploying microservices..."
           for service in catalog basket discount ordering; do
@@ -225,7 +225,7 @@ jobs:
 
       - name: Deploy API Gateway with Helm
         run: |
-          cd Deployments/helm
+          cd deploy/helm
 
           echo "Deploying API Gateway..."
           helm upgrade --install eshopping-ocelotapigw \

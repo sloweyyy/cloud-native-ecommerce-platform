@@ -143,11 +143,11 @@ build_and_push_image() {
 }
 
 # Build each service
-build_and_push_image "catalogapi" "Services/Catalog/Catalog.API/Dockerfile"
-build_and_push_image "basketapi" "Services/Basket/Basket.API/Dockerfile"
-build_and_push_image "discountapi" "Services/Discount/Discount.API/Dockerfile"
-build_and_push_image "orderingapi" "Services/Ordering/Ordering.API/Dockerfile"
-build_and_push_image "ocelotapigateway" "ApiGateways/Ocelot.ApiGateway/Dockerfile"
+build_and_push_image "catalogapi" "src/Services/Catalog/Catalog.API/Dockerfile"
+build_and_push_image "basketapi" "src/Services/Basket/Basket.API/Dockerfile"
+build_and_push_image "discountapi" "src/Services/Discount/Discount.API/Dockerfile"
+build_and_push_image "orderingapi" "src/Services/Ordering/Ordering.API/Dockerfile"
+build_and_push_image "ocelotapigateway" "src/ApiGateways/Ocelot.ApiGateway/Dockerfile"
 
 log_success "All Docker images pushed to ECR"
 
@@ -205,7 +205,7 @@ log_success "S3 bucket configured with public read access"
 
 # Update seed data with correct S3 URLs before building Docker images
 log_info "Updating product seed data with correct S3 bucket URLs..."
-SEED_FILE="Services/Catalog/Catalog.Infrastructure/Data/SeedData/products.json"
+SEED_FILE="src/Services/Catalog/Catalog.Infrastructure/Data/SeedData/products.json"
 S3_URL_PATTERN="https://${S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/products/"
 if [ -f "$SEED_FILE" ]; then
     sed -i.bak -E "s|https://ecommerce-product-images-[0-9]+\.s3\.[a-z0-9-]+\.amazonaws\.com/products/|${S3_URL_PATTERN}|g" "$SEED_FILE"
@@ -214,9 +214,9 @@ if [ -f "$SEED_FILE" ]; then
 fi
 
 # Upload product images if they exist
-if [ -d "client/src/images/products" ]; then
+if [ -d "frontend/client/src/images/products" ]; then
     log_info "Uploading product images to S3..."
-    aws s3 sync client/src/images/products/ "s3://${S3_BUCKET}/products/" --quiet
+    aws s3 sync frontend/client/src/images/products/ "s3://${S3_BUCKET}/products/" --quiet
     IMAGE_COUNT=$(aws s3 ls "s3://${S3_BUCKET}/products/" --recursive | wc -l)
     log_success "Uploaded ${IMAGE_COUNT} product images"
 else
@@ -395,7 +395,7 @@ log_success "IRSA configured for S3 access"
 # ============================================================================
 log_step "Step 8/8: Deploying Core Services"
 
-cd Deployments/helm
+cd deploy/helm
 
 # Deploy Databases
 log_info "Deploying databases..."

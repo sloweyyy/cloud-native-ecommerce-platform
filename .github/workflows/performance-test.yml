@@ -78,12 +78,12 @@ jobs:
           # pattern ran the foreground `cd ../../..` in the parent shell, walking
           # it above the repo, so every service after the first (and the gateway)
           # failed with "No such file or directory" and never started.
-          ( cd Services/Catalog/Catalog.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8001" ) &
-          ( cd Services/Basket/Basket.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8002" ) &
-          ( cd Services/Ordering/Ordering.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8004" ) &
+          ( cd src/Services/Catalog/Catalog.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8001" ) &
+          ( cd src/Services/Basket/Basket.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8002" ) &
+          ( cd src/Services/Ordering/Ordering.API && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8004" ) &
 
           # Start API Gateway
-          ( cd ApiGateways/Ocelot.ApiGateway && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8010" ) &
+          ( cd src/ApiGateways/Ocelot.ApiGateway && dotnet run --configuration Release --no-build --urls "http://0.0.0.0:8010" ) &
 
           # Wait for the gateway to accept connections. Ocelot exposes no /health
           # route, so treat ANY HTTP response (even 404) as "process is listening".
@@ -107,9 +107,9 @@ jobs:
           TEST_TYPE: ${{ github.event.inputs.test_type || 'smoke' }}
           AWS_GATEWAY_URL: ${{ github.event.inputs.target_url || 'http://localhost:8010' }}
         run: |
-          cd tests/k6
+          cd tests/load/k6
           # Map the requested test type to the script that actually exists in
-          # tests/k6 (there is no generic "load-test.js").
+          # tests/load/k6 (there is no generic "load-test.js").
           case "$TEST_TYPE" in
             smoke)  SCRIPT=gateway-smoke-test.js ;;
             stress) SCRIPT=stress-test.js ;;
@@ -131,7 +131,7 @@ jobs:
           echo "**Test Type:** ${{ github.event.inputs.test_type || 'smoke' }}" >> $GITHUB_STEP_SUMMARY
           echo "**Date:** $(date -u)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          if [ -f tests/k6/results.json ]; then
+          if [ -f tests/load/k6/results.json ]; then
             echo "Results file generated successfully." >> $GITHUB_STEP_SUMMARY
           else
             echo "No results file generated." >> $GITHUB_STEP_SUMMARY
@@ -142,5 +142,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: k6-results-${{ github.event.inputs.test_type || 'smoke' }}-${{ github.run_number }}
-          path: tests/k6/results.json
+          path: tests/load/k6/results.json
           retention-days: 30

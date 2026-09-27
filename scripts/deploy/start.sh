@@ -49,9 +49,9 @@ log_success "Port forwards started!"
 
 # Start Angular frontend
 log_info "Starting Angular frontend..."
-cd client
+cd frontend/client
 npm start > /dev/null 2>&1 &
-cd ..
+cd ../..
 
 sleep 3
 

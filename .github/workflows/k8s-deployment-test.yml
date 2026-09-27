@@ -4,9 +4,8 @@ on:
   pull_request:
     branches: [main, develop]
     paths:
-      - 'Deployments/k8s/**'
-      - 'Services/**'
-      - 'ApiGateways/**'
+      - 'deploy/k8s/**'
+      - 'src/**'
       - '**/Dockerfile'
   workflow_dispatch:
 
@@ -46,11 +45,11 @@ jobs:
           echo "🔨 Building Docker images for testing..."
           
           # Build all service images
-          docker build -f Services/Catalog/Catalog.API/Dockerfile -t eshop/catalog.api:latest .
-          docker build -f Services/Basket/Basket.API/Dockerfile -t eshop/basket.api:latest .
-          docker build -f Services/Discount/Discount.API/Dockerfile -t eshop/discount.grpc:latest .
-          docker build -f Services/Ordering/Ordering.API/Dockerfile -t eshop/ordering.api:latest .
-          docker build -f ApiGateways/Ocelot.ApiGateway/Dockerfile -t eshop/ocelot.apigw:latest .
+          docker build -f src/Services/Catalog/Catalog.API/Dockerfile -t eshop/catalog.api:latest .
+          docker build -f src/Services/Basket/Basket.API/Dockerfile -t eshop/basket.api:latest .
+          docker build -f src/Services/Discount/Discount.API/Dockerfile -t eshop/discount.grpc:latest .
+          docker build -f src/Services/Ordering/Ordering.API/Dockerfile -t eshop/ordering.api:latest .
+          docker build -f src/ApiGateways/Ocelot.ApiGateway/Dockerfile -t eshop/ocelot.apigw:latest .
           
           # Load images into Minikube
           minikube image load eshop/catalog.api:latest
@@ -64,7 +63,7 @@ jobs:
       - name: Test Kubernetes deployment
         run: |
           echo "🚀 Testing Kubernetes deployment..."
-          cd Deployments/k8s
+          cd deploy/k8s
 
           # Clean up any existing deployments first
           echo "🧹 Cleaning up existing deployments..."
@@ -123,7 +122,7 @@ jobs:
       - name: Validate deployment
         run: |
           echo "🔍 Validating deployment..."
-          cd Deployments/k8s
+          cd deploy/k8s
           
           # Run validation script
           ./validate-deployment.sh || echo "⚠️ Some validation checks failed"
@@ -213,7 +212,7 @@ jobs:
         if: always()
         run: |
           echo "🧹 Cleaning up..."
-          cd Deployments/k8s
+          cd deploy/k8s
 
           # Run cleanup script
           ./cleanup-k8s.sh || echo "⚠️ Cleanup script failed"
