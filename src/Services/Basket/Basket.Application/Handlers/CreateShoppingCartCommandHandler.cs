@@ -13,14 +13,14 @@ namespace Basket.Application.Handlers;
 public class CreateShoppingCartCommandHandler : IRequestHandler<CreateShoppingCartCommand, ShoppingCartResponse>
 {
     private readonly IBasketRepository _basketRepository;
-    private readonly DiscountGrpcService _discountGrpcService;
+    private readonly IDiscountService _discountService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<CreateShoppingCartCommandHandler> _logger;
 
-    public CreateShoppingCartCommandHandler(IBasketRepository basketRepository, DiscountGrpcService discountGrpcService, IConfiguration configuration, ILogger<CreateShoppingCartCommandHandler> logger)
+    public CreateShoppingCartCommandHandler(IBasketRepository basketRepository, IDiscountService discountService, IConfiguration configuration, ILogger<CreateShoppingCartCommandHandler> logger)
     {
         _basketRepository = basketRepository;
-        _discountGrpcService = discountGrpcService;
+        _discountService = discountService;
         _configuration = configuration;
         _logger = logger;
     }
@@ -29,6 +29,8 @@ public class CreateShoppingCartCommandHandler : IRequestHandler<CreateShoppingCa
     CancellationToken cancellationToken)
     {
         var bypassDiscount = _configuration.GetValue<bool>("BypassDiscount:Enabled");
+
+        request.Items ??= new List<ShoppingCartItem>();
 
         foreach (var item in request.Items)
         {
@@ -41,8 +43,9 @@ public class CreateShoppingCartCommandHandler : IRequestHandler<CreateShoppingCa
             // Apply discount only if it hasn't been applied yet and bypass is not enabled
             if (!bypassDiscount && item.DiscountAmount == 0 && item.Price == item.OriginalPrice)
             {
-                var coupon = await _discountGrpcService.GetDiscount(item.ProductName);
-                item.DiscountAmount = coupon.Amount;
+                var coupon = await _discountService.GetDiscount(item.ProductName, cancellationToken);
+                // A coupon larger than the price must not produce a negative price.
+                item.DiscountAmount = Math.Min(Math.Max(coupon.Amount, 0), Math.Max(item.OriginalPrice, 0));
 
                 // Update the Price to reflect the discounted price
                 item.Price = item.OriginalPrice - item.DiscountAmount;

@@ -108,7 +108,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // Application Services
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-builder.Services.AddScoped<DiscountGrpcService>();
+builder.Services.Configure<DiscountGrpcOptions>(builder.Configuration.GetSection(DiscountGrpcOptions.SectionName));
+builder.Services.AddScoped<IDiscountService, DiscountGrpcService>();
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
     (cfg =>
     {
