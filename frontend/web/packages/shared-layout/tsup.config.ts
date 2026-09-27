@@ -13,7 +13,7 @@ export default defineConfig({
     'react',
     'react-dom',
     'react-dom/client',
-    'react-router-dom',
+    'react-router',
     'antd',
     '@tanstack/react-query',
     '@ecommerce-platform/auth-provider',

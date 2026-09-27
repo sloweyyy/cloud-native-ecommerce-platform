@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { BrowserRouter, useRoutes } from 'react-router';
 import { ConfigProvider, theme } from 'antd';
 import { EcommerceAuthProvider as EcommerceAuthProviderOriginal, MsalConfigOptions } from '@ecommerce-platform/auth-provider';
 import {

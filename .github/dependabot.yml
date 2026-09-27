@@ -96,6 +96,11 @@ updates:
       - dependency-name: "nx"
       - dependency-name: "@nx/*"
       - dependency-name: "@nrwl/*"
+      # webpack >= 5.105 breaks the Module Federation runtime chunk
+      # ("[contenthash] not implemented in this context" in checkout/admin builds).
+      # Keep the 5.104.1 pin until @module-federation/enhanced supports it.
+      - dependency-name: "webpack"
+        versions: [">=5.105.0"]
       # Ignore major version updates for stability
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]

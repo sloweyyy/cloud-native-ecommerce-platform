@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Dropdown, Avatar, Flex, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Typography, Button, Space, Flex } from 'antd';
 import { promotionalBanners } from '../../data/promotionalBanners';
 

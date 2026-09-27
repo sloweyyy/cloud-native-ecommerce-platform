@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Dropdown, Button, Spin } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';

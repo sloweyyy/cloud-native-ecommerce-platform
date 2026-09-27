@@ -1,5 +1,5 @@
 import React from 'react';
-import { RouteObject } from 'react-router-dom';
+import { RouteObject } from 'react-router';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
