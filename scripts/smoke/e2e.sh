@@ -63,6 +63,17 @@ request() {
   HTTP_CODE="${HTTP_CODE:-000}"
 }
 
+# request_retry_429 METHOD PATH [DATA]: like request, but backs off while the
+# gateway's rate limiter answers 429 (e.g. /Basket/Checkout allows 1 call per 3s).
+request_retry_429() {
+  local attempt
+  for attempt in 1 2 3 4 5; do
+    request "$@"
+    [[ "$HTTP_CODE" == "429" ]] || return 0
+    sleep 3
+  done
+}
+
 expect_status() {
   local expected="$1"
   [[ "$HTTP_CODE" == "$expected" ]] || fail "expected HTTP $expected, got $HTTP_CODE"
@@ -161,7 +172,7 @@ print(json.dumps({"userName": sys.argv[1], "totalPrice": 0,
 }
 
 step "Invalid checkout is rejected with 400 and keeps the basket"
-request POST "/Basket/Checkout" "$(checkout_json "not-an-email")"
+request_retry_429 POST "/Basket/Checkout" "$(checkout_json "not-an-email")"
 expect_status 400
 [[ -n "$(json "(d.get('errors') or {}).get('EmailAddress') or (d.get('errors') or {}).get('emailAddress')")" ]] || fail "expected an EmailAddress validation error"
 request GET "/Basket/GetBasket/$USER_NAME"
@@ -169,7 +180,7 @@ request GET "/Basket/GetBasket/$USER_NAME"
 ok "400 with errors.EmailAddress; basket intact"
 
 step "Checkout"
-request POST "/Basket/Checkout" "$(checkout_json "smoke@example.com")"
+request_retry_429 POST "/Basket/Checkout" "$(checkout_json "smoke@example.com")"
 expect_status 202
 ok "checkout accepted"
 

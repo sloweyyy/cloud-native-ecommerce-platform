@@ -52,7 +52,7 @@ services:
     image: docker.elastic.co/kibana/kibana:7.9.2
 
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack:3.8  # pinned: newer "latest" images require a LocalStack license token
     container_name: localstack
     ports:
       - "4566:4566"
