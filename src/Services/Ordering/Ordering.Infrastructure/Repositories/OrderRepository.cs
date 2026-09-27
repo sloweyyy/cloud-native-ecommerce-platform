@@ -18,4 +18,9 @@ public class OrderRepository : RepositoryBase<Order>, IOrderRepository
             .ToListAsync();
         return orderList;
     }
+
+    public Task<bool> ExistsByCorrelationIdAsync(string correlationId)
+    {
+        return _dbContext.Orders.AnyAsync(o => o.CorrelationId == correlationId);
+    }
 }

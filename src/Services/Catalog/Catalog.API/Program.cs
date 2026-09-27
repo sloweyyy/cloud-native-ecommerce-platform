@@ -7,6 +7,7 @@ using Catalog.Infrastructure.Repositories;
 using Common.Logging;
 using EventBus.Messages.Common;
 using MassTransit;
+using MongoDB.Driver;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -66,7 +67,11 @@ var assemblies = new Assembly[]
 builder.Services.AddMediator(assemblies);
 
 //Register Application Services
-builder.Services.AddScoped<ICatalogContext, CatalogContext>();
+// MongoClient is thread-safe and pools connections: one per process.
+builder.Services.AddSingleton<IMongoClient>(_ =>
+    new MongoClient(builder.Configuration.GetValue<string>("DatabaseSettings:ConnectionString")));
+builder.Services.AddSingleton<ICatalogContext, CatalogContext>();
+builder.Services.AddSingleton<CatalogSeeder>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IBrandRepository, ProductRepository>();
 builder.Services.AddScoped<ITypesRepository, ProductRepository>();
@@ -148,6 +153,9 @@ builder.Services.AddMassTransit(config =>
 });
 
 var app = builder.Build();
+
+// Create indexes and seed reference data once; throws (and stops the process) on failure
+await app.Services.GetRequiredService<CatalogSeeder>().SeedAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

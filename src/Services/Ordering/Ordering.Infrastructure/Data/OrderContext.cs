@@ -13,6 +13,12 @@ public class OrderContext : DbContext
     public DbSet<Order> Orders { get; set; }
     public DbSet<Activity> Activities { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(OrderContext).Assembly);
+    }
+
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default)
     {

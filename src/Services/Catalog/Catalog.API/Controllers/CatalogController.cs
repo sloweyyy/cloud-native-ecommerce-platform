@@ -185,6 +185,23 @@ public class CatalogController : ApiController
     {
         var command = new DeleteProductByIdCommand(id);
         var result = await _mediator.Send(command);
+
+        // Publish ProductActivityEvent after successful deletion
+        if (result)
+        {
+            var eventMessage = new ProductActivityEvent
+            {
+                ActivityType = ProductActivityType.Deleted,
+                ProductId = id,
+                ProductName = string.Empty, // Not known here without an extra lookup
+                Actor = "system", // TODO: Get from auth context
+                OccurredAt = DateTime.UtcNow
+            };
+
+            await _publishEndpoint.Publish(eventMessage);
+            _logger.LogInformation("ProductActivityEvent published for ProductId: {ProductId}", id);
+        }
+
         return Ok(result);
     }
 }
