@@ -1,4 +1,42 @@
 # Changelog
+## [0.11.11] - 2026-09-27
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(web): react-router v7, patched SheetJS, webpack pin — npm audit to 0 (#569) (24b009a)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- docs: update changelog for 0.11.9 (#565) (23f8154)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- No infrastructure changes
+
+### Other Changes
+- No other changes
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.10...0.11.11
+
 ## [0.11.9] - 2026-09-27
 
 ## What's Changed
