@@ -87,9 +87,11 @@ public static class DbExtension
                 new NpgsqlCommand($"CREATE DATABASE \"{dbName!.Replace("\"", "\"\"")}\"", connection);
             await createCmd.ExecuteNonQueryAsync(cancellationToken);
         }
-        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.DuplicateDatabase)
+        catch (PostgresException ex) when (ex.SqlState is PostgresErrorCodes.DuplicateDatabase
+                                               or PostgresErrorCodes.UniqueViolation)
         {
-            // Another replica created it first.
+            // Another replica created it first (a truly concurrent CREATE DATABASE can surface as a
+            // unique violation on pg_database rather than 42P04).
         }
     }
 
