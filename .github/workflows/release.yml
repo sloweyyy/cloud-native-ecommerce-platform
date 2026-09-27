@@ -129,7 +129,7 @@ jobs:
           
           ## Helm Deployment
           \`\`\`bash
-          helm upgrade --install ecommerce-platform ./Deployments/helm/platform \\
+          helm upgrade --install ecommerce-platform ./deploy/helm/platform \\
             --set global.image.tag=${{ needs.analyze-changes.outputs.new_version }}
           \`\`\`
           
@@ -213,7 +213,7 @@ jobs:
           
           ## Helm Deployment
           ```bash
-          helm upgrade --install ecommerce-platform ./Deployments/helm/platform \
+          helm upgrade --install ecommerce-platform ./deploy/helm/platform \
             --set global.image.tag=${{ needs.analyze-changes.outputs.new_version }}
           ```
           
@@ -316,7 +316,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}/ocelot-gateway:${{ needs.analyze-changes.outputs.new_version }}
 
             # Deploy with Helm
-            helm upgrade --install ecommerce-platform ./Deployments/helm/platform \\
+            helm upgrade --install ecommerce-platform ./deploy/helm/platform \\
               --set global.image.tag=${{ needs.analyze-changes.outputs.new_version }}
             \`\`\`
 

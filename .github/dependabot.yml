@@ -31,7 +31,7 @@ updates:
 
   # npm packages for frontend
   - package-ecosystem: "npm"
-    directory: "/client"
+    directory: "/frontend/legacy-angular"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -66,7 +66,7 @@ updates:
 
   # npm packages for micro-frontend
   - package-ecosystem: "npm"
-    directory: "/micro-frontends"
+    directory: "/frontend/web"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -102,7 +102,11 @@ updates:
 
   # Docker base images
   - package-ecosystem: "docker"
-    directory: "/"
+    # Dockerfiles live next to each service; "/" has none, so no base-image
+    # PRs were ever opened.
+    directories:
+      - "/src/Services/*/*.API"
+      - "/src/ApiGateways/*"
     schedule:
       interval: "weekly"
       day: "monday"

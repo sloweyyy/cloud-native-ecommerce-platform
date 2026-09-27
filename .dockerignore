@@ -8,11 +8,11 @@
 **/dist/
 **/build/
 **/target/
-client/node_modules/
-client/dist/
-client/.angular/
-micro-frontends/node_modules/
-micro-frontends/dist/
+frontend/legacy-angular/node_modules/
+frontend/legacy-angular/dist/
+frontend/legacy-angular/.angular/
+frontend/web/node_modules/
+frontend/web/dist/
 
 # .NET build outputs
 **/bin/
@@ -38,13 +38,13 @@ SECURITY.md
 
 # Deployment and infrastructure (not needed in container)
 .github/
-Deployments/
-Infrastructure/aws/
+deploy/
+deploy/aws/
 scripts/
 wiki/
 docs/
 images/
-diagrams/
+docs/diagrams/
 
 # Docker files
 docker-compose*.yml
@@ -74,7 +74,7 @@ istio-*/
 *.key
 
 # Product images (not needed for build, only for migration)
-client/src/images/products/
+frontend/legacy-angular/src/images/products/
 
 # Postman collections
 PostmanCollection/

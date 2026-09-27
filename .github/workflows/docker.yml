@@ -29,19 +29,19 @@ jobs:
         service:
           - name: catalog-api
             context: .
-            dockerfile: ./Services/Catalog/Catalog.API/Dockerfile
+            dockerfile: ./src/Services/Catalog/Catalog.API/Dockerfile
           - name: basket-api
             context: .
-            dockerfile: ./Services/Basket/Basket.API/Dockerfile
+            dockerfile: ./src/Services/Basket/Basket.API/Dockerfile
           - name: discount-api
             context: .
-            dockerfile: ./Services/Discount/Discount.API/Dockerfile
+            dockerfile: ./src/Services/Discount/Discount.API/Dockerfile
           - name: ordering-api
             context: .
-            dockerfile: ./Services/Ordering/Ordering.API/Dockerfile
+            dockerfile: ./src/Services/Ordering/Ordering.API/Dockerfile
           - name: ocelot-gateway
             context: .
-            dockerfile: ./ApiGateways/Ocelot.ApiGateway/Dockerfile
+            dockerfile: ./src/ApiGateways/Ocelot.ApiGateway/Dockerfile
 
     steps:
       - name: Checkout

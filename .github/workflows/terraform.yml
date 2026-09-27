@@ -3,11 +3,11 @@ name: Terraform
 on:
   pull_request:
     paths:
-      - "terraform/**"
+      - "deploy/terraform/**"
   push:
     branches: [main]
     paths:
-      - "terraform/**"
+      - "deploy/terraform/**"
 
 concurrency:
   group: terraform-${{ github.ref }}
@@ -18,7 +18,7 @@ permissions:
   pull-requests: write # Needed to post plan output as PR comment
 
 env:
-  TF_DIR: terraform
+  TF_DIR: deploy/terraform
   TF_VERSION: "1.14.8"
 
 jobs:

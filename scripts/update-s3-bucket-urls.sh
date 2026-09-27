@@ -216,7 +216,7 @@ if [ "${REMAINING_OLD}" == "0" ]; then
     echo -e "     ${CYAN}aws s3 ls s3://${NEW_S3_BUCKET}/products/${NC}"
     echo ""
     echo "  2. If images are missing, upload them:"
-    echo -e "     ${CYAN}aws s3 sync client/src/images/products/ s3://${NEW_S3_BUCKET}/products/${NC}"
+    echo -e "     ${CYAN}aws s3 sync frontend/legacy-angular/src/images/products/ s3://${NEW_S3_BUCKET}/products/${NC}"
     echo ""
     echo "  3. Restart the Catalog API pod to clear any cache:"
     echo -e "     ${CYAN}kubectl rollout restart deployment catalog -n ${NAMESPACE}${NC}"

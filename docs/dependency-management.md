@@ -24,14 +24,14 @@ Dependabot **ignores** `nx`, `@nx/*`, and `@nrwl/*` (see the `ignore:` block in
 Nx must be upgraded as a **coordinated set** — `nx` core and every `@nx/*` plugin
 have to move together. Piecemeal bumps (e.g. a single `@nx/*` patch inside an
 already-declared `^22` range) leave the toolchain split across versions and
-generate a `micro-frontends/package-lock.json` that `npm ci` rejects with errors
+generate a `frontend/web/package-lock.json` that `npm ci` rejects with errors
 like `Missing @nx/jest@<v> from lock file`, which breaks the `frontend-quality`
 CI job. This happened repeatedly before nx was pinned out of Dependabot.
 
 To upgrade Nx, run the official migration instead:
 
 ```bash
-cd micro-frontends
+cd frontend/web
 npx nx migrate latest
 npx nx migrate --run-migrations
 ```
@@ -40,13 +40,13 @@ Then commit the regenerated `package.json` + `package-lock.json` together.
 
 ## Regenerating the micro-frontends lockfile
 
-CI runs `npm ci` in `micro-frontends/` under **Node 20.x / npm 10.x**. If the
+CI runs `npm ci` in `frontend/web/` under **Node 20.x / npm 10.x**. If the
 lockfile ever falls out of sync with `package.json`, regenerate it with the same
 npm major CI uses (a newer npm can produce a lock that npm 10's `npm ci`
 rejects):
 
 ```bash
-cd micro-frontends
+cd frontend/web
 npx -y npm@10 install --package-lock-only --no-audit --no-fund
 # verify it is in sync the way CI will see it:
 npx -y npm@10 ci --dry-run

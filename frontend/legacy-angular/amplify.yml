@@ -1,0 +1,25 @@
+version: 1
+applications:
+  - appRoot: frontend/legacy-angular
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # Install dependencies
+            - npm install --legacy-peer-deps
+        build:
+          commands:
+            # Build Angular app for production with environment variable injection
+            # This runs both generate-env.js and ng build with --configuration=production
+            - npm run build:prod
+      artifacts:
+        # Angular outputs to dist/client
+        baseDirectory: dist/client
+        files:
+          - '**/*'
+      cache:
+        paths:
+          # Cache node_modules for faster builds
+          - node_modules/**/*
+          # Cache Angular build cache
+          - .angular/cache/**/*

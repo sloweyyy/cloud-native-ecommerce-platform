@@ -240,8 +240,8 @@ PublishScripts/
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
 # except micro-frontends packages (shared libraries)
-!micro-frontends/packages/
-!micro-frontends/packages/**
+!frontend/web/packages/
+!frontend/web/packages/**
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
@@ -322,8 +322,8 @@ node_modules/
 # Typescript v1 declaration files
 # Note: Using **/typings/ to allow negation for micro-frontends
 **/typings/
-!micro-frontends/**/typings/
-!micro-frontends/**/typings/**
+!frontend/web/**/typings/
+!frontend/web/**/typings/**
 
 # Visual Studio 6 build log
 *.plg
@@ -403,9 +403,9 @@ coverage.json
 .env
 
 # Environment files
-client/.env
-client/.env.local
-client/.env.production
+frontend/legacy-angular/.env
+frontend/legacy-angular/.env.local
+frontend/legacy-angular/.env.production
 
 /.cursor
 
@@ -435,7 +435,7 @@ backups/
 *.zip.backup
 *.backup-*
 *.bak-*
-/.claude
+**/.claude/
 
 # Stakpak session files
 .stakpak/session*

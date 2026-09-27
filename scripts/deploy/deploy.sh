@@ -149,19 +149,19 @@ build_images() {
     
     # Build all microservice images
     log_info "Building Catalog API..."
-    docker build -t catalogapi:latest -f Services/Catalog/Catalog.API/Dockerfile .
+    docker build -t catalogapi:latest -f src/Services/Catalog/Catalog.API/Dockerfile .
     
     log_info "Building Basket API..."
-    docker build -t basketapi:latest -f Services/Basket/Basket.API/Dockerfile .
+    docker build -t basketapi:latest -f src/Services/Basket/Basket.API/Dockerfile .
     
     log_info "Building Discount API..."
-    docker build -t discountapi:latest -f Services/Discount/Discount.API/Dockerfile .
+    docker build -t discountapi:latest -f src/Services/Discount/Discount.API/Dockerfile .
     
     log_info "Building Ordering API..."
-    docker build -t orderingapi:latest -f Services/Ordering/Ordering.API/Dockerfile .
+    docker build -t orderingapi:latest -f src/Services/Ordering/Ordering.API/Dockerfile .
     
     log_info "Building API Gateway..."
-    docker build -t ocelotapigateway:latest -f ApiGateways/Ocelot.ApiGateway/Dockerfile .
+    docker build -t ocelotapigateway:latest -f src/ApiGateways/Ocelot.ApiGateway/Dockerfile .
     
     # Tag images for Kubernetes
     log_info "Tagging images for Kubernetes..."
@@ -183,7 +183,7 @@ deploy_infrastructure() {
     
     log_info "Deploying infrastructure services..."
     
-    cd Deployments/helm
+    cd deploy/helm
     
     HELM_CMD="install"
     if [ "$DEPLOYMENT_MODE" = "upgrade" ]; then
@@ -230,7 +230,7 @@ deploy_localstack() {
 
     log_info "Deploying LocalStack for local S3 storage..."
 
-    cd Deployments/helm
+    cd deploy/helm
 
     # Always use upgrade --install to handle both new and existing installations
     helm upgrade --install eshopping-localstack ./localstack --namespace default --timeout 600s
@@ -260,7 +260,7 @@ deploy_localstack() {
         fi
 
         # Create bucket and upload images TO LocalStack S3
-        bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 client/src/images/products
+        bash scripts/init-localstack-s3.sh ecommerce-product-images http://localhost:4566 frontend/legacy-angular/src/images/products
 
         kill $PF_PID 2>/dev/null || true
     else
@@ -316,7 +316,7 @@ deploy_apis() {
     
     log_info "Deploying API microservices..."
     
-    cd Deployments/helm
+    cd deploy/helm
     
     HELM_CMD="install"
     if [ "$DEPLOYMENT_MODE" = "upgrade" ]; then
@@ -473,7 +473,7 @@ deploy_monitoring() {
 configure_frontend() {
     log_info "Configuring Angular frontend..."
     
-    cd client
+    cd frontend/legacy-angular
     
     # Update API endpoints to use localhost:8010
     log_info "Updating API endpoints..."
@@ -495,7 +495,7 @@ configure_frontend() {
     log_info "Installing npm dependencies..."
     npm install --legacy-peer-deps
     
-    cd ..
+    cd ../..
     
     log_success "Angular frontend configured"
 }
@@ -536,12 +536,12 @@ setup_port_forwards() {
 start_frontend() {
     log_info "Starting Angular development server..."
     
-    cd client
+    cd frontend/legacy-angular
     
     # Start Angular in background
     npm start > /dev/null 2>&1 &
     
-    cd ..
+    cd ../..
     
     log_success "Angular development server started"
 }

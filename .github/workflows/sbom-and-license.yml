@@ -25,15 +25,15 @@ jobs:
       matrix:
         service:
           - name: catalog-api
-            dockerfile: ./Services/Catalog/Catalog.API/Dockerfile
+            dockerfile: ./src/Services/Catalog/Catalog.API/Dockerfile
           - name: basket-api
-            dockerfile: ./Services/Basket/Basket.API/Dockerfile
+            dockerfile: ./src/Services/Basket/Basket.API/Dockerfile
           - name: discount-api
-            dockerfile: ./Services/Discount/Discount.API/Dockerfile
+            dockerfile: ./src/Services/Discount/Discount.API/Dockerfile
           - name: ordering-api
-            dockerfile: ./Services/Ordering/Ordering.API/Dockerfile
+            dockerfile: ./src/Services/Ordering/Ordering.API/Dockerfile
           - name: ocelot-gateway
-            dockerfile: ./ApiGateways/Ocelot.ApiGateway/Dockerfile
+            dockerfile: ./src/ApiGateways/Ocelot.ApiGateway/Dockerfile
     steps:
       - uses: actions/checkout@v7
 
@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Check npm license compliance
-        working-directory: ./micro-frontends
+        working-directory: ./frontend/web
         run: |
           npx license-checker --production --summary --failOn "GPL-3.0;AGPL-3.0" || true
           echo "## npm License Report" >> $GITHUB_STEP_SUMMARY

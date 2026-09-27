@@ -56,7 +56,7 @@
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.10" />
 
     <!-- Mediator: replaced MediatR (commercial since v13) with the in-house
-         Infrastructure/Common.Mediator project (reflection-based dispatcher,
+         src/BuildingBlocks/Common.Mediator project (reflection-based dispatcher,
          API-compatible with the subset of MediatR used in this repo). -->
     <!-- <PackageVersion Include="MediatR" ... /> removed -->
 

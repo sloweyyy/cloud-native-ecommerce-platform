@@ -43,7 +43,7 @@ backup_current_config() {
 apply_permanent_configmap() {
     log_info "Applying Grafana ConfigMap with correct Prometheus connection..."
 
-    kubectl apply -f Deployments/monitoring/grafana/grafana-configmap-fixed.yaml
+    kubectl apply -f deploy/monitoring/grafana/grafana-configmap-fixed.yaml
 
     log_success "Grafana ConfigMap updated"
 }
@@ -52,7 +52,7 @@ apply_permanent_configmap() {
 create_permanent_service_bridge() {
     log_info "Creating Prometheus service alias for compatibility..."
 
-    kubectl apply -f Deployments/monitoring/grafana/prometheus-service-alias.yaml
+    kubectl apply -f deploy/monitoring/grafana/prometheus-service-alias.yaml
 
     log_success "Prometheus service alias created"
 }

@@ -27,6 +27,6 @@ jobs:
           dotnet list package --vulnerable --include-transitive || echo "No vulnerabilities found"
       
       - name: npm Security Audit
-        working-directory: ./micro-frontends
+        working-directory: ./frontend/web
         run: |
           npm audit || echo "Audit completed" 

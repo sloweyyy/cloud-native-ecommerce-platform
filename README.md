@@ -279,7 +279,7 @@ Best for: Production workloads, enterprise deployments
 **Includes**: Multi-AZ EKS, all services, full monitoring (Prometheus, Grafana, Jaeger, Elasticsearch, Kibana), HTTPS, auto-scaling
 **Cost**: ~$150-300/month
 
-For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)
+For detailed deployment instructions, see [docs/deployment-guide.md](docs/deployment-guide.md)
 
 ## 📍 Access Services
 
@@ -338,7 +338,7 @@ For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE
 | **Runtime** | .NET | 10.0 | Framework |
 | **Framework** | ASP.NET Core | 10.0 | Web API |
 | **Architecture** | Clean Architecture | - | SOLID principles |
-| **Pattern** | CQRS + in-house Mediator | - | Command/Query separation (`Infrastructure/Common.Mediator`) |
+| **Pattern** | CQRS + in-house Mediator | - | Command/Query separation (`src/BuildingBlocks/Common.Mediator`) |
 | **ORM** | Entity Framework Core | 10.0 | Database abstraction |
 | **Mapping** | Riok.Mapperly | 4.1 | Source-generated DTO mapping (no reflection) |
 | **Validation** | FluentValidation | 11.12 | Input validation |
@@ -392,100 +392,42 @@ For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE
 
 ```text
 cloud-native-ecommerce-platform/
+├── src/                          # All .NET backend code
+│   ├── Services/                 # Microservices (Clean Architecture: API → Application → Core ← Infrastructure)
+│   │   ├── Catalog/              #   Products, brands, types — MongoDB + S3
+│   │   ├── Basket/               #   Shopping cart — Redis, gRPC client → Discount
+│   │   ├── Discount/             #   Coupons — gRPC server, PostgreSQL
+│   │   └── Ordering/             #   Orders — SQL Server (EF Core), RabbitMQ consumer
+│   ├── ApiGateways/
+│   │   └── Ocelot.ApiGateway/    # Edge gateway: routing, CORS, per-environment ocelot.*.json
+│   └── BuildingBlocks/           # Shared libraries referenced by every service
+│       ├── Common.Logging/       #   Serilog + OpenTelemetry setup
+│       ├── Common.Mediator/      #   In-house CQRS mediator + pipeline behaviours
+│       └── EventBus.Messages/    #   Integration events (MassTransit contracts)
 │
-├── 📁 micro-frontends/          # Microfrontend monorepo (Nx)
-│   ├── host/                             # Shell app (Host) - Router, Auth
-│   ├── store/                            # Store MFE - Product browsing
-│   ├── checkout/                         # Checkout MFE - Cart & checkout
-│   ├── account/                          # Account MFE - User profile
-│   ├── admin/                            # Admin MFE - Management dashboard
-│   ├── packages/
-│   │   ├── app-injector/                 # MFE injection utilities
-│   │   ├── auth-provider/                # Shared authentication provider
-│   │   └── shared-layout/                # Shared UI components (Navbar, Footer)
-│   ├── e2e/                              # E2E tests (Playwright)
-│   ├── nx.json                           # Nx configuration
-│   ├── tsconfig.base.json                # TypeScript base config
-│   └── package.json                      # Dependencies
+├── frontend/
+│   ├── web/                      # Current web app: React micro-frontends (Nx + Module Federation)
+│   └── legacy-angular/           # Deprecated Angular SPA, kept for reference / migration history
 │
-├── 📁 Services/                          # Backend microservices (.NET 10)
-│   ├── Catalog/
-│   │   ├── Catalog.API/                  # REST endpoints
-│   │   ├── Catalog.Core/                 # Domain entities
-│   │   └── Catalog.Infrastructure/       # MongoDB, S3
-│   ├── Basket/
-│   │   ├── Basket.API/                   # REST endpoints
-│   │   ├── Basket.Core/                  # Domain entities
-│   │   └── Basket.Infrastructure/        # Redis, gRPC client
-│   ├── Discount/
-│   │   ├── Discount.API/                 # gRPC & REST endpoints
-│   │   ├── Discount.Core/                # Domain entities
-│   │   └── Discount.Infrastructure/      # PostgreSQL
-│   └── Ordering/
-│       ├── Ordering.API/                 # REST endpoints
-│       ├── Ordering.Core/                # Domain entities, Activity tracking
-│       └── Ordering.Infrastructure/      # SQL Server, RabbitMQ consumer
+├── deploy/                       # Everything needed to run the platform somewhere
+│   ├── k8s/                      # Raw Kubernetes manifests + deploy/validate scripts
+│   ├── helm/                     # Helm charts (services, databases, observability)
+│   ├── istio/                    # Service mesh: gateway, virtual services, tracing
+│   ├── monitoring/               # Grafana dashboards & Prometheus wiring
+│   ├── terraform/                # AWS (VPC, EKS, ECR) infrastructure as code
+│   └── aws/                      # CloudFormation templates (alternative to Terraform)
 │
-├── 📁 ApiGateways/
-│   └── Ocelot.ApiGateway/                # API Gateway configuration
+├── tests/
+│   └── load/k6/                  # k6 smoke / load / stress / soak scenarios
 │
-├── 📁 Infrastructure/                    # Shared libraries & IaC
-│   ├── aws/
-│   │   └── cloudformation/               # AWS infrastructure templates
-│   │       ├── vpc.yaml                  # VPC, subnets, NAT
-│   │       ├── eks-cluster.yaml          # EKS cluster & node groups
-│   │       ├── minimal-stack.yaml        # Combined VPC + EKS
-│   │       └── alb-ingress.yaml          # Load balancer
-│   └── EventBus/                         # RabbitMQ, MassTransit setup
+├── docs/                         # Guides, architecture diagrams (eraser.io) and images
+├── scripts/                      # Operational scripts: deploy, access, cleanup, debug, monitoring
+├── tools/postman/                # API collections
 │
-├── 📁 Deployments/
-│   ├── helm/                             # Helm charts (19 total)
-│   │   ├── catalogdb/                    # MongoDB chart
-│   │   ├── basketdb/                     # Redis chart
-│   │   ├── discountdb/                   # PostgreSQL chart
-│   │   ├── orderdb/                      # SQL Server chart
-│   │   ├── rabbitmq/                     # RabbitMQ chart
-│   │   ├── catalog/                      # Catalog service chart
-│   │   ├── basket/                       # Basket service chart
-│   │   ├── discount/                     # Discount service chart
-│   │   ├── ordering/                     # Ordering service chart
-│   │   ├── ocelotapigw/                  # API Gateway chart
-│   │   ├── prometheus/                   # Prometheus chart
-│   │   ├── grafana/                      # Grafana chart
-│   │   ├── elasticsearch/                # Elasticsearch chart
-│   │   └── kibana/                       # Kibana chart
-│   ├── k8s/                              # Kubernetes manifests
-│   │   ├── deployments/                  # Service deployments
-│   │   ├── services/                     # Service definitions
-│   │   ├── ingress/                      # Ingress rules
-│   │   └── monitoring/                   # Monitoring resources
-│   └── monitoring/                       # Observability configs
-│
-├── 📁 .github/
-│   └── workflows/                        # CI/CD pipelines
-│       ├── ci.yml                        # Build, test, security scan
-│       ├── cd.yml                        # Build images, push ECR, deploy
-│       └── docker.yml                    # Publish to GHCR
-│
-├── 📁 scripts/
-│   ├── deploy/                           # Deployment scripts
-│   │   ├── deploy.sh                     # Local Minikube deployment
-│   │   ├── deploy-aws.sh                 # Full AWS EKS deployment
-│   │   ├── deploy-aws-minimal.sh         # Cost-optimized AWS deployment
-│   │   ├── docker-deploy.sh              # Docker Compose deployment
-│   │   └── build-images.sh               # Build Docker images
-│   ├── cleanup/                          # Resource teardown
-│   ├── access/                           # Service access portals
-│   ├── debug/                            # Debugging utilities
-│   └── monitoring/                       # Observability setup scripts
-│
-├── 📁 tools/postman/                     # API testing collections
-├── 📁 diagrams/                          # Architecture diagrams (eraser.io)
-│
-├── README.md                             # This file
-├── DEPLOYMENT-GUIDE.md                   # Detailed deployment docs
-├── LICENSE                               # MIT License
-└── docker-compose.yml                    # Local development stack
+├── Ecommerce.sln                 # Solution (all backend projects)
+├── Directory.Packages.props      # Central NuGet package versions
+├── global.json                   # Pinned .NET SDK
+└── docker-compose*.yml           # Full local stack (services + databases + observability)
 ```
 
 ## 🧠 Architecture Patterns & Design
@@ -580,7 +522,7 @@ Controllers/Endpoints → Mediator Pipeline → Commands/Queries
 ### E2E Testing (Playwright)
 
 ```bash
-cd micro-frontends
+cd frontend/web
 npm run test:e2e              # Run all tests
 npm run test:e2e:ui           # Interactive mode
 npm run test:e2e:debug        # Debug mode
@@ -814,15 +756,15 @@ export AWS_REGION=ap-southeast-1 # Set region
 
 For detailed configuration options, see:
 
-- [Deployments/DEPLOYMENT-CONFIGURATION.md](Deployments/DEPLOYMENT-CONFIGURATION.md)
-- [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)
+- [deploy/CONFIGURATION.md](deploy/CONFIGURATION.md)
+- [docs/deployment-guide.md](docs/deployment-guide.md)
 
 ## 💻 Development
 
 ### Frontend Development
 
 ```bash
-cd micro-frontends
+cd frontend/web
 
 # Install dependencies
 npm install
@@ -842,13 +784,13 @@ npm run start:admin    # Port 4204
 
 ```bash
 # Catalog Service
-cd Services/Catalog/Catalog.API
+cd src/Services/Catalog/Catalog.API
 dotnet watch run        # Auto-reload on changes
 
 # Other services (similar pattern)
-cd Services/Basket/Basket.API && dotnet watch run
-cd Services/Discount/Discount.API && dotnet watch run
-cd Services/Ordering/Ordering.API && dotnet watch run
+cd src/Services/Basket/Basket.API && dotnet watch run
+cd src/Services/Discount/Discount.API && dotnet watch run
+cd src/Services/Ordering/Ordering.API && dotnet watch run
 ```
 
 ### Available npm Commands
@@ -894,10 +836,10 @@ Also review:
 
 ## 📚 Documentation
 
-- [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) - Complete deployment instructions
-- [Deployments/DEPLOYMENT-CONFIGURATION.md](Deployments/DEPLOYMENT-CONFIGURATION.md) - Service configurations
+- [docs/deployment-guide.md](docs/deployment-guide.md) - Complete deployment instructions
+- [deploy/CONFIGURATION.md](deploy/CONFIGURATION.md) - Service configurations
 - [scripts/README.md](scripts/README.md) - Script reference guide
-- [diagrams/](diagrams/) - Architecture diagrams
+- [docs/diagrams/](docs/diagrams/) - Architecture diagrams
 
 ## 📄 License
 
