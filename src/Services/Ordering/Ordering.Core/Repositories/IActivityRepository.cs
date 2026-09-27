@@ -5,12 +5,17 @@ namespace Ordering.Core.Repositories;
 public interface IActivityRepository : IAsyncRepository<Activity>
 {
     /// <summary>
+    /// Upper bound for <c>pageSize</c> in <see cref="GetActivitiesAsync"/>.
+    /// </summary>
+    const int MaxPageSize = 100;
+
+    /// <summary>
     /// Check if activity with given EventId already exists (for idempotency)
     /// </summary>
     Task<bool> ExistsByEventIdAsync(Guid eventId);
 
     /// <summary>
-    /// Get activities with pagination and filters
+    /// Get activities with pagination and filters. <paramref name="pageIndex"/> is 0-based.
     /// </summary>
     Task<PagedResult<Activity>> GetActivitiesAsync(
         int pageIndex,

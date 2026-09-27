@@ -3,6 +3,7 @@ using Catalog.Application.Mappers;
 using Catalog.Application.Responses;
 using Catalog.Core.Entities;
 using Catalog.Core.Repositories;
+using Common.Exceptions;
 using Common.Mediator;
 
 namespace Catalog.Application.Handlers;
@@ -19,7 +20,7 @@ public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, Bra
   public async Task<BrandResponse> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
   {
     if (string.IsNullOrWhiteSpace(request.Name))
-      throw new ArgumentException("Brand name is required", nameof(request.Name));
+      throw new BadRequestException("Brand name is required");
 
     var brandEntity = ProductMapper.Instance.ToProductBrand(request);
     if (brandEntity is null)

@@ -1,7 +1,9 @@
 ﻿using Catalog.Core.Entities;
+using Catalog.Core.Exceptions;
 using Catalog.Core.Repositories;
 using Catalog.Core.Specs;
 using Catalog.Infrastructure.Data;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Catalog.Infrastructure.Repositories;
@@ -17,6 +19,10 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
 
     async Task<Product> IProductRepository.GetProduct(string id)
     {
+        // Ids are stored as ObjectIds: a malformed id can't match anything, and passing it
+        // to the driver would throw a FormatException (500) instead of "not found".
+        if (!ObjectId.TryParse(id, out _)) return null;
+
         return await _context
             .Products
             .Find(p => p.Id == id)
@@ -109,7 +115,7 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
     async Task<ProductBrand> IBrandRepository.CreateBrand(ProductBrand brand)
     {
         if (await ((IBrandRepository)this).BrandExists(brand.Name))
-            throw new ArgumentException($"Brand '{brand.Name}' already exists");
+            throw new DuplicateEntityException("Brand", brand.Name);
 
         try
         {
@@ -143,7 +149,7 @@ public class ProductRepository : IProductRepository, IBrandRepository, ITypesRep
     async Task<ProductType> ITypesRepository.CreateType(ProductType type)
     {
         if (await ((ITypesRepository)this).TypeExists(type.Name))
-            throw new ArgumentException($"Type '{type.Name}' already exists");
+            throw new DuplicateEntityException("Type", type.Name);
 
         try
         {

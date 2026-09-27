@@ -1,6 +1,7 @@
 ﻿using Basket.Application.Mappers;
 using Basket.Application.Queries;
 using Basket.Application.Responses;
+using Basket.Core.Entities;
 using Basket.Core.Repositories;
 using Common.Mediator;
 
@@ -18,7 +19,9 @@ public class GetBasketByUserNameHandler : IRequestHandler<GetBasketByUserNameQue
     public async Task<ShoppingCartResponse> Handle(GetBasketByUserNameQuery request,
         CancellationToken cancellationToken)
     {
-        var shoppingCart = await _basketRepository.GetBasket(request.UserName);
+        // A user without a stored basket (e.g. first visit) simply has an empty one.
+        var shoppingCart = await _basketRepository.GetBasket(request.UserName)
+                           ?? new ShoppingCart(request.UserName);
         return BasketMapper.Instance.ToShoppingCartResponse(shoppingCart);
     }
 }

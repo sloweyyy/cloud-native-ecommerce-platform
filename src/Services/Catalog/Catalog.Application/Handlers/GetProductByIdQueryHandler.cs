@@ -1,7 +1,9 @@
 ﻿using Catalog.Application.Mappers;
 using Catalog.Application.Queries;
 using Catalog.Application.Responses;
+using Catalog.Core.Entities;
 using Catalog.Core.Repositories;
+using Common.Exceptions;
 using Common.Mediator;
 
 namespace Catalog.Application.Handlers;
@@ -18,6 +20,9 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
     public async Task<ProductResponse> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
         var product = await _productRepository.GetProduct(request.Id);
+        if (product is null)
+            throw new NotFoundException(nameof(Product), request.Id);
+
         var productRespose = ProductMapper.Instance.ToProductResponse(product);
         return productRespose;
     }

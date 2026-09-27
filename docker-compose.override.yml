@@ -3,15 +3,15 @@ services:
     container_name: catalogdb
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin1234
-      - MONGO_INITDB_DATABASE=CatalogDb
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-admin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-admin1234}
+      - MONGO_INITDB_DATABASE=${MONGO_DB:-CatalogDb}
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "--host", "localhost", "--username", "admin", "--password", "admin1234", "--authenticationDatabase", "admin"]
+      test: ["CMD-SHELL", "mongosh --quiet --host localhost -u \"$$MONGO_INITDB_ROOT_USERNAME\" -p \"$$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval \"db.adminCommand('ping').ok\""]
       interval: 10s
       timeout: 10s
       retries: 10

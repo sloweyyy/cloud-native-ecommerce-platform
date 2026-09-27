@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Common.Exceptions\Common.Exceptions.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\Common.Logging\Common.Logging.csproj" />
     <ProjectReference Include="..\Discount.Application\Discount.Application.csproj" />
     <ProjectReference Include="..\Discount.Infrastructure\Discount.Infrastructure.csproj" />

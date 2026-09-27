@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Dependency-free exception types shared by Core/Application layers.
+       Common.Api maps them to HTTP status codes; Discount maps them to gRPC codes. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Common.Exceptions</RootNamespace>
+  </PropertyGroup>
+
+</Project>

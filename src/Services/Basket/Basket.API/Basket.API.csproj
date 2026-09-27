@@ -25,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\..\BuildingBlocks\Common.Api\Common.Api.csproj" />
 		<ProjectReference Include="..\..\..\BuildingBlocks\Common.Logging\Common.Logging.csproj" />
 		<ProjectReference Include="..\Basket.Application\Basket.Application.csproj" />
 		<ProjectReference Include="..\Basket.Infrastructure\Basket.Infrastructure.csproj" />

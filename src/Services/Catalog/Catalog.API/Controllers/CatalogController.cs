@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Commands;
+﻿using Common.Logging;
+using Catalog.Application.Commands;
 using Catalog.Application.Queries;
 using Catalog.Application.Responses;
 using Catalog.Core.Specs;
@@ -44,7 +45,7 @@ public class CatalogController : ApiController
     {
         var query = new GetProductByNameQuery(productName);
         var result = await _mediator.Send(query);
-        _logger.LogInformation($"Product with {productName} fetched");
+        _logger.LogInformation("Product with {ProductName} fetched", LogSanitizer.Sanitize(productName));
         return Ok(result);
     }
 
@@ -127,7 +128,8 @@ public class CatalogController : ApiController
             };
             
             await _publishEndpoint.Publish(eventMessage);
-            _logger.LogInformation("ProductActivityEvent published for ProductId: {ProductId}", result.Id);
+            _logger.LogInformation("ProductActivityEvent published for ProductId: {ProductId}",
+                LogSanitizer.Sanitize(result.Id));
         }
         
         return Ok(result);
@@ -172,7 +174,8 @@ public class CatalogController : ApiController
             };
             
             await _publishEndpoint.Publish(eventMessage);
-            _logger.LogInformation("ProductActivityEvent published for ProductId: {ProductId}", productCommand.Id);
+            _logger.LogInformation("ProductActivityEvent published for ProductId: {ProductId}",
+                LogSanitizer.Sanitize(productCommand.Id));
         }
         
         return Ok(result);

@@ -31,7 +31,7 @@ public class GetDiscountQueryHandler : IRequestHandler<GetDiscountQuery, CouponM
             Description = coupon.Description,
             ProductName = coupon.ProductName
         };
-        _logger.LogInformation($"Coupon for the {request.ProductName} is fetched");
+        _logger.LogInformation("Coupon for the {ProductName} is fetched", request.ProductName);
         return couponModel;
     }
 }

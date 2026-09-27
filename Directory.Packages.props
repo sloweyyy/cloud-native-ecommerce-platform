@@ -97,6 +97,14 @@
     <!-- OpenAPI. Swashbuckle 10.x retained pending Microsoft.AspNetCore.OpenApi
          migration (now the in-box option since .NET 9). -->
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+
+    <!-- Testing. Shouldly (BSD-3) instead of FluentAssertions v8 (commercial licence). -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
 
   <!-- Integration tests (tests/integration/*): xUnit + Shouldly + Testcontainers. -->

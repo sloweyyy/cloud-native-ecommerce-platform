@@ -1,5 +1,6 @@
 using Common.Mediator;
 using Common.Logging;
+using Discount.API.Interceptors;
 using Discount.API.Services;
 using Discount.Application.Handlers;
 using Discount.Application.Mapper;
@@ -43,7 +44,8 @@ var assemblies = new Assembly[]
 };
 builder.Services.AddMediator(assemblies);
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
-builder.Services.AddGrpc();
+// Map exceptions to proper gRPC status codes (NotFound, AlreadyExists, InvalidArgument, Internal)
+builder.Services.AddGrpc(options => options.Interceptors.Add<ExceptionInterceptor>());
 
 var app = builder.Build();
 

@@ -5,8 +5,10 @@ using Basket.Application.GrpcService;
 using Basket.Application.Handlers;
 using Basket.Core.Repositories;
 using Basket.Infrastructure.Repositories;
+using Common.Api;
 using Common.Logging;
 using Discount.Grpc.Protos;
+using FluentValidation;
 using MassTransit;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -42,6 +44,9 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddControllers();
+
+// RFC 7807 problem details + shared exception -> status code mapping
+builder.Services.AddApiProblemDetails();
 
 // Add API Versioning and API Explorer for Swagger
 builder.Services.AddApiVersioning(options =>
@@ -92,6 +97,9 @@ var assemblies = new Assembly[]
 };
 builder.Services.AddMediator(assemblies);
 
+// FluentValidation validators (checkout requests)
+builder.Services.AddValidatorsFromAssembly(typeof(CreateShoppingCartCommandHandler).Assembly);
+
 // Redis
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -100,7 +108,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // Application Services
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-builder.Services.AddScoped<DiscountGrpcService>();
+builder.Services.Configure<DiscountGrpcOptions>(builder.Configuration.GetSection(DiscountGrpcOptions.SectionName));
+builder.Services.AddScoped<IDiscountService, DiscountGrpcService>();
 builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>
     (cfg =>
     {
@@ -117,21 +126,20 @@ builder.Services.AddMassTransit(config =>
 {
     config.UsingRabbitMq((ct, cfg) =>
     {
-        var rabbitMqUri = new Uri(builder.Configuration["EventBusSettings:HostAddress"] ?? "amqp://guest:guest@localhost:5672");
-        cfg.Host(rabbitMqUri.Host, h =>
-        {
-            h.Username(rabbitMqUri.UserInfo.Split(':')[0]);
-            h.Password(rabbitMqUri.UserInfo.Split(':')[1]);
-        });
+        // Pass the full URI (as Catalog/Ordering do) so MassTransit keeps the port and
+        // virtual host and URL-decodes the credentials.
+        cfg.Host(new Uri(builder.Configuration["EventBusSettings:HostAddress"] ?? "amqp://guest:guest@localhost:5672"));
     });
 });
 
 var app = builder.Build();
 
+// Must be first so it wraps every other middleware (replaces UseDeveloperExceptionPage).
+app.UseApiExceptionHandler();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
