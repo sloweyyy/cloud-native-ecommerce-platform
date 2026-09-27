@@ -3,7 +3,7 @@
 public class ShoppingCartResponse
 {
     public string UserName { get; set; }
-    public List<ShoppingCartItemResponse> Items { get; set; }
+    public List<ShoppingCartItemResponse> Items { get; set; } = new();
 
     public ShoppingCartResponse()
     {

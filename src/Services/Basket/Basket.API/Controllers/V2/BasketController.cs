@@ -37,7 +37,11 @@ public class BasketController : ControllerBase
         //Get the existing basket with username
         var query = new GetBasketByUserNameQuery(basketCheckout.UserName);
         var basket = await _mediator.Send(query);
-        if (basket == null) return BadRequest();
+        // Missing and empty baskets look the same (GetBasket returns an empty basket):
+        // either way there is nothing to check out.
+        if (basket.Items.Count == 0)
+            return Problem(statusCode: (int)HttpStatusCode.BadRequest, title: "Basket is empty",
+                detail: $"No items in the basket for user '{basketCheckout.UserName}'.");
 
         var eventMsg = BasketMapper.Instance.ToBasketCheckoutEventV2(basketCheckout);
         eventMsg.TotalPrice = basket.TotalPrice;
