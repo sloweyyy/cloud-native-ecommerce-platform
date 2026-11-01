@@ -1,0 +1,43 @@
+name: Website
+
+# Builds the docs site (website/, deployed by Vercel) so dependency bumps
+# that break `npm ci` or `astro build` fail here instead of on Vercel.
+# Always runs on PRs and reports success when website/ is unchanged,
+# so "website-build" can be a required status check.
+on:
+  push:
+    branches: [main]
+    paths: ["website/**"]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  website-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          filters: |
+            website:
+              - 'website/**'
+      - uses: actions/setup-node@v7
+        if: steps.changes.outputs.website == 'true'
+        with:
+          node-version: "22.x"
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - name: Install and build
+        if: steps.changes.outputs.website == 'true'
+        working-directory: website
+        run: |
+          npm ci
+          npm run build
