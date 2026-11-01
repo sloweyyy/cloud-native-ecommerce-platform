@@ -1,4 +1,80 @@
 # Changelog
+## [0.11.12] - 2026-11-01
+
+## What's Changed
+
+### 🚀 Features
+- No new features
+
+### 🐛 Bug Fixes
+- fix(website): restore Vercel docs build and skip unrelated deploys (#612) (8ed85c1)
+
+### 🔧 Improvements
+- No improvements
+
+### 📚 Documentation
+- fix(website): restore Vercel docs build and skip unrelated deploys (#612) (8ed85c1)
+- docs: update changelog for 0.11.11 (#570) (f67742f)
+- docs: update changelog for 0.11.10 (#568) (2ae5c0f)
+
+### 🔐 Security
+- No security updates
+
+### 🏗️ Infrastructure
+- No infrastructure changes
+
+### Other Changes
+- chore(deps-dev): Bump fast-uri from 3.1.7 to 3.1.9 in /frontend/legacy-angular (#605) (d16a2ba)
+- chore(deps): Bump seroval from 1.6.9 to 1.6.12 in /frontend/web (#611) (840d32c)
+- chore(deps): Bump follow-redirects from 1.16.1 to 1.16.2 in /frontend/legacy-angular (#610) (c451e2e)
+- chore(deps): Bump qs from 6.16.0 to 6.16.2 in /frontend/web (#609) (f48f34a)
+- chore(deps): Bump axios from 1.20.0 to 1.21.0 in /frontend/web (#608) (bc23fe6)
+- chore(deps): Bump serialize-javascript from 7.1.2 to 7.1.4 in /frontend/web (#607) (87329cf)
+- chore(deps): Bump fast-uri from 3.1.8 to 3.1.9 in /frontend/web (#604) (0c13195)
+- chore(deps): Bump the minor-and-patch group in /frontend/web with 9 updates (#603) (b1acfa0)
+- chore(deps): Bump the minor-and-patch group in /frontend/web with 9 updates (#600) (851be05)
+- chore(deps-dev): Bump the minor-and-patch group in /frontend/legacy-angular with 3 updates (#599) (a6f061b)
+- chore: Bump the dotnet-minor-and-patch group with 12 updates (#598) (71b5b48)
+- chore(deps): Bump follow-redirects from 1.16.0 to 1.16.1 in /frontend/legacy-angular (#596) (d0488ca)
+- chore(deps): Bump vite from 8.3.1 to 8.3.5 in /website in the npm_and_yarn group across 1 directory (#595) (70d4324)
+- chore(deps): Bump proxy-addr from 2.0.7 to 2.0.8 in /frontend/web (#588) (3dbeac3)
+- chore(deps-dev): Bump postcss-selector-parser from 7.1.5 to 7.1.6 in /frontend/legacy-angular (#585) (03cc820)
+- chore(deps): Bump katex from 0.16.47 to 0.18.10 in /website in the npm_and_yarn group across 1 directory (#594) (fbb645f)
+- chore(deps): Bump the minor-and-patch group in /frontend/web with 10 updates (#593) (6629069)
+- chore(deps-dev): Bump the minor-and-patch group in /frontend/legacy-angular with 3 updates (#592) (9eb1fd6)
+- chore: Bump the dotnet-minor-and-patch group with 10 updates (#591) (8cb9fe4)
+- chore(deps): Bump seroval from 1.6.8 to 1.6.9 in /frontend/web (#590) (337836f)
+- chore(deps): Bump source-map-js from 1.2.1 to 1.2.2 in /website in the npm_and_yarn group across 1 directory (#589) (e01caae)
+- chore(deps-dev): Bump source-map-js from 1.2.1 to 1.2.2 in /frontend/legacy-angular (#587) (f5f7855)
+- chore(deps): Bump handlebars from 4.7.9 to 4.7.10 in /frontend/web (#586) (9f3fdd2)
+- chore(deps): Bump source-map-js from 1.2.1 to 1.2.2 in /frontend/web (#584) (5e1a441)
+- chore(deps): Bump the minor-and-patch group in /frontend/web with 5 updates (#583) (f853201)
+- chore(deps-dev): Bump the minor-and-patch group in /frontend/legacy-angular with 3 updates (#582) (fe2b82a)
+- chore: Bump the dotnet-minor-and-patch group with 2 updates (#581) (70d86e1)
+- chore(deps): Bump the minor-and-patch group in /frontend/web with 8 updates (#580) (45c8f03)
+- chore(deps): Bump http-cache-semantics from 4.2.0 to 4.3.0 in /frontend/web (#579) (c3dc372)
+- chore(deps-dev): Bump http-cache-semantics from 4.2.0 to 4.3.0 in /frontend/legacy-angular (#578) (ca31c98)
+- chore(deps): Bump http-cache-semantics from 4.2.0 to 4.3.0 in /website in the npm_and_yarn group across 1 directory (#577) (9bb4436)
+- chore(deps): Bump the minor-and-patch group in /frontend/legacy-angular with 8 updates (#576) (9905e23)
+- chore: Bump the dotnet-minor-and-patch group with 2 updates (#575) (c063802)
+- chore(deps-dev): Bump brace-expansion from 1.1.18 to 1.1.21 in /frontend/legacy-angular (#574) (b4f5672)
+- chore(deps): Bump fast-uri from 3.1.7 to 3.1.8 in /frontend/web (#573) (d24f8a8)
+- chore(deps-dev): Bump ip-address from 10.4.0 to 10.7.2 in /frontend/legacy-angular (#572) (0405626)
+- chore(deps): Bump @xhmikosr/decompress from 11.1.3 to 11.1.4 in /frontend/web (#571) (2585b79)
+
+## Docker Images
+All services are available as Docker images:
+- 
+- 
+- 
+- 
+- 
+
+## Helm Deployment
+
+
+**Full Changelog**: https://github.com/sloweyyy/cloud-native-ecommerce-platform/compare/0.11.11...0.11.12
+
 ## [0.11.11] - 2026-09-27
 
 ## What's Changed
