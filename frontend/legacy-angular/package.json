@@ -27,7 +27,7 @@
     "@azure/msal-browser": "^3.30.0",
     "@fortawesome/fontawesome-free": "^6.7.2",
     "aos": "^2.3.4",
-    "bootstrap": "^5.3.8",
+    "bootstrap": "^5.3.9",
     "font-awesome": "^4.7.0",
     "ngx-bootstrap": "^21.2.2",
     "ngx-spinner": "^17.0.0",
@@ -39,13 +39,13 @@
     "zone.js": "~0.16.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^21.2.29",
+    "@angular-devkit/build-angular": "^21.2.30",
     "@angular-eslint/builder": "^18.0.0",
     "@angular-eslint/eslint-plugin": "^18.0.0",
     "@angular-eslint/eslint-plugin-template": "^18.0.0",
     "@angular-eslint/schematics": "^18.0.0",
     "@angular-eslint/template-parser": "^18.0.0",
-    "@angular/cli": "^21.2.29",
+    "@angular/cli": "^21.2.30",
     "@angular/compiler-cli": "^21.2.26",
     "@types/jasmine": "~5.1.15",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
@@ -59,6 +59,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.3.0",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.72.2"
   }
 }
